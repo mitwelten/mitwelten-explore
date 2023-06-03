@@ -1,0 +1,19 @@
+.compare_tod_chart .js-plotly-plot .plotly .modebar {
+    /*left: 50%;
+    transform: translateX(-50%);
+    */
+    right:0px;
+    top: 28px;
+
+}
+
+
+.ql-editor {
+   
+    max-height: 35vh;
+
+    
+    /*max-height: max-content;*/
+    overflow-y: auto;
+}
+
