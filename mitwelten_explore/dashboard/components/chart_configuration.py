@@ -30,7 +30,11 @@ def reload_control(reload_on_zoom_id):
 
 
 def timeseries_chart_config_menu(
-    chart_type_id=None, reload_on_zoom_id=None, layout_type_id=None, **kwargs
+    chart_type_id=None,
+    reload_on_zoom_id=None,
+    layout_type_id=None,
+    default_chart_type_index: int = None,
+    **kwargs
 ):
     menu_dd_children = []
     if chart_type_id:
@@ -38,7 +42,9 @@ def timeseries_chart_config_menu(
             [dmc.Radio(l, value=k) for k, l in TS_CHART_TYPES],
             id=chart_type_id,
             persistence=True,
-            value=TS_CHART_TYPES[0][0],
+            value=TS_CHART_TYPES[0][0]
+            if default_chart_type_index is None
+            else TS_CHART_TYPES[default_chart_type_index][0],
             orientation="vertical",
             size="sm",
             spacing="xs",

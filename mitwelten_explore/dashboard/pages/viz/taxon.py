@@ -21,12 +21,20 @@ from dashboard.api_clients.bird_results_client import (
     get_detection_time_of_day,
 )
 from dashboard.api_clients.taxonomy_client import get_taxon
-from dashboard.utils.communication import parse_nested_qargs, qargs_to_dict, urlencode_dict
+from dashboard.utils.communication import (
+    parse_nested_qargs,
+    qargs_to_dict,
+    urlencode_dict,
+)
 
 from dashboard.charts.time_series_charts import (
     generate_ts_figure,
     no_data_figure,
     generate_time_of_day_scatter,
+)
+from dashboard.components.chart_configuration import (
+    timeseries_chart_config_menu,
+    reload_control,
 )
 from dashboard.models import UrlSearchArgs
 from dashboard.components.navbar import ThemeSwitchAIO
@@ -48,6 +56,8 @@ class PageIds(object):
     n_depl_txt = str(uuid4())
     time_bucket_indicator = str(uuid4())
     time_series_chart = str(uuid4())
+    time_series_chart_type = str(uuid4())
+    time_series_chart_reload = str(uuid4())
     time_of_day_chart = str(uuid4())
     tod_bucket_indicator = str(uuid4())
     subspecies_list = str(uuid4())
@@ -124,12 +134,29 @@ def layout(taxon_id=None, **qargs):
                                 children=[
                                     dmc.Group(
                                         [
-                                            dmc.Text("Detections", weight=600),
-                                            dmc.Code(
-                                                id=ids.time_bucket_indicator,
-                                                children="1w",
+                                            dmc.Group(
+                                                [
+                                                    dmc.Text("Time Series", weight=600),
+                                                    dmc.Code(
+                                                        id=ids.time_bucket_indicator,
+                                                        children="1w",
+                                                    ),
+                                                ]
                                             ),
-                                        ]
+                                            dmc.Group(
+                                                [
+                                                    reload_control(
+                                                        ids.time_series_chart_reload
+                                                    ),
+                                                    timeseries_chart_config_menu(
+                                                        chart_type_id=ids.time_series_chart_type,
+                                                        default_chart_type_index=2,
+                                                        position="left-end",
+                                                    ),
+                                                ]
+                                            ),
+                                        ],
+                                        position="apart",
                                     ),
                                     dmc.CardSection(
                                         dmc.LoadingOverlay(
@@ -305,9 +332,11 @@ def update_title(pn):
     Input(ids.url, "pathname"),
     Input(ids.url, "search"),
     Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
+    Input(ids.time_series_chart_type, "value"),
+
     prevent_initial_call=True,
 )
-def update_ts_chart(pn, search, theme):
+def update_ts_chart(pn, search, theme, chart_type):
     query_args = parse_nested_qargs(qargs_to_dict(search))
     args = UrlSearchArgs(**query_args)
     vc = args.view_config
@@ -325,7 +354,7 @@ def update_ts_chart(pn, search, theme):
             values=det_dates.get("detections"),
             date_from=vc.time_from,
             date_to=vc.time_to,
-            chart_type="bar",
+            chart_type=chart_type,
             marker_color=SINGLE_CHART_COLOR,
             light_mode=theme,
         ),
