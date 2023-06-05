@@ -45,7 +45,7 @@ nav_dataset_target = dmc.Menu(
                         styles={"display": "none"},
                     ),
                     dmc.MediaQuery(
-                        get_icon(icon=icons.database),
+                        get_icon(icon=icons.database, width=24),
                         largerThan="lg",
                         styles={"display": "none"},
                     ),
@@ -114,7 +114,7 @@ nav_collection_target = dmc.Anchor(
                 styles={"display": "none"},
             ),
             dmc.MediaQuery(
-                get_icon(icon=icons.bookmark),
+                get_icon(icon=icons.bookmark, width=24),
                 largerThan="lg",
                 styles={"display": "none"},
             ),
@@ -153,7 +153,7 @@ nav_viz_target = dmc.Menu(
                         styles={"display": "none"},
                     ),
                     dmc.MediaQuery(
-                        get_icon(icon=icons.scatter_chart),
+                        get_icon(icon=icons.scatter_chart, width=24),
                         largerThan="lg",
                         styles={"display": "none"},
                     ),
@@ -203,7 +203,7 @@ nav_docs_target = dmc.Anchor(
                 styles={"display": "none"},
             ),
             dmc.MediaQuery(
-                get_icon(icons.info),
+                get_icon(icons.info, width=24),
                 largerThan="lg",
                 styles={"display": "none"},
             ),
@@ -224,7 +224,7 @@ nav_annotations_target = dmc.Anchor(
                 styles={"display": "none"},
             ),
             dmc.MediaQuery(
-                get_icon(icon=icons.annotation_bank),
+                get_icon(icon=icons.annotation_bank, width=24),
                 largerThan="lg",
                 styles={"display": "none"},
             ),
