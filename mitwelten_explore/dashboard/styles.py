@@ -43,6 +43,7 @@ class Icons(object):
     single_chart = "material-symbols:show-chart-rounded"
     multi_chart = "material-symbols:ssid-chart-rounded"
     map_chart = "material-symbols:map-outline-rounded"
+    weather = "fluent:weather-partly-cloudy-day-16-regular"
 
 icons = Icons()
 

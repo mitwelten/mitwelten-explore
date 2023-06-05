@@ -1,6 +1,8 @@
 import datetime
 from enum import Enum
 from configuration import DEFAULT_AGGREGATION, DEFAULT_CONFIDENCE
+from dashboard.styles import icons
+
 
 class AppUser:
     def __init__(self, decoded_cookie: dict):
@@ -149,6 +151,12 @@ class Taxon:
     def get_location(self):
         return "Mitwelten Deployments"
 
+    def get_icon(self):
+        return icons.bird
+
+    def get_id(self):
+        return self.datum_id
+
 
 class MeteoDataset:
     def __init__(
@@ -186,6 +194,12 @@ class MeteoDataset:
     def get_location(self):
         return self.station_name
 
+    def get_icon(self):
+        return icons.weather
+
+    def get_id(self):
+        return self.param_id
+
 
 class PaxDataset:
     def __init__(
@@ -219,6 +233,12 @@ class PaxDataset:
 
     def get_location(self):
         return f"Mitwelten Deployment {self.deployment_id}"
+
+    def get_icon(self):
+        return icons.pax_counter
+
+    def get_id(self):
+        return self.node_label
 
 
 class PollinatorDataset:
@@ -256,6 +276,12 @@ class PollinatorDataset:
                 return f"{len(self.deployment_id)} Mitwelten Deployments"
         else:
             return "Mitwelten Deployments"
+
+    def get_icon(self):
+        return icons.bee
+
+    def get_id(self):
+        return "polli"
 
 
 class EnvHumiDataset:
@@ -295,6 +321,12 @@ class EnvHumiDataset:
     def get_location(self):
         return f"Mitwelten Deployment {self.deployment_id}"
 
+    def get_icon(self):
+        return icons.env_sensors
+
+    def get_id(self):
+        return self.node_label
+
 
 class EnvTempDataset:
     def __init__(
@@ -333,6 +365,12 @@ class EnvTempDataset:
     def get_location(self):
         return f"Mitwelten Deployment {self.deployment_id}"
 
+    def get_icon(self):
+        return icons.env_sensors
+
+    def get_id(self):
+        return self.node_label
+
 
 class EnvMoistDataset:
     def __init__(
@@ -370,6 +408,13 @@ class EnvMoistDataset:
 
     def get_location(self):
         return f"Mitwelten Deployment {self.deployment_id}"
+
+    def get_icon(self):
+        return icons.env_sensors
+
+    def get_id(self):
+        return self.node_label
+
 
 class ViewConfiguration:
     def __init__(
@@ -440,6 +485,7 @@ class UrlSearchArgs:
             time_to=self.time_to,
             **kwargs,
         )
+
 
 def to_typed_dataset(dataset: dict):
     dataset_type = dataset.get("type")
