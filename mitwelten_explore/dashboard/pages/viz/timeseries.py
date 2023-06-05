@@ -54,26 +54,26 @@ from uuid import uuid4
 
 
 class PageIds(object):
-    conf_select = "viz_ts_conf"
-    agg_select = "viz_ts_agg"
-    bucket_select = "viz_ts_bucket"
-    select_dataset_modal = "viz_ts_select_dataset_modal"
-    url = "viz_ts_url"
-    store_ts_data = "viz_ts_trace_store"
-    store_tod_data = "viz_ts_tod_trace_store"
-    store_map_data = "viz_ts_map_trace_store"
-    store_statsagg_data = "viz_ts_summary_trace_store"
-    title = "viz_ts_title"
-    affix_share = "viz_ts_share"
-    affix_annotate = "viz_ts_annotate"
-    share_modal_div = "viz_ts_share_modal_placeholder"
-    main_chart = "viz_ts_main_chart"
-    main_chart_type = "viz_main_ts_chart_select"
-    main_chart_sync = "viz_ts_main_chart_sync"
-    statsagg_card = "viz_ts_statsagg_card"
-    tod_chart = "viz_ts_tod_chart"
+    conf_select = str(uuid4())
+    agg_select = str(uuid4())
+    bucket_select = str(uuid4())
+    select_dataset_modal = str(uuid4())
+    url = str(uuid4())
+    store_ts_data = str(uuid4())
+    store_tod_data = str(uuid4())
+    store_map_data = str(uuid4())
+    store_statsagg_data = str(uuid4())
+    title = str(uuid4())
+    affix_share = str(uuid4())
+    affix_annotate = str(uuid4())
+    share_modal_div = str(uuid4())
+    main_chart = str(uuid4())
+    main_chart_type = str(uuid4())
+    main_chart_sync = str(uuid4())
+    statsagg_card = str(uuid4())
+    tod_chart = str(uuid4())
     tod_chart_type = str(uuid4())
-    map_chart = "viz_ts_map_chart"
+    map_chart = str(uuid4())
 
 
 ids = PageIds()
@@ -168,8 +168,9 @@ def layout(**qargs):
             # Main Chart
             dmc.Card(
                 [
-                    dmc.CardSection(
+                    dmc.Group(
                         [
+                            dmc.Text("Time Series", weight=500),
                             dmc.Group(
                                 [
                                     reload_control(ids.main_chart_sync),
@@ -178,10 +179,9 @@ def layout(**qargs):
                                         position="left-end",
                                     ),
                                 ],
-                                pl=4,
-                                position="right",
                             ),
-                        ]
+                        ],
+                        position="apart",
                     ),
                     dmc.LoadingOverlay(
                         dcc.Graph(

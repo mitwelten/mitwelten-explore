@@ -239,12 +239,17 @@ def layout(**qargs):
                                                             pl=2,
                                                             pt=2,
                                                             className="position-absolute",
-                                                            style={"zIndex": 1000,"right": 0,},
-                                                            #position="right"
+                                                            style={
+                                                                "zIndex": 1000,
+                                                                "right": 0,
+                                                            },
+                                                            # position="right"
                                                         ),
                                                         dcc.Graph(
                                                             id=ids.tod_chart,
-                                                            style={"height": "30vh"},# "width":"50%"},
+                                                            style={
+                                                                "height": "30vh"
+                                                            },  # "width":"50%"},
                                                             className="compare_tod_chart",
                                                             config=dict(
                                                                 displaylogo=False,
@@ -729,21 +734,27 @@ def update_analysis(data, search, pn, theme):
     values = []
     seconds = []
     for d in data:
-        if len(d[1])>24 and len(d[0])>24:
-            fft, periods = compute_fft(amplitude=d[1], times=d[0])
-            values, seconds = create_fft_bins(fft, periods)
-            ffts.append([seconds, values])
+        if len(d[1]) > 24 and len(d[0]) > 24:
+            try:
+                fft, periods = compute_fft(amplitude=d[1], times=d[0])
+                values, seconds = create_fft_bins(fft, periods)
+                ffts.append([seconds, values])
+            except:
+                ffts.append([[0], [None]])
+
         else:
-            ffts.append([[0],[None]])
+            ffts.append([[0], [None]])
     return dcc.Graph(
         figure=correlation_matrix_heatmap(matrix, labels, light_mode=theme),
-        config=dict(displayModeBar=False,)
-
+        config=dict(
+            displayModeBar=False,
+        ),
     ), dcc.Graph(
-        figure=fft_multi(ffts, dataset_names=labels,light_mode=theme),
-        config=dict(displayModeBar=False,)
+        figure=fft_multi(ffts, dataset_names=labels, light_mode=theme),
+        config=dict(
+            displayModeBar=False,
+        ),
     )
-
 
 
 # update stats
@@ -754,9 +765,11 @@ def update_analysis(data, search, pn, theme):
     Input(ids.url, "pathname"),
 )
 def update_stats(data, search, pn):
-    if data is None:
+    if data is None or search is None:
         raise PreventUpdate
     if not "viz/compare" in pn:
+        raise PreventUpdate
+    if len(search) < 1:
         raise PreventUpdate
     args = UrlSearchArgs(**parse_nested_qargs(qargs_to_dict(search)))
 
