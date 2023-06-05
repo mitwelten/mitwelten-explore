@@ -11,7 +11,8 @@ from dashboard.api_clients.userdata_client import (
     get_annotation_by_user,
     delete_annotation,
 )
-from dashboard.models import UrlSearchArgs, to_typed_dataset, Annotation
+from dashboard.api_clients.taxonomy_client import get_taxon
+from dashboard.models import UrlSearchArgs, to_typed_dataset, Annotation, DatasetType
 from dashboard.styles import icons, get_icon
 from dashboard.utils.communication import (
     parse_nested_qargs,
@@ -38,14 +39,21 @@ ids = PageIds()
 
 def get_dataset_types(annot: Annotation):
     ds_types = []
-    if annot.url is not None and "?" in annot.url:
-        search_args = annot.url.split("?")[1]
-        args = UrlSearchArgs(**parse_nested_qargs(qargs_to_dict(search_args)))
-        if args.datasets is not None:
-            for ds in args.datasets:
-                ds_types.append(to_typed_dataset(ds).type)
-        elif args.dataset is not None:
-            ds_types.append(to_typed_dataset(args.dataset).type)
+    if annot.url is not None:
+        if "?" in annot.url:
+            search_args = annot.url.split("?")[1]
+            args = UrlSearchArgs(**parse_nested_qargs(qargs_to_dict(search_args)))
+            if args.datasets is not None:
+                for ds in args.datasets:
+                    ds_types.append(to_typed_dataset(ds).type)
+            elif args.dataset is not None:
+                ds_types.append(to_typed_dataset(args.dataset).type)
+        if len(ds_types)==0:
+            if annot.url.startswith("viz/taxon/"):
+                ds_types.append(DatasetType.birds)
+                #taxon_id = annot.url.split("viz/taxon/")[1].split("?")[0]
+                #taxon = get_taxon(int(taxon_id))
+                #ds_types.append(taxon.get_title())
     return ds_types
 
 
@@ -54,6 +62,8 @@ def get_dashboard_type(annot: Annotation):
         if "?" in annot.url:
             pn = annot.url.split("?")[0]
             if "viz/" in pn:
+                if pn.startswith("viz/taxon/"):
+                    return "taxon"
 
                 return pn.split("viz/")[1]
         return None
