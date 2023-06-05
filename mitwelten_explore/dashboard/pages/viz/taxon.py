@@ -259,19 +259,36 @@ def layout(taxon_id=None, **qargs):
     Output(traio.ids.store_set(traio.aio_id), "data"),
     Input(ids.url, "pathname"),
     State(ids.url, "search"),
+    Input(ids.time_series_chart, "relayoutData"),
+    State(ids.time_series_chart_reload, "checked"),
 )
-def update_tr_store(pn, search_args):
+def update_tr_store(pn, search_args, relayout_event, reload_enabled):
     if pn is not None:
         query_args = qargs_to_dict(search_args)
-        args = UrlSearchArgs(**query_args)
-        vc = args.view_config
-        if vc.time_from and vc.time_to:
-            return [vc.time_from, vc.time_to]
-        else:
-            return [
-                str(DEFAULT_TR_START.isoformat()),
-                str(datetime.datetime.now().isoformat()),
-            ]
+        query_args_dr = [
+            query_args.get("from", str(DEFAULT_TR_START.isoformat())),
+            query_args.get("to", str(datetime.datetime.now().isoformat())),
+        ]
+
+        trg = ctx.triggered_id
+        if trg == ids.time_series_chart:
+            if not reload_enabled:
+                return query_args_dr
+            if (
+                "xaxis.range[0]" in relayout_event
+                and "xaxis.range[1]" in relayout_event
+            ):
+                try:
+                    ts_0 = datetime.datetime.fromisoformat(
+                        relayout_event.get("xaxis.range[0]").split(".")[0]
+                    ).isoformat()
+                    ts_1 = datetime.datetime.fromisoformat(
+                        relayout_event.get("xaxis.range[1]").split(".")[0]
+                    ).isoformat()
+                    return [ts_0, ts_1]
+                except:
+                    return query_args_dr
+        return query_args_dr
     raise PreventUpdate
 
 
@@ -333,7 +350,6 @@ def update_title(pn):
     Input(ids.url, "search"),
     Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
     Input(ids.time_series_chart_type, "value"),
-
     prevent_initial_call=True,
 )
 def update_ts_chart(pn, search, theme, chart_type):
