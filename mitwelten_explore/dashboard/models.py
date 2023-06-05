@@ -138,7 +138,7 @@ class Taxon:
             label_de=self.label_de,
             label_en=self.label_en,
             label_sci=self.label_sci,
-            rank=self.rank,
+            rank=self.rank.value,
             deployment_filter=[],
         )
 
