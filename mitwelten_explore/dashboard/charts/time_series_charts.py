@@ -179,7 +179,7 @@ def generate_multi_ts_figure(
 
 
 def generate_time_of_day_scatter(
-    minutes_of_day, values, light_mode=True, marker_color=None, spike=False
+    minutes_of_day, values, light_mode=True, marker_color=None, spike=False, chart_type = "line"
 ):
 
     fig = go.Figure()
@@ -191,7 +191,8 @@ def generate_time_of_day_scatter(
         hoverlabel_font_color="black",
         template="plotly_white" if light_mode else "plotly_dark",
     )
-    fig.add_trace(
+    if chart_type == "line":
+        fig.add_trace(
         go.Scatter(
             x=minutes_of_day,
             y=values,
@@ -204,6 +205,45 @@ def generate_time_of_day_scatter(
             showlegend=False,
         )
     )
+    elif chart_type == "scatter":
+        fig.add_trace(
+        go.Scatter(
+            x=minutes_of_day,
+            y=values,
+            mode="markers",
+            marker_color=marker_color,
+            customdata=[minute_to_tod(v) for v in minutes_of_day],
+            hovertemplate="<b>%{customdata}</b>: %{y}<extra></extra>",
+            showlegend=False,
+        )
+    )
+    elif chart_type == "area":
+        fig.add_trace(
+        go.Scatter(
+            x=minutes_of_day,
+            y=values,
+            mode="lines",
+            line_shape="hv",
+            fill="tozeroy",
+            line_width=1.5,
+            marker_color=marker_color,
+            customdata=[minute_to_tod(v) for v in minutes_of_day],
+            hovertemplate="<b>%{customdata}</b>: %{y}<extra></extra>",
+            showlegend=False,
+        )
+    )
+    elif chart_type == "bar":
+        fig.add_trace(
+        go.Bar(
+            x=minutes_of_day,
+            y=values,
+            marker_color=marker_color,
+            customdata=[minute_to_tod(v) for v in minutes_of_day],
+            hovertemplate="<b>%{customdata}</b>: %{y}<extra></extra>",
+            showlegend=False,
+        )
+    )
+    
     if spike:
         fig.update_xaxes(
             showspikes=True,

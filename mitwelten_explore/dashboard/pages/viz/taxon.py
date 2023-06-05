@@ -60,6 +60,7 @@ class PageIds(object):
     time_series_chart_reload = str(uuid4())
     time_of_day_chart = str(uuid4())
     tod_bucket_indicator = str(uuid4())
+    tod_chart_type = str(uuid4())
     subspecies_list = str(uuid4())
     taxon_card_div = str(uuid4())
 
@@ -190,14 +191,26 @@ def layout(taxon_id=None, **qargs):
                                             children=[
                                                 dmc.Group(
                                                     [
-                                                        dmc.Text(
-                                                            "Time Of Day", weight=600
+                                                        dmc.Group(
+                                                            [
+                                                                dmc.Text(
+                                                                    "Time Of Day",
+                                                                    weight=600,
+                                                                ),
+                                                                dmc.Code(
+                                                                    id=ids.tod_bucket_indicator,
+                                                                    children="20 min",
+                                                                ),
+                                                            ]
                                                         ),
-                                                        dmc.Code(
-                                                            id=ids.tod_bucket_indicator,
-                                                            children="20 min",
-                                                        ),
-                                                    ]
+                                                        dmc.Group([
+                                                            timeseries_chart_config_menu(
+                                                                chart_type_id=ids.tod_chart_type,
+                                                                position="left-end",
+                                                            ),
+                                                        ]),
+                                                    ],
+                                                    position="apart",
                                                 ),
                                                 dmc.CardSection(
                                                     dmc.LoadingOverlay(
@@ -421,10 +434,11 @@ def update_map_stats(conf, time_range, pn):
     Input(ids.conf_select, "value"),
     Input(traio.ids.store(traio.aio_id), "data"),
     State(ids.url, "pathname"),
+    Input(ids.tod_chart_type, "value"),
     Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
     prevent_initial_call=True,
 )
-def update_time_of_day_chart(conf, tr, pn, theme):
+def update_time_of_day_chart(conf, tr, pn,chart_type, theme):
     if isinstance(tr, list) and len(tr) == 2 and pn is not None:
         taxon_id = pn.split("/")[-1]
         tod_res = get_detection_time_of_day(
@@ -441,6 +455,7 @@ def update_time_of_day_chart(conf, tr, pn, theme):
                 light_mode=theme,
                 marker_color=SINGLE_CHART_COLOR,
                 spike=True,
+                chart_type=chart_type
             ),
             f"bucket: {DEFAULT_TOD_BUCKET_WIDTH}m",
         )
