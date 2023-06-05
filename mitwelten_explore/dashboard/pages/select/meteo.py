@@ -2,7 +2,7 @@ import dash
 from dash import dcc, callback, Input, Output, State, ctx, no_update, ALL
 from dash.exceptions import PreventUpdate
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
+from dashboard.styles import get_icon
 from dashboard.aio_components.aio_list_component import PagedListSearchableAIO
 from dashboard.data_handler import (
     get_meteo_stations,
@@ -69,7 +69,7 @@ def get_dataset_list(station_id=None, unit=None):
         )
         stn_badge = dmc.Group(
             [
-                DashIconify(icon="material-symbols:location-on-outline"),
+                get_icon(icon="material-symbols:location-on-outline"),
                 dmc.Text(param.get("station_name"), size="md"),
             ],
             spacing=0,
@@ -79,7 +79,7 @@ def get_dataset_list(station_id=None, unit=None):
                 dmc.Grid(
                     [
                         dmc.Col(
-                            # DashIconify(icon="arcticons:meteoswiss", width=32),
+                            # get_icon(icon="arcticons:meteoswiss", width=32),
                             dmc.Group(
                                 [
                                     dmc.Text(
@@ -108,7 +108,7 @@ def get_dataset_list(station_id=None, unit=None):
                                         dmc.Anchor(
                                             dmc.Button(
                                                 "Viz",
-                                                leftIcon=DashIconify(
+                                                leftIcon=get_icon(
                                                     icon="ph:chart-scatter", width=20
                                                 ),
                                                 color="indigo.6",
@@ -119,7 +119,7 @@ def get_dataset_list(station_id=None, unit=None):
                                         ),
                                         dmc.Button(
                                             # "Collect",
-                                            DashIconify(
+                                            get_icon(
                                                 icon="material-symbols:bookmark-outline-rounded",
                                                 width=20,
                                             ),
@@ -171,7 +171,7 @@ def layout(**qargs):
                                             data=get_station_select_data(),
                                             searchable=True,
                                             clearable=True,
-                                            icon=DashIconify(
+                                            icon=get_icon(
                                                 icon="material-symbols:location-on-outline"
                                             ),
                                             placeholder="Station",

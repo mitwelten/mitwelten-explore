@@ -7,7 +7,6 @@ import time
 import json
 import flask
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
 
 from dashboard.aio_components.aio_time_range_picker_component import TimeRangeAIO
 from dashboard.aio_components.aio_texteditor_component import TextEditorAIO

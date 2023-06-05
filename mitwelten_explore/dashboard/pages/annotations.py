@@ -12,8 +12,7 @@ from dashboard.api_clients.userdata_client import (
     delete_annotation,
 )
 from dashboard.models import UrlSearchArgs, to_typed_dataset, Annotation
-from dashboard.styles import icons
-from dash_iconify import DashIconify
+from dashboard.styles import icons, get_icon
 from dashboard.utils.communication import (
     parse_nested_qargs,
     qargs_to_dict,
@@ -218,7 +217,7 @@ def annot_container(annot: Annotation, current_user_sub=None):
             dmc.Anchor(
                 dmc.Group(
                     [
-                        DashIconify(icon=icons.arrow_back),
+                        get_icon(icon=icons.arrow_back),
                         dmc.Text("Annotations", weight=500),
                     ]
                 ),
@@ -316,7 +315,7 @@ def annot_container(annot: Annotation, current_user_sub=None):
                                                                     "Open Dashboard",
                                                                     color="teal",
                                                                     variant="outline",
-                                                                    rightIcon=DashIconify(
+                                                                    rightIcon=get_icon(
                                                                         icon=icons.open_in_new_tab
                                                                     ),
                                                                 ),
@@ -396,7 +395,7 @@ def annot_container1(annot: Annotation, current_user_sub=None):
             dmc.Anchor(
                 dmc.Group(
                     [
-                        DashIconify(icon=icons.arrow_back),
+                        get_icon(icon=icons.arrow_back),
                         dmc.Text("Annotations", weight=500),
                     ]
                 ),
@@ -450,7 +449,7 @@ def annot_container1(annot: Annotation, current_user_sub=None):
                                             "Open Dashboard",
                                             color="teal",
                                             variant="subtle",
-                                            rightIcon=DashIconify(
+                                            rightIcon=get_icon(
                                                 icon=icons.open_in_new_tab
                                             ),
                                         ),

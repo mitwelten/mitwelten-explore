@@ -1,6 +1,5 @@
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
-
+from dashboard.styles import get_icon
 # TODO: move icons to styles.icons
 
 def confidence_threshold_select(id, value=None, visible=True, **kwargs):
@@ -10,7 +9,7 @@ def confidence_threshold_select(id, value=None, visible=True, **kwargs):
         value=value,
         data=[{"value": i / 20, "label": f"{i*5} %"} for i in range(1, 20)],
         style={"minWidth": 120} if visible else {"display": "none"},
-        icon=DashIconify(icon="fluent:math-formula-20-filled"),
+        icon=get_icon(icon="fluent:math-formula-20-filled"),
         **kwargs,
     )
 
@@ -28,7 +27,7 @@ def agg_fcn_select(id, value=None, visible=True, **kwargs):
             {"value": "min", "label": "min()"},
         ],
         style={"minWidth": 120} if visible else {"display": "none"},
-        icon=DashIconify(icon="fluent:math-formula-20-filled"),
+        icon=get_icon(icon="fluent:math-formula-20-filled"),
         **kwargs,
     )
 
@@ -51,6 +50,6 @@ def time_bucket_select(id, value=None, **kwargs):
             {"value": "4w", "label": "4 Weeks"},
         ],
         style={"minWidth": 120},
-        icon=DashIconify(icon="ic:round-access-time"),
+        icon=get_icon(icon="ic:round-access-time"),
         **kwargs,
     )

@@ -2,8 +2,7 @@ import dash
 from dash import html, dcc, callback, Input, Output, no_update
 import flask
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
-from dashboard.styles import icons
+from dashboard.styles import icons, get_icon
 from configuration import PATH_PREFIX
 
 dash.register_page(__name__, path_template="/select")
@@ -23,7 +22,7 @@ class DSCard:
                 dmc.Alert(
                     title=dmc.Group(
                         [
-                            DashIconify(icon=self.icon, width="1.5rem"),
+                            get_icon(icon=self.icon, width="1.5rem"),
                             dmc.Text(self.name, size="1.2rem"),
                         ]
                     ),
@@ -39,7 +38,7 @@ class DSCard:
         return dmc.Alert(
             title=dmc.Group(
                 [
-                            DashIconify(icon=self.icon, width="1.5rem"),
+                            get_icon(icon=self.icon, width="1.5rem"),
                             dmc.Text(self.name, size="1.2rem"),
                     dmc.Badge("Not yet available", color="pink"),
                 ],

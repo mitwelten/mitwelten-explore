@@ -1,7 +1,7 @@
 import datetime
 from enum import Enum
 from configuration import DEFAULT_AGGREGATION, DEFAULT_CONFIDENCE
-from dashboard.styles import icons
+from dashboard.styles import icons, icon_urls
 
 
 class AppUser:
@@ -195,7 +195,7 @@ class MeteoDataset:
         return self.station_name
 
     def get_icon(self):
-        return icons.weather
+        return icon_urls.meteoswiss
 
     def get_id(self):
         return self.param_id

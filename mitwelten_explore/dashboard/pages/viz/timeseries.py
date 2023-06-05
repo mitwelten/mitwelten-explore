@@ -15,7 +15,6 @@ from dashboard.utils.communication import (
     get_user_from_cookies,
 )
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
 from dashboard.components.modals import (
     viz_timeseries_select_modal,
     generate_viz_timeseries_select_modal_children,

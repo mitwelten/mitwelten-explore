@@ -1,5 +1,4 @@
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
 from dashboard.utils.communication import urlencode_dict
 from dashboard.api_clients.third_party_clients import (
     generate_wiki_link,
@@ -18,7 +17,7 @@ from dashboard.models import (
     ViewConfiguration,
     PollinatorDataset,
 )
-from dashboard.styles import icons
+from dashboard.styles import icons, get_icon
 from dash import dcc
 from configuration import PATH_PREFIX, DEFAULT_CONFIDENCE
 import uuid
@@ -56,7 +55,7 @@ def generate_viz_timeseries_select_modal_children(store_data):
         unit = None
         if trace_type == DatasetType.meteodata:
             trace_id = dmc.Code(data.get("param_id"))
-            icon = DashIconify(icon=icons.meteoswiss, width=32)
+            icon = get_icon(icon=icons.meteoswiss, width=32)
             description = dmc.Text(data.get("param_desc"), size="md")
             unit = dmc.Badge(data.get("unit"), color="teal")
 
@@ -64,7 +63,7 @@ def generate_viz_timeseries_select_modal_children(store_data):
 
         elif trace_type == DatasetType.birds:
             trace_id = dmc.Code(data.get("datum_id"))
-            icon = DashIconify(icon="game-icons:seagull", width=32)
+            icon = get_icon(icon="game-icons:seagull", width=32)
             description = dmc.Text(data.get("label_sci"), size="md")
             unit = dmc.Badge(data.get("rank"), color="teal")
 
@@ -72,7 +71,7 @@ def generate_viz_timeseries_select_modal_children(store_data):
 
         elif trace_type == DatasetType.pax:
             trace_id = dmc.Code(data.get("node_label"))
-            icon = DashIconify(icon=icons.pax_counter, width=32)
+            icon = get_icon(icon=icons.pax_counter, width=32)
             description = dmc.Text("Pax Counter", size="md")
             unit = dmc.Badge("PAX", color="teal")
 
@@ -82,7 +81,7 @@ def generate_viz_timeseries_select_modal_children(store_data):
         elif trace_type == DatasetType.pollinators:
             ds = PollinatorDataset(**data)
             trace_id = dmc.Code(ds.get_unit())
-            icon = DashIconify(icon=icons.bee, width=32)
+            icon = get_icon(icon=icons.bee, width=32)
             description = dmc.Text(ds.get_title(), size="md")
             unit = dmc.Badge(ds.get_unit(), color="teal")
 
@@ -94,7 +93,7 @@ def generate_viz_timeseries_select_modal_children(store_data):
             DatasetType.env_moist,
         ]:
             trace_id = dmc.Code(data.get("node_label"))
-            icon = DashIconify(icon=icons.env_sensors, width=32)
+            icon = get_icon(icon=icons.env_sensors, width=32)
             description = dmc.Text(data.get("param_desc"), size="md")
             unit = dmc.Badge(data.get("unit"), color="teal")
 
@@ -117,7 +116,7 @@ def generate_viz_timeseries_select_modal_children(store_data):
                             dmc.Col(
                                 dmc.Group(
                                     [
-                                        DashIconify(
+                                        get_icon(
                                             icon="material-symbols:location-on-outline"
                                         ),
                                         location_name,
@@ -165,7 +164,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
         unit = None
         if trace_type == DatasetType.meteodata:
             trace_id = dmc.Code(data.get("param_id"))
-            icon = DashIconify(icon=icons.meteoswiss, width=32)
+            icon = get_icon(icon=icons.meteoswiss, width=32)
             description = dmc.Text(data.get("param_desc"), size="md")
             unit = dmc.Badge(data.get("unit"), color="teal")
 
@@ -173,7 +172,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
 
         elif trace_type == DatasetType.birds:
             trace_id = dmc.Code(data.get("datum_id"))
-            icon = DashIconify(icon="game-icons:seagull", width=32)
+            icon = get_icon(icon="game-icons:seagull", width=32)
             description = dmc.Text(data.get("label_sci"), size="md")
             unit = dmc.Badge(data.get("rank"), color="teal")
 
@@ -181,7 +180,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
 
         elif trace_type == DatasetType.pax:
             trace_id = dmc.Code(data.get("node_label"))
-            icon = DashIconify(icon=icons.pax_counter, width=32)
+            icon = get_icon(icon=icons.pax_counter, width=32)
             description = dmc.Text("Pax Counter", size="md")
             unit = dmc.Badge("PAX", color="teal")
 
@@ -195,7 +194,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
             DatasetType.env_moist,
         ]:
             trace_id = dmc.Code(data.get("node_label"))
-            icon = DashIconify(icon=icons.env_sensors, width=32)
+            icon = get_icon(icon=icons.env_sensors, width=32)
             description = dmc.Text(data.get("param_desc"), size="md")
             unit = dmc.Badge(data.get("unit"), color="teal")
 
@@ -206,7 +205,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
         elif trace_type == DatasetType.pollinators:
             ds = PollinatorDataset(**data)
             trace_id = dmc.Code(ds.get_unit())
-            icon = DashIconify(icon=icons.bee, width=32)
+            icon = get_icon(icon=icons.bee, width=32)
             description = dmc.Text(ds.get_title(), size="md")
             unit = dmc.Badge(ds.get_unit(), color="teal")
 
@@ -231,7 +230,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
                     dmc.Col(
                         dmc.Group(
                             [
-                                DashIconify(icon=icons.location_marker),
+                                get_icon(icon=icons.location_marker),
                                 location_name,
                             ],
                             spacing=4,
@@ -292,7 +291,7 @@ def taxon_select_modal(taxon_id, id_role):
         if len(rank_badges) > 0:
             rank_badges.append(
                 dmc.Text(
-                    DashIconify(icon=icons.arrow_right, height="1.5rem"),
+                    get_icon(icon=icons.arrow_right, height="1.5rem"),
                     color="teal.9",
                 )
             )
@@ -412,7 +411,7 @@ def taxon_select_modal(taxon_id, id_role):
                             dmc.Button(
                                 "Add to Collection",
                                 color="teal.6",
-                                leftIcon=DashIconify(icon=icons.bookmark, height=25),
+                                leftIcon=get_icon(icon=icons.bookmark, height=25),
                                 id={
                                     "role": id_role,
                                     "index": selected_taxon.datum_id,
@@ -422,10 +421,10 @@ def taxon_select_modal(taxon_id, id_role):
                                 dmc.Button(
                                     "Go to Taxon Dashboard",
                                     color="teal.6",
-                                    leftIcon=DashIconify(
+                                    leftIcon=get_icon(
                                         icon=icons.dashboard, height=25
                                     ),
-                                    rightIcon=DashIconify(icon=icons.open_in_new_tab),
+                                    rightIcon=get_icon(icon=icons.open_in_new_tab),
                                 ),
                                 href=f"{PATH_PREFIX}viz/taxon/{selected_taxon.datum_id}",
                                 target="_blank",

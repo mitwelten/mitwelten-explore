@@ -1,5 +1,5 @@
 import dash_mantine_components as dmc
-from dashboard.styles import icons
+from dashboard.styles import icons, get_icon
 from dashboard.models import (
     Taxon,
     PaxDataset,
@@ -9,7 +9,6 @@ from dashboard.models import (
     PollinatorDataset,
     to_typed_dataset
 )
-from dash_iconify import DashIconify
 from dash import html
 import json
 from configuration import PATH_PREFIX
@@ -27,7 +26,7 @@ def dataset_title(dataset: dict):
             dmc.Badge(ds.get_unit(), size="md", color="indigo"),
             dmc.Group(
                 [
-                    DashIconify(icon=icons.location_marker),
+                    get_icon(icon=icons.location_marker),
                     dmc.Text(ds.get_location(), size="sm"),
                 ],
                 spacing=2,
@@ -113,7 +112,7 @@ def pax_deployment_select_card(deployment: dict, id_role="pax_deployment_add"):
                                     dmc.Text(node_type, weight=500),
                                     dmc.Group(
                                         [
-                                            DashIconify(icon=icons.location_marker),
+                                            get_icon(icon=icons.location_marker),
                                             dmc.Text(
                                                 f"deployment #{deployment_id}",
                                                 weight=500,
@@ -159,7 +158,7 @@ def pax_deployment_select_card(deployment: dict, id_role="pax_deployment_add"):
                                 dmc.Anchor(
                                     dmc.Button(
                                         "Viz",
-                                        leftIcon=DashIconify(
+                                        leftIcon=get_icon(
                                             icon=icons.line_chart, width=20
                                         ),
                                         color="indigo.6",
@@ -170,7 +169,7 @@ def pax_deployment_select_card(deployment: dict, id_role="pax_deployment_add"):
                                 ),
                                 dmc.Button(
                                     # "Collect",
-                                    DashIconify(
+                                    get_icon(
                                         icon=icons.bookmark,
                                         width=20,
                                     ),
@@ -241,7 +240,7 @@ def env_deployment_select_cards(deployment: dict, id_role):
                                         ),
                                         dmc.Group(
                                             [
-                                                DashIconify(icon=icons.location_marker),
+                                                get_icon(icon=icons.location_marker),
                                                 dmc.Text(
                                                     f"deployment #{deployment_id}",
                                                     weight=500,
@@ -289,7 +288,7 @@ def env_deployment_select_cards(deployment: dict, id_role):
                                     dmc.Anchor(
                                         dmc.Button(
                                             "Viz",
-                                            leftIcon=DashIconify(
+                                            leftIcon=get_icon(
                                                 icon=icons.line_chart, width=20
                                             ),
                                             color="indigo.6",
@@ -300,7 +299,7 @@ def env_deployment_select_cards(deployment: dict, id_role):
                                     ),
                                     dmc.Button(
                                         # "Collect",
-                                        DashIconify(
+                                        get_icon(
                                             icon=icons.bookmark,
                                             width=20,
                                         ),
@@ -337,13 +336,13 @@ def pollinator_dataset_card(id_role, deployment_ids=None, pollinator_class=None)
         if pollinator_class is None
         else pollinator_class.title()
     )
-    title_group = dmc.Group([DashIconify(icon=icons.bee), dmc.Text(title, weight=500)])
+    title_group = dmc.Group([get_icon(icon=icons.bee), dmc.Text(title, weight=500)])
     btn_group = dmc.Group(
         [
             dmc.Anchor(
                 dmc.Button(
                     "Viz",
-                    leftIcon=DashIconify(icon=icons.line_chart, width=20),
+                    leftIcon=get_icon(icon=icons.line_chart, width=20),
                     color="indigo.6",
                     variant="outline",
                 ),
@@ -352,7 +351,7 @@ def pollinator_dataset_card(id_role, deployment_ids=None, pollinator_class=None)
             ),
             dmc.Button(
                 # "Collect",
-                DashIconify(
+                get_icon(
                     icon=icons.bookmark,
                     width=20,
                 ),
@@ -372,7 +371,7 @@ def pollinator_dataset_card(id_role, deployment_ids=None, pollinator_class=None)
     if deployment_ids is None or len(deployment_ids) == 0:
         location = "All Deployments"
         location_group = dmc.Group(
-            [DashIconify(icon=icons.location_marker), dmc.Text(location)]
+            [get_icon(icon=icons.location_marker), dmc.Text(location)]
         )
     else:
         location_group = deployments_table(deployment_ids)

@@ -2,9 +2,8 @@ import dash
 from dash import html, dcc, callback, Input, Output, no_update
 import flask
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
 from configuration import PATH_PREFIX
-from dashboard.styles import icons
+from dashboard.styles import icons, get_icon
 
 
 dash.register_page(__name__, path="/")
@@ -23,7 +22,7 @@ polli_card = dmc.Anchor(
         dmc.Alert(
             title=dmc.Group(
                 [
-                    DashIconify(icon=icons.bee, width="1.5rem"),
+                    get_icon(icon=icons.bee, width="1.5rem"),
                     dmc.Text("Compare Pollinator results", size="1.2rem"),
                 ]
             ),
@@ -45,7 +44,7 @@ pax_insektenkiosk = dmc.Anchor(
         dmc.Alert(
             title=dmc.Group(
                 [
-                    DashIconify(icon=icons.pax_counter, width="1.5rem"),
+                    get_icon(icon=icons.pax_counter, width="1.5rem"),
                     dmc.Text("PAX Counter Insektenkiosk", size="1.2rem"),
                 ]
             ),
@@ -66,7 +65,7 @@ apus_apus = dmc.Anchor(
         dmc.Alert(
             title=dmc.Group(
                 [
-                    DashIconify(icon=icons.bird, width="1.5rem"),
+                    get_icon(icon=icons.bird, width="1.5rem"),
                     dmc.Text("Apus Apus Detections", size="1.2rem"),
                 ]
             ),
@@ -89,7 +88,7 @@ class_aves = dmc.Anchor(
         dmc.Alert(
             title=dmc.Group(
                 [
-                    DashIconify(icon=icons.bird, width="1.5rem"),
+                    get_icon(icon=icons.bird, width="1.5rem"),
                     dmc.Text("Aves Detections", size="1.2rem"),
                 ]
             ),
@@ -113,7 +112,7 @@ quickstart_card = dmc.Anchor(
         dmc.Alert(
             title=dmc.Group(
                 [
-                    DashIconify(icon=icons.quickstart_rocket, width="1.5rem"),
+                    get_icon(icon=icons.quickstart_rocket, width="1.5rem"),
                     dmc.Text("Quickstart", size="1.2rem"),
                 ]
             ),
@@ -135,7 +134,7 @@ doc_card = dmc.Anchor(
         dmc.Alert(
             title=dmc.Group(
                 [
-                    DashIconify(icon=icons.docs_book, width="1.5rem"),
+                    get_icon(icon=icons.docs_book, width="1.5rem"),
                     dmc.Text("Datasets", size="1.2rem"),
                 ]
             ),
@@ -158,7 +157,7 @@ annots_card = dmc.Anchor(
         dmc.Alert(
             title=dmc.Group(
                 [
-                    DashIconify(icon=icons.annotation_bank, width="1.5rem"),
+                    get_icon(icon=icons.annotation_bank, width="1.5rem"),
                     dmc.Text("Annotations", size="1.2rem"),
                 ]
             ),

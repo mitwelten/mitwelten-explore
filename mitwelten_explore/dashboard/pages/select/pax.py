@@ -4,8 +4,7 @@ from dash.exceptions import PreventUpdate
 import dash_mantine_components as dmc
 from uuid import uuid4
 import json
-from dashboard.styles import icons
-from dash_iconify import DashIconify
+from dashboard.styles import icons, get_icon
 from dashboard.aio_components.aio_list_component import PagedListSearchableAIO
 from dashboard.components.dataset_presentation import pax_deployment_select_card
 from dashboard.api_clients.deployments_client import get_deployments
@@ -62,7 +61,7 @@ def layout(**qargs):
                                             data=get_deployment_select_data(),
                                             searchable=True,
                                             clearable=True,
-                                            icon=DashIconify(
+                                            icon=get_icon(
                                                 icon=icons.location_marker
                                             ),
                                             placeholder="Deployment",

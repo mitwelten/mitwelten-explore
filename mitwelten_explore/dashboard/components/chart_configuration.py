@@ -1,27 +1,26 @@
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
-from dashboard.styles import icons
+from dashboard.styles import icons, get_icon
 
 TS_CHART_TYPES = [
-    ["line", dmc.Group([DashIconify(icon=icons.line_chart, width=20), "Line"])],
+    ["line", dmc.Group([get_icon(icon=icons.line_chart, width=20), "Line"])],
     [
         "scatter",
-        dmc.Group([DashIconify(icon=icons.scatter_chart, width=20), "Scatter"]),
+        dmc.Group([get_icon(icon=icons.scatter_chart, width=20), "Scatter"]),
     ],
-    ["bar", dmc.Group([DashIconify(icon=icons.bar_chart, width=20), "Bar"])],
-    ["area", dmc.Group([DashIconify(icon=icons.area_chart, width=20), "Area"])],
+    ["bar", dmc.Group([get_icon(icon=icons.bar_chart, width=20), "Bar"])],
+    ["area", dmc.Group([get_icon(icon=icons.area_chart, width=20), "Area"])],
 ]
 
 TS_CHART_LAYOUTS = [
-    ["single", dmc.Group([DashIconify(icon=icons.layout_rect, width=20), "Overlay"])],
-    ["subplots", dmc.Group([DashIconify(icon=icons.layout_row, width=20), "Subplots"])],
+    ["single", dmc.Group([get_icon(icon=icons.layout_rect, width=20), "Overlay"])],
+    ["subplots", dmc.Group([get_icon(icon=icons.layout_row, width=20), "Subplots"])],
 ]
 
 
 def reload_control(reload_on_zoom_id):
     return dmc.Switch(
-        onLabel=DashIconify(icon=icons.sync_on, width=16),
-        offLabel=DashIconify(icon=icons.sync_off, width=16),
+        onLabel=get_icon(icon=icons.sync_on, width=16),
+        offLabel=get_icon(icon=icons.sync_off, width=16),
         color="teal.6",
         checked=True,
         id=reload_on_zoom_id,
@@ -55,8 +54,8 @@ def timeseries_chart_config_menu(
         menu_dd_children.append(type_radiogroup)
     if reload_on_zoom_id:
         reload_switch = dmc.Switch(
-            onLabel=DashIconify(icon=icons.sync_on, width=16),
-            offLabel=DashIconify(icon=icons.sync_off, width=16),
+            onLabel=get_icon(icon=icons.sync_on, width=16),
+            offLabel=get_icon(icon=icons.sync_off, width=16),
             color="indigo.9",
             checked=True,
             id=reload_on_zoom_id,
@@ -88,7 +87,7 @@ def timeseries_chart_config_menu(
         [
             dmc.MenuTarget(
                 dmc.ActionIcon(
-                    DashIconify(
+                    get_icon(
                         icon=icons.burger_menu,
                         width=20,
                     ),

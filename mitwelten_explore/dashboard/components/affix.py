@@ -1,6 +1,5 @@
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
-from dashboard.styles import icons
+from dashboard.styles import icons, get_icon
 import uuid
 
 
@@ -13,7 +12,7 @@ def affix_br(children, horizontal=False):
 
 def affix_button(id, icon):
     return dmc.ActionIcon(
-        DashIconify(icon=icon, height=30),
+        get_icon(icon=icon, height=30),
         variant="filled",
         radius="xl",
         size="xl",

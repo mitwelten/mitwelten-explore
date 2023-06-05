@@ -1,8 +1,7 @@
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
 from configuration import PATH_PREFIX
 from dashboard.utils.communication import urlencode_dict
-from dashboard.styles import icons
+from dashboard.styles import icons, get_icon
 from dashboard.models import DatasetType, PollinatorDataset, to_typed_dataset
 
 
@@ -21,7 +20,7 @@ def generate_selected_data_list(store_data):
                         "Taxon Dashboard",
                         color="teal.6",
                         variant="outline",
-                        leftIcon=DashIconify(icon=icons.dashboard, width=24),
+                        leftIcon=get_icon(icon=icons.dashboard, width=24),
                     ),
                     href=f"{PATH_PREFIX}viz/taxon/{ds.datum_id}",
                 )
@@ -41,7 +40,7 @@ def generate_selected_data_list(store_data):
                         "Time Series Dashboard",
                         color="indigo.6",
                         variant="outline",
-                        leftIcon=DashIconify(icon=icons.line_chart, width=24),
+                        leftIcon=get_icon(icon=icons.line_chart, width=24),
                     ),
                     href=f"{PATH_PREFIX}viz/timeseries?{urlencode_dict(dict(trace=ds.to_dataset()))}",
                     target="_blank",
@@ -55,7 +54,7 @@ def generate_selected_data_list(store_data):
                         dmc.Col(
                             dmc.Stack(
                                 [
-                                    DashIconify(icon=ds.get_icon(), width=32),
+                                    get_icon(icon=ds.get_icon(), width=32),
                                     dmc.Text(ds.get_id(), color="dimmed", size="sm"),
                                 ],
                                 spacing=4,
@@ -82,7 +81,7 @@ def generate_selected_data_list(store_data):
                                         ),
                                         dmc.Group(
                                             [
-                                                DashIconify(icon=icons.location_marker),
+                                                get_icon(icon=icons.location_marker),
                                                 dmc.Text(ds.get_location(), size="md"),
                                             ],
                                             spacing=2,
@@ -99,7 +98,7 @@ def generate_selected_data_list(store_data):
                                     dashboard_buttons
                                     + [
                                         dmc.Button(
-                                            DashIconify(icon=icons.trash, width=24),
+                                            get_icon(icon=icons.trash, width=24),
                                             color="red",
                                             px=4,
                                             id={

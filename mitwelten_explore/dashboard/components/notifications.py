@@ -1,6 +1,5 @@
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
-
+from dashboard.styles import get_icon
 import uuid
 
 
@@ -11,6 +10,6 @@ def generate_notification(title, message=None, id=None, action="show", autoClose
             action="show",
             message=message,
             autoClose=autoClose,
-            icon=DashIconify(icon=icon) if icon else None,
+            icon=get_icon(icon=icon) if icon else None,
             **kwargs
         )

@@ -1,8 +1,7 @@
 import dash_mantine_components as dmc
 from dash import dcc
 from dashboard.api_clients.taxonomy_client import get_parent_taxonomy
-from dash_iconify import DashIconify
-from dashboard.styles import icons, MULTI_VIZ_COLORSCALE
+from dashboard.styles import icons, MULTI_VIZ_COLORSCALE, get_icon
 from dashboard.components.labels import badge_de, badge_en
 from dashboard.api_clients.third_party_clients import (
     generate_wiki_link,
@@ -63,7 +62,7 @@ def taxon_viz_info_card(taxon_id):
     parent_taxons = taxon_tree[1:]
     parent_taxons.reverse()
     for i in range(len(parent_taxons)):
-        arrow = DashIconify(icon=icons.arrow_subdir) if i > 0 else None
+        arrow = get_icon(icon=icons.arrow_subdir) if i > 0 else None
         space = dmc.Space(w=(i - 1) * 12) if i > 1 else None
         rank_badges.append(
             dmc.Group(
@@ -223,7 +222,7 @@ def dataset_info_cards(args: UrlSearchArgs, config_btn_role):
                                 ),
                                 dmc.Group(
                                     [
-                                        DashIconify(icon=icons.location_marker),
+                                        get_icon(icon=icons.location_marker),
                                         dmc.Text(ds.get_location(), size="xs"),
                                     ],
                                     spacing=2,
@@ -237,7 +236,7 @@ def dataset_info_cards(args: UrlSearchArgs, config_btn_role):
                                     cfg_indicator_codes
                                 ),
                                 dmc.ActionIcon(
-                                    DashIconify(icon=icons.edit_pen),
+                                    get_icon(icon=icons.edit_pen),
                                     id={"role": config_btn_role, "index": i},
                                     variant="subtle",
                                 ),

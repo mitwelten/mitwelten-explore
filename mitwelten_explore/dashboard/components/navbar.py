@@ -2,9 +2,8 @@ from dash import html
 import dash_mantine_components as dmc
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import ThemeSwitchAIO
-from dash_iconify import DashIconify
 from configuration import *
-from dashboard.styles import icons
+from dashboard.styles import icons, get_icon
 
 theme_switch = ThemeSwitchAIO(
     aio_id="theme",
@@ -13,8 +12,7 @@ theme_switch = ThemeSwitchAIO(
 )
 
 
-def get_icon(icon, height=24):
-    return DashIconify(icon=icon, height=height)
+
 
 
 nav_logo_target = dmc.Anchor(
@@ -52,7 +50,7 @@ nav_dataset_target = dmc.Menu(
                         styles={"display": "none"},
                     ),
                     dmc.MediaQuery(
-                        get_icon(icon=icons.arrow_down_expand, height=16),
+                        get_icon(icon=icons.arrow_down_expand, width=16),
                         smallerThan="lg",
                         styles={"display": "none"},
                     ),
@@ -160,7 +158,7 @@ nav_viz_target = dmc.Menu(
                         styles={"display": "none"},
                     ),
                     dmc.MediaQuery(
-                        get_icon(icon=icons.arrow_down_expand, height=16),
+                        get_icon(icon=icons.arrow_down_expand, width=16),
                         smallerThan="lg",
                         styles={"display": "none"},
                     ),
@@ -243,7 +241,7 @@ nav_settings_target = dmc.Menu(
         dmc.MenuTarget(
             dmc.Group(
                 [
-                    get_icon(icons.theme, height=22),
+                    get_icon(icons.theme, width=22),
                 ],
                 style={"cursor": "pointer"},
             ),
@@ -295,7 +293,7 @@ nav_user_element = dmc.Group(
                             ),
                             dmc.MediaQuery(
                                 get_icon(
-                                    icon=icons.arrow_down_expand, height=16
+                                    icon=icons.arrow_down_expand, width=16
                                 ),
                                 smallerThan="sm",
                                 styles={"display": "none"},
@@ -310,7 +308,7 @@ nav_user_element = dmc.Group(
                         dmc.MenuItem(
                             "My Annotations",
                             icon=get_icon(
-                                icon=icons.annotation_bank, height=16
+                                icon=icons.annotation_bank, width=16
                             ),
                             href=PATH_PREFIX + "annotations?my_annotations=true",
                         ),
@@ -323,12 +321,12 @@ nav_user_element = dmc.Group(
                                 color="red",
                                 pl=0,
                             ),
-                            icon=get_icon(icon=icons.trash, height=16),
+                            icon=get_icon(icon=icons.trash, width=16),
                         ),
                         dmc.MenuDivider(),
                         dmc.MenuItem(
                             "Logout",
-                            icon=get_icon(icons.logout, height=16),
+                            icon=get_icon(icons.logout, width=16),
                             href="/logout",
                             refresh=True,
                         ),

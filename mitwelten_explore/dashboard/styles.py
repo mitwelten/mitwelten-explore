@@ -1,3 +1,5 @@
+from dash_iconify import DashIconify
+import dash_mantine_components as dmc
 
 class Icons(object):
     share = "material-symbols:share"
@@ -7,12 +9,12 @@ class Icons(object):
     more_3_dots = "material-symbols:more-horiz"
     more_3_dots_vertical = "material-symbols:more-vert"
     line_chart = "mdi:chart-line"
-    scatter_chart ="mdi:chart-scatter-plot"
+    scatter_chart = "mdi:chart-scatter-plot"
     bar_chart = "mdi:chart-bar"
-    area_chart ="mdi:chart-areaspline-variant"
+    area_chart = "mdi:chart-areaspline-variant"
     settings_gear = "clarity:settings-line"
     sync_on = "uil:sync"
-    sync_off ="uis:sync-slash"
+    sync_off = "uis:sync-slash"
     location_marker = "material-symbols:location-on-outline"
     hierarchy = "system-uicons:hierarchy"
     arrow_right = "ic:outline-arrow-right"
@@ -45,16 +47,36 @@ class Icons(object):
     map_chart = "material-symbols:map-outline-rounded"
     weather = "fluent:weather-partly-cloudy-day-16-regular"
 
+class IconUrls(object):
+    meteoswiss = "/app/assets/icons/meteoswiss.svg"
+
+icon_urls = IconUrls()
+
+
 icons = Icons()
 
 
+def get_icon(icon=None,width=None, **kwargs):
+
+    if "/assets/icons" in icon:
+        if width:
+
+            return dmc.Avatar(src=icon,size=width,**kwargs)
+        else:
+            return dmc.Avatar(src=icon,**kwargs)
+    else:
+        if width:
+            return DashIconify(icon=icon, width=width, **kwargs)
+        else:
+            return DashIconify(icon=icon, **kwargs)
+
 
 MULTI_VIZ_COLORSCALE = [
-    "#228BE6", #blue.6
-    "#40C057", #green.6
-    "#7950F2", #violet.6
-    "#E64980", #pink.6
-    "#FD7E14", #orange.6
+    "#228BE6",  # blue.6
+    "#40C057",  # green.6
+    "#7950F2",  # violet.6
+    "#E64980",  # pink.6
+    "#FD7E14",  # orange.6
 ]
 
-SINGLE_CHART_COLOR = "#12B886"#  #teal.6
+SINGLE_CHART_COLOR = "#12B886"  #  #teal.6
