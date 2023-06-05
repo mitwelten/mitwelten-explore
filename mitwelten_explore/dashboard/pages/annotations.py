@@ -488,7 +488,7 @@ def layout(**kwargs):
             dcc.Location(id=ids.url, refresh=True),
             dmc.Group(
                 [
-                    dmc.Text("Annotations", weight=600),
+                    dmc.Text("Annotations", weight=600 ,size="lg"),
                     dmc.Anchor(
                         get_icon(icons.help, width=18),
                         href=f"{PATH_PREFIX}docs#annotations",

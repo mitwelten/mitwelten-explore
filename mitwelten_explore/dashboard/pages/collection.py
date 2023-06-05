@@ -4,7 +4,7 @@ import flask
 from dash.exceptions import PreventUpdate
 import dash_mantine_components as dmc
 import json
-from dashboard.aio_components.aio_list_component import PagedListAIO
+from dashboard.aio_components.aio_list_component import PagedListAIO, PagedListSearchableAIO
 from dashboard.components.lists import generate_selected_data_list
 from dashboard.components.notifications import generate_notification
 
@@ -13,7 +13,7 @@ dash.register_page(
     __name__,
 )
 
-plaio = PagedListAIO(items=[])
+plaio = PagedListSearchableAIO(items=[])
 
 
 def layout(**qargs):
