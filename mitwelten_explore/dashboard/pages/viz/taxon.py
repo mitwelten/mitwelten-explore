@@ -1,10 +1,13 @@
 import dash
-from dash import dcc, callback, Input, Output, State, ctx, html
+from dash import dcc, callback, Input, Output, State, ctx, html, no_update
 from dash.exceptions import PreventUpdate
+import flask
 import dash_mantine_components as dmc
 
 from dashboard.aio_components.aio_hexbinmap_component import H3HexBinMapAIO
 from dashboard.aio_components.aio_time_range_picker_component import TimeRangeAIO
+from dashboard.aio_components.aio_texteditor_component import TextEditorAIO
+from dashboard.components.navbar import ThemeSwitchAIO
 from uuid import uuid4
 import datetime
 from dashboard.components.affix import affix_menu, affix_button
@@ -21,10 +24,12 @@ from dashboard.api_clients.bird_results_client import (
     get_detection_time_of_day,
 )
 from dashboard.api_clients.taxonomy_client import get_taxon
+from dashboard.api_clients.userdata_client import post_annotation
 from dashboard.utils.communication import (
     parse_nested_qargs,
     qargs_to_dict,
     urlencode_dict,
+    get_user_from_cookies,
 )
 
 from dashboard.charts.time_series_charts import (
@@ -36,11 +41,11 @@ from dashboard.components.chart_configuration import (
     timeseries_chart_config_menu,
     reload_control,
 )
-from dashboard.models import UrlSearchArgs
-from dashboard.components.navbar import ThemeSwitchAIO
+from dashboard.components.modals import share_modal
+from dashboard.models import UrlSearchArgs, Annotation
 
 from dashboard.styles import icons, SINGLE_CHART_COLOR
-from configuration import DEFAULT_TR_START, DEFAULT_TOD_BUCKET_WIDTH
+from configuration import DEFAULT_TR_START, DEFAULT_TOD_BUCKET_WIDTH, PATH_PREFIX
 
 dash.register_page(__name__, path_template="/viz/taxon/<taxon_id>")
 
@@ -49,6 +54,7 @@ class PageIds(object):
     url = str(uuid4())
     conf_select = str(uuid4())
     bucket_select = str(uuid4())
+    share_modal_div = str(uuid4())
     affix_share = str(uuid4())
     affix_annotate = str(uuid4())
     title = str(uuid4())
@@ -77,11 +83,16 @@ hexbinmap = H3HexBinMapAIO(
         style=dict(height="45vh"),
     ),
 )
+annot_editor = TextEditorAIO()
+
 
 affix = affix_menu(
     [
         affix_button(ids.affix_share, icons.share),
-        affix_button(ids.affix_annotate, icons.add_annotation),
+        affix_button(
+            annot_editor.ids.open_annot_window_actionicon(annot_editor.aio_id),
+            icons.add_annotation,
+        ),
     ]
 )
 
@@ -96,6 +107,8 @@ def layout(taxon_id=None, **qargs):
     conf_select = confidence_threshold_select(id=ids.conf_select, value=vc.confidence)
     return dmc.Container(
         [
+            html.Div(id=ids.share_modal_div),
+            annot_editor,
             affix,
             dcc.Location(ids.url, refresh=False),
             dmc.Grid(
@@ -203,12 +216,14 @@ def layout(taxon_id=None, **qargs):
                                                                 ),
                                                             ]
                                                         ),
-                                                        dmc.Group([
-                                                            timeseries_chart_config_menu(
-                                                                chart_type_id=ids.tod_chart_type,
-                                                                position="left-end",
-                                                            ),
-                                                        ]),
+                                                        dmc.Group(
+                                                            [
+                                                                timeseries_chart_config_menu(
+                                                                    chart_type_id=ids.tod_chart_type,
+                                                                    position="left-end",
+                                                                ),
+                                                            ]
+                                                        ),
                                                     ],
                                                     position="apart",
                                                 ),
@@ -438,7 +453,7 @@ def update_map_stats(conf, time_range, pn):
     Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
     prevent_initial_call=True,
 )
-def update_time_of_day_chart(conf, tr, pn,chart_type, theme):
+def update_time_of_day_chart(conf, tr, pn, chart_type, theme):
     if isinstance(tr, list) and len(tr) == 2 and pn is not None:
         taxon_id = pn.split("/")[-1]
         tod_res = get_detection_time_of_day(
@@ -455,7 +470,7 @@ def update_time_of_day_chart(conf, tr, pn,chart_type, theme):
                 light_mode=theme,
                 marker_color=SINGLE_CHART_COLOR,
                 spike=True,
-                chart_type=chart_type
+                chart_type=chart_type,
             ),
             f"bucket: {DEFAULT_TOD_BUCKET_WIDTH}m",
         )
@@ -476,5 +491,93 @@ def update_subspecies_list(conf, pn):
         return taxon_species_detections_table(
             species_counts, confidence=conf, selected_species_id=taxon_id
         )
+
+    raise PreventUpdate
+
+
+# share modal
+@callback(
+    Output(ids.share_modal_div, "children"),
+    Input(ids.affix_share, "n_clicks"),
+    State(ids.url, "search"),
+    State(ids.url, "href"),
+)
+def show_modal(nc, search, href):
+    if nc is not None:
+        base_path = href.split("?")[0]
+        path_to_share = base_path + search
+        return share_modal(path_to_share)
+    return no_update
+
+
+# post annotation
+@callback(
+    Output(ids.share_modal_div, "children", allow_duplicate=True),
+    Output(
+        annot_editor.ids.annot_published_store(annot_editor.aio_id),
+        "data",
+        allow_duplicate=True,
+    ),
+    Input(annot_editor.ids.publish_btn(annot_editor.aio_id), "n_clicks"),
+    State(ids.url, "search"),
+    State(ids.url, "pathname"),
+    State(annot_editor.ids.store(annot_editor.aio_id), "data"),
+    prevent_initial_call=True,
+)
+def publish_annotation(nc, search, pathname, data):
+    if nc is not None:
+        cookies = flask.request.cookies
+
+        user = get_user_from_cookies(cookies)
+
+        annot = Annotation(
+            user=user, url=pathname.split(PATH_PREFIX)[1] + search, **data
+        )
+        title_row = dmc.Group(
+            [
+                dmc.Text(annot.title, weight=600, size="xl"),
+                dmc.Group(
+                    [
+                        dmc.Text(annot.time_str, weight=300),
+                        dmc.Text(f"by {user.username}"),
+                    ]
+                ),
+            ],
+            position="apart",
+        )
+        if post_annotation(annotation=annot, auth_cookie=cookies.get("auth")):
+
+            return (
+                dmc.Modal(
+                    children=dmc.Card(
+                        [
+                            title_row,
+                            dmc.Space(h=12),
+                            dmc.Divider(pb=12),
+                            dcc.Markdown(data.get("md_content")),
+                        ],
+                        withBorder=True,
+                        style={"border": "1px solid green"},
+                    ),
+                    opened=True,
+                    title="Annotation published!",
+                    size="60%",
+                    zIndex=1000,
+                ),
+                1,
+            )
+        else:
+            return (
+                dmc.Modal(
+                    children=dmc.Alert(
+                        children="Something went wrong. Try again.", color="red"
+                    ),
+                    opened=True,
+                    title="Annotation published!",
+                    size="60%",
+                    zIndex=1000,
+                ),
+                no_update,
+            )
 
     raise PreventUpdate
