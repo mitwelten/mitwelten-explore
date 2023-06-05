@@ -7,6 +7,7 @@ from dashboard.models import (
     EnvTempDataset,
     EnvMoistDataset,
     PollinatorDataset,
+    to_typed_dataset
 )
 from dash_iconify import DashIconify
 from dash import html
@@ -17,7 +18,23 @@ from dashboard.components.tables import deployments_table
 from dashboard.components.labels import badge_de, badge_en
 
 
+def dataset_title(dataset: dict):
+    ds = to_typed_dataset(dataset)
 
+    return dmc.Group(
+        [
+            dmc.Text(ds.get_title(), size="md", weight=500),
+            dmc.Badge(ds.get_unit(), size="md", color="indigo"),
+            dmc.Group(
+                [
+                    DashIconify(icon=icons.location_marker),
+                    dmc.Text(ds.get_location(), size="sm"),
+                ],
+                spacing=2,
+            ),
+        ],
+        style={"rowGap": "2px"},
+    )
 
 
 
