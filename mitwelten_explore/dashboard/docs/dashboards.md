@@ -3,9 +3,15 @@
 
 ## Single Time Series
 
+The [*Single Time Series* Dashboard](viz/timeseries) is used to analyze a dataset with the time axis as primary dimension.
+
+## Compare Dashboard
+
+The [*Compare* Dashboard](viz/compare) is used to analyze multiple datasets. The datasets have to be present in the collection.
 
 
-### Controls
+
+## Controls
 ![ctrl_img](assets/images/controls.jpg)
 
 #### Aggregation method
