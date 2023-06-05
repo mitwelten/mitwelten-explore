@@ -18,10 +18,7 @@ from dashboard.utils.communication import (
     qargs_to_dict,
     get_user_from_cookies,
 )
-from dashboard.utils.text_utils import (
-    beautify_timedelta,
-    markdown_to_plain_text
-)
+from dashboard.utils.text_utils import beautify_timedelta, markdown_to_plain_text
 import datetime
 from uuid import uuid4
 
@@ -61,6 +58,7 @@ def get_dashboard_type(annot: Annotation):
                 return pn.split("viz/")[1]
         return None
 
+
 def get_dataset_time_range(annot: Annotation):
     if annot.url is not None:
         try:
@@ -68,10 +66,18 @@ def get_dataset_time_range(annot: Annotation):
             args = UrlSearchArgs(**parse_nested_qargs(qargs_to_dict(search_args)))
             time_from = args.view_config.time_from
             time_to = args.view_config.time_to
-            return [time_from.strftime("%d.%m.%Y") if isinstance(time_from, datetime.datetime) else "any", time_to.strftime("%d.%m.%Y") if isinstance(time_to, datetime.datetime) else "any"]
+            return [
+                time_from.strftime("%d.%m.%Y")
+                if isinstance(time_from, datetime.datetime)
+                else "any",
+                time_to.strftime("%d.%m.%Y")
+                if isinstance(time_to, datetime.datetime)
+                else "any",
+            ]
         except:
             return None
     return None
+
 
 def get_annotation_list(annotations):
     if len(annotations) < 1:
@@ -203,7 +209,11 @@ def get_annotation_list(annotations):
 def annot_container(annot: Annotation, current_user_sub=None):
     ds_types = get_dataset_types(annot)
     time_range = get_dataset_time_range(annot)
-    dashboard_time_range = dmc.Text(f"{time_range[0]} - {time_range[1]}") if time_range is not None else None
+    dashboard_time_range = (
+        dmc.Text(f"{time_range[0]} - {time_range[1]}")
+        if time_range is not None
+        else None
+    )
 
     delete_btn = None
     if current_user_sub == annot.user_sub:
@@ -226,23 +236,23 @@ def annot_container(annot: Annotation, current_user_sub=None):
             dmc.Space(h=20),
             dmc.Container(
                 [
-
                     dmc.Grid(
                         [
                             dmc.Col(
-                                dmc.Card([
-                                    dmc.Text(annot.title, weight=700, size="2rem"),
-                                    dmc.Space(h=2),
-                                    dmc.Divider(),
-                                    dmc.Space(h=6),
-                                    dmc.Group(
-                                        [
-                                            dcc.Markdown(annot.md_content),
-                                        ],
-                                        noWrap=True,
-                                    ),
-                                    
-                                ],withBorder=True
+                                dmc.Card(
+                                    [
+                                        dmc.Text(annot.title, weight=700, size="2rem"),
+                                        dmc.Space(h=2),
+                                        dmc.Divider(),
+                                        dmc.Space(h=6),
+                                        dmc.Group(
+                                            [
+                                                dcc.Markdown(annot.md_content),
+                                            ],
+                                            noWrap=True,
+                                        ),
+                                    ],
+                                    withBorder=True,
                                 ),
                                 className="col-md-9",
                             ),
@@ -252,44 +262,44 @@ def annot_container(annot: Annotation, current_user_sub=None):
                                         [
                                             dmc.Stack(
                                                 [
-                                                     dmc.Stack(
+                                                    dmc.Stack(
                                                         [
                                                             dmc.Text(
                                                                 "Author",
                                                                 color="dimmed",
-                                                                size="sm"
+                                                                size="sm",
                                                             ),
-                                                    dmc.Anchor(
-                                                        [
-                                                            dmc.Group(
+                                                            dmc.Anchor(
                                                                 [
-                                                                    dmc.Avatar(
-                                                                        annot.user.initials,
-                                                                        radius="xl",
-                                                                        color="blue",
-                                                                    ),
-                                                                    dmc.Stack(
+                                                                    dmc.Group(
                                                                         [
-                                                                            dmc.Text(
-                                                                                annot.user.username,
-                                                                                size="sm",
-                                                                                weight=500,
+                                                                            dmc.Avatar(
+                                                                                annot.user.initials,
+                                                                                radius="xl",
+                                                                                color="blue",
                                                                             ),
-                                                                            dmc.Text(
-                                                                                annot.user.full_name,
-                                                                                size="sm",
+                                                                            dmc.Stack(
+                                                                                [
+                                                                                    dmc.Text(
+                                                                                        annot.user.username,
+                                                                                        size="sm",
+                                                                                        weight=500,
+                                                                                    ),
+                                                                                    dmc.Text(
+                                                                                        annot.user.full_name,
+                                                                                        size="sm",
+                                                                                    ),
+                                                                                ],
+                                                                                spacing=0,
                                                                             ),
                                                                         ],
-                                                                        spacing=0,
+                                                                        spacing="xs",
                                                                     ),
                                                                 ],
-                                                                spacing="xs",
+                                                                href=f"{PATH_PREFIX}annotations?q={annot.user.username}",
+                                                                variant="text",
                                                             ),
                                                         ],
-                                                        href=f"{PATH_PREFIX}annotations?q={annot.user.username}",
-                                                        variant="text",
-                                                    ),
-                                                    ],
                                                         spacing=4,
                                                     ),
                                                     dmc.Stack(
@@ -297,10 +307,13 @@ def annot_container(annot: Annotation, current_user_sub=None):
                                                             dmc.Text(
                                                                 "Created at",
                                                                 color="dimmed",
-                                                                size="sm"
+                                                                size="sm",
                                                             ),
-                                                    dmc.Text(annot.time_str, size="sm"),
-                                                    ],
+                                                            dmc.Text(
+                                                                annot.time_str,
+                                                                size="sm",
+                                                            ),
+                                                        ],
                                                         spacing=4,
                                                     ),
                                                     dmc.Stack(
@@ -308,7 +321,7 @@ def annot_container(annot: Annotation, current_user_sub=None):
                                                             dmc.Text(
                                                                 "Dashboard Reference",
                                                                 color="dimmed",
-                                                                size="sm"
+                                                                size="sm",
                                                             ),
                                                             dmc.Anchor(
                                                                 dmc.Button(
@@ -331,7 +344,7 @@ def annot_container(annot: Annotation, current_user_sub=None):
                                                             dmc.Text(
                                                                 "Datasets",
                                                                 color="dimmed",
-                                                                size="sm"
+                                                                size="sm",
                                                             ),
                                                             dmc.Group(
                                                                 [
@@ -352,9 +365,9 @@ def annot_container(annot: Annotation, current_user_sub=None):
                                                             dmc.Text(
                                                                 "Dashboard Time Range",
                                                                 color="dimmed",
-                                                                size="sm"
+                                                                size="sm",
                                                             ),
-                                                            dashboard_time_range
+                                                            dashboard_time_range,
                                                         ],
                                                         spacing=4,
                                                     ),
@@ -364,7 +377,6 @@ def annot_container(annot: Annotation, current_user_sub=None):
                                         ],
                                         withBorder=False,
                                         bg="transparent",
-                                        
                                     )
                                 ],
                                 className="col-lg-3",
@@ -374,113 +386,6 @@ def annot_container(annot: Annotation, current_user_sub=None):
                 ],
                 # className="container-xl"
                 fluid=True,
-            ),
-        ],
-        fluid=True,
-    )
-
-
-def annot_container1(annot: Annotation, current_user_sub=None):
-    ds_types = get_dataset_types(annot)
-
-    delete_btn = None
-    if current_user_sub == annot.user_sub:
-        delete_btn = dmc.Button(
-            color="red",
-            children="Delete Annotation",
-            id={"role": ids.delete_annot_role, "index": annot.id},
-        )
-    return dmc.Container(
-        [
-            dmc.Anchor(
-                dmc.Group(
-                    [
-                        get_icon(icon=icons.arrow_back),
-                        dmc.Text("Annotations", weight=500),
-                    ]
-                ),
-                href=f"{PATH_PREFIX}annotations",
-            ),
-            dmc.Container(
-                [
-                    dmc.Stack(
-                        [
-                            dmc.Group(
-                                [
-                                    dmc.Text(annot.time_str, size="md"),
-                                    dmc.Anchor(
-                                        [
-                                            dmc.Group(
-                                                [
-                                                    dmc.Avatar(
-                                                        annot.user.initials,
-                                                        radius="xl",
-                                                        color="blue",
-                                                    ),
-                                                    dmc.Stack(
-                                                        [
-                                                            dmc.Text(
-                                                                annot.user.username,
-                                                                size="sm",
-                                                                weight=500,
-                                                            ),
-                                                            dmc.Text(
-                                                                annot.user.full_name,
-                                                                size="sm",
-                                                            ),
-                                                        ],
-                                                        spacing=0,
-                                                    ),
-                                                ],
-                                                spacing="xs",
-                                            ),
-                                        ],
-                                        href=f"{PATH_PREFIX}annotations?q={annot.user.username}",
-                                        variant="text",
-                                    ),
-                                ],
-                                position="apart",
-                            ),
-                            dmc.Group(
-                                [
-                                    dmc.Text(annot.title, weight=700, size="2rem"),
-                                    dmc.Anchor(
-                                        dmc.Button(
-                                            "Open Dashboard",
-                                            color="teal",
-                                            variant="subtle",
-                                            rightIcon=get_icon(
-                                                icon=icons.open_in_new_tab
-                                            ),
-                                        ),
-                                        target="_blank",
-                                        href=f"{PATH_PREFIX}{annot.url}",
-                                        variant="text",
-                                    ),
-                                ],
-                                position="apart",
-                            ),
-                        ],
-                        spacing=2,
-                    ),
-                    dmc.Space(h=2),
-                    dmc.Divider(),
-                    dmc.Space(h=6),
-                    dmc.Group(
-                        [
-                            dmc.Group([dmc.Badge(t.value) for t in ds_types]),
-                        ],
-                        position="right",
-                    ),
-                    dmc.Space(h=12),
-                    dmc.Group(
-                        [
-                            dcc.Markdown(annot.md_content),
-                        ],
-                        noWrap=True,
-                    ),
-                    dmc.Group(delete_btn, position="right"),
-                ]
             ),
         ],
         fluid=True,
@@ -571,7 +476,18 @@ def layout(**kwargs):
         fluid=True,
         children=[
             dcc.Location(id=ids.url, refresh=True),
-            dmc.Text("Annotations", weight=600),
+            dmc.Group(
+                [
+                    dmc.Text("Annotations", weight=600),
+                    dmc.Anchor(
+                        get_icon(icons.help, width=18),
+                        href=f"{PATH_PREFIX}docs#annotations",
+                        variant="text",
+                        target="_blank",
+                    ),
+                ],
+                align="center",
+            ),
             dmc.Space(h=12),
             plaio,
         ],
@@ -596,7 +512,9 @@ def update_annotation_list(search, href):
     if "user" in search:
         qargs_dict = qargs_to_dict(search)
         if "user" in qargs_dict:
-            annotations = get_annotation_by_user(qargs_dict.get("user"),  cookies.get("auth"))
+            annotations = get_annotation_by_user(
+                qargs_dict.get("user"), cookies.get("auth")
+            )
             return get_annotation_list(annotations)
     else:
         annotations = get_annotations(auth_cookie=cookies.get("auth"))
