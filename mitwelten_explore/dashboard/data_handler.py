@@ -41,6 +41,7 @@ from dashboard.api_clients.pollinator_results_client import (
     get_polli_detection_tod,
     get_polli_detection_locations
 )
+from configuration import DEFAULT_TOD_BUCKET_WIDTH
 
 
 
@@ -248,7 +249,7 @@ def load_ts_data(dataset, cfg,  vc: ViewConfiguration, auth_cookie=None):
     return
 
 
-def load_tod_data(dataset, cfg,  vc: ViewConfiguration, auth_cookie=None, bucket_width_m = 60):
+def load_tod_data(dataset, cfg,  vc: ViewConfiguration, auth_cookie=None, bucket_width_m = DEFAULT_TOD_BUCKET_WIDTH):
     if not isinstance(cfg, ViewConfiguration):
         cfg = ViewConfiguration(**cfg)
     if isinstance(dataset, dict):
