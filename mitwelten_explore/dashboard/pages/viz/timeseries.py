@@ -50,6 +50,7 @@ from dashboard.charts.time_series_charts import (
 from dashboard.charts.map_charts import generate_scatter_map_plot
 from dashboard.models import UrlSearchArgs, DatasetType, Annotation, to_typed_dataset
 from dashboard.api_clients.userdata_client import post_annotation
+from uuid import uuid4
 
 
 class PageIds(object):
@@ -71,6 +72,7 @@ class PageIds(object):
     main_chart_sync = "viz_ts_main_chart_sync"
     statsagg_card = "viz_ts_statsagg_card"
     tod_chart = "viz_ts_tod_chart"
+    tod_chart_type = str(uuid4())
     map_chart = "viz_ts_map_chart"
 
 
@@ -201,7 +203,24 @@ def layout(**qargs):
                         [
                             dmc.Card(
                                 children=[
-                                    dmc.Text("Time of Day", weight=500),
+                                    dmc.Group(
+                                        [
+                                            dmc.Group(
+                                                [
+                                                    dmc.Text("Time of Day", weight=500),
+                                                ]
+                                            ),
+                                            dmc.Group(
+                                                [
+                                                    timeseries_chart_config_menu(
+                                                        chart_type_id=ids.tod_chart_type,
+                                                        position="left-end",
+                                                    ),
+                                                ]
+                                            ),
+                                        ],
+                                        position="apart",
+                                    ),
                                     dcc.Graph(
                                         id=ids.tod_chart,
                                         style={"height": "33vh"},
@@ -475,8 +494,9 @@ def update_time_series_chart(search_args, theme, chart_type, data):
     Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
     Input(ids.store_tod_data, "modified_timestamp"),
     State(ids.store_tod_data, "data"),
+    Input(ids.tod_chart_type, "value"),
 )
-def update_time_series_chart(theme, ts, data):
+def update_time_series_chart(theme, ts, data, chart_type):
     if data is None:
         raise PreventUpdate
 
@@ -487,6 +507,7 @@ def update_time_series_chart(theme, ts, data):
         values=values,
         light_mode=theme,
         marker_color="#15AABF",
+        chart_type=chart_type,
     )
 
 
