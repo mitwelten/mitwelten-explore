@@ -4,7 +4,9 @@ import flask
 import dash_mantine_components as dmc
 from configuration import PATH_PREFIX
 from dashboard.styles import icons, get_icon
-
+from dashboard.api_clients.userdata_client import get_annotations
+from dashboard.utils.text_utils import beautify_timedelta
+import datetime
 
 dash.register_page(__name__, path="/")
 
@@ -58,7 +60,8 @@ pax_insektenkiosk = dmc.Anchor(
         )
     ],
     href=PATH_PREFIX
-    + "viz/timeseries?trace=%7B%27type%27%3A+%27pax%27%2C+%27deployment_id%27%3A+865%2C+%27node_label%27%3A+%279231-7621%27%2C+%27period_from%27%3A+%272023-04-20T22%3A00%3A00%2B00%3A00%27%2C+%27period_to%27%3A+None%7D&agg=None&bucket=2h&from=2023-04-30T02%3A41%3A27",    target="_blank",
+    + "viz/timeseries?trace=%7B%27type%27%3A+%27pax%27%2C+%27deployment_id%27%3A+865%2C+%27node_label%27%3A+%279231-7621%27%2C+%27period_from%27%3A+%272023-04-20T22%3A00%3A00%2B00%3A00%27%2C+%27period_to%27%3A+None%7D&agg=None&bucket=2h&from=2023-04-30T02%3A41%3A27",
+    target="_blank",
 )
 apus_apus = dmc.Anchor(
     [
@@ -117,16 +120,13 @@ quickstart_card = dmc.Anchor(
                 ]
             ),
             children=[
-                dmc.Text(
-                    "Follow a simple tutorial to learn how to use this tool"
-                )
+                dmc.Text("Follow a simple tutorial to learn how to use this tool")
             ],
             color="indigo",
             variant="text",
         )
     ],
-    href=PATH_PREFIX
-    + "docs#quickstart",
+    href=PATH_PREFIX + "docs#quickstart",
     target="_blank",
 )
 doc_card = dmc.Anchor(
@@ -138,17 +138,12 @@ doc_card = dmc.Anchor(
                     dmc.Text("Datasets", size="1.2rem"),
                 ]
             ),
-            children=[
-                dmc.Text(
-                    "Learn about the datasets in this tool"
-                )
-            ],
+            children=[dmc.Text("Learn about the datasets in this tool")],
             color="indigo",
             variant="text",
         )
     ],
-    href=PATH_PREFIX
-    + "docs#datasets",
+    href=PATH_PREFIX + "docs#datasets",
     target="_blank",
 )
 
@@ -161,76 +156,133 @@ annots_card = dmc.Anchor(
                     dmc.Text("Annotations", size="1.2rem"),
                 ]
             ),
-            children=[
-                dmc.Text(
-                    "See what users have discovered"
-                )
-            ],
+            children=[dmc.Text("See what users have discovered")],
             color="cyan",
             variant="text",
         )
     ],
-    href=PATH_PREFIX
-    + "annotations",
+    href=PATH_PREFIX + "annotations",
     target="_blank",
 )
 
-layout = dmc.Container(
-    [
-        dcc.Location("url", refresh=False),
-        dmc.Title("Mitwelten Explore"),
-        dmc.Space(h=40),
-        dmc.Grid(
-            [
-                dmc.Col(
-                    [
-                        dmc.Stack(
-                            [
-                                dmc.Text("Selected Dashboards", size="1.2rem",weight=500),
-                                polli_card,
-                                pax_insektenkiosk,
-                                apus_apus,
-                                class_aves
-                            ],
-                            spacing="sm",
-                        )
-                                
 
-                    ],
-                    className="col-md-6",
-                ),
-                dmc.Col(
-                    [
-                        dmc.Stack(
-                            [
-                                dmc.Text("Documentation", size="1.2rem",weight=500),
-                                quickstart_card,
-                                doc_card
-                            ],
-                            spacing="sm",
-                        ),
-                        dmc.Space(h=30),
-                        
+def layout(**kwargs):
+    return dmc.Container(
+        [
+            dcc.Location("url", refresh=False),
+            dmc.Title("Mitwelten Explore"),
+            dmc.Space(h=40),
+            dmc.Grid(
+                [
+                    dmc.Col(
+                        [
+                            dmc.Stack(
+                                [
+                                    dmc.Text(
+                                        "Selected Dashboards", size="1.2rem", weight=500
+                                    ),
+                                    polli_card,
+                                    pax_insektenkiosk,
+                                    apus_apus,
+                                    class_aves,
+                                ],
+                                spacing="sm",
+                            )
+                        ],
+                        className="col-md-6",
+                    ),
+                    dmc.Col(
+                        [
+                            dmc.Stack(
+                                [
+                                    dmc.Text(
+                                        "Documentation", size="1.2rem", weight=500
+                                    ),
+                                    quickstart_card,
+                                    doc_card,
+                                ],
+                                spacing="sm",
+                            ),
+                            dmc.Space(h=30),
+                            dmc.Stack(
+                                [
+                                    dmc.Group(
+                                        [
+                                            dmc.Text(
+                                                "Latest Annotations",
+                                                size="1.2rem",
+                                                weight=500,
+                                            ),
+                                            dmc.Anchor(
+                                                dmc.Text(
+                                                    "See all", size="1.2rem", weight=500
+                                                ),
+                                                href=PATH_PREFIX + "annotations",
+                                            ),
+                                        ],
+                                        position="apart",
+                                    ),
+                                    dmc.Stack(id="annots_card_stack", spacing="sm"),
+                                ],
+                                spacing="sm",
+                            ),
+                            dmc.Space(h=30),
+                        ],
+                        className="col-md-6",
+                    ),
+                ],
+                gutter="xl",
+            ),
+            dmc.Affix(not_yet_func_alert, position={"bottom": 30, "right": 30}),
+        ],
+        fluid=False,
+    )
 
-                        dmc.Stack(
-                            [
-                                dmc.Text("Annotations", size="1.2rem",weight=500),
-                                annots_card,
-                            ],
-                            spacing="sm",
-                        ),
-                        dmc.Space(h=30),
-                    ],
-                    className="col-md-6",
-                ),
-                
 
-            ],
-            gutter="xl"
-        ),
-        dmc.Affix(not_yet_func_alert,position={"bottom":30,"right":30})
-    ],
-    fluid=False,
-)
-
-
+@callback(Output("annots_card_stack", "children"), Input("url", "href"))
+def update_latest_annots(href):
+    annots = get_annotations(auth_cookie=flask.request.cookies.get("auth"))
+    annot_cards = []
+    for i in range(min(4, len(annots))):
+        annot_cards.append(
+            dmc.Anchor(
+                [
+                    dmc.Card(
+                        children=[
+                            dmc.Group(
+                                [
+                                    dmc.Group(
+                                        [
+                                            dmc.Avatar(
+                                                annots[i].user.initials,
+                                                radius="xl",
+                                                color="blue",
+                                            ),
+                                            dmc.Text(
+                                                annots[i].user.full_name, weight=500
+                                            ),
+                                        ]
+                                    ),
+                                    dmc.Badge(
+                                        beautify_timedelta(
+                                            datetime.datetime.now().astimezone(
+                                                datetime.timezone.utc
+                                            )
+                                            - annots[i].timestamp
+                                        ),
+                                        color="teal",
+                                    ),
+                                ],
+                                position="apart",
+                            ),
+                            dmc.Text(annots[i].title[:80]),
+                        ],
+                        withBorder=True,
+                    )
+                ],
+                href=PATH_PREFIX + f"annotations?annot_id={annots[i].id}",
+                target="_blank",
+                variant="text",
+            )
+        )
+    return annot_cards
