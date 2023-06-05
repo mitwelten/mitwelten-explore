@@ -52,7 +52,6 @@ def correlation_matrix(data:list):
     return correlation_matrix
 
 def compute_fft(amplitude, times):
-    t0 = time.time()
     if isinstance(times[0], str):
         times = [datetime.fromisoformat(d) for d in times]
     amplitude = interpolate_nan(amplitude)
@@ -67,7 +66,6 @@ def compute_fft(amplitude, times):
     frequencies = values / tp
     periods_s = [round(1/f) for f in frequencies[1:]]
     aft = list(np.abs(ft))
-    print("took",time.time()-t0)
 
     return aft[1:],periods_s
 
