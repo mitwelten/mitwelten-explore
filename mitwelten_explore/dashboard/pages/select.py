@@ -38,8 +38,8 @@ class DSCard:
         return dmc.Alert(
             title=dmc.Group(
                 [
-                            get_icon(icon=self.icon, width="1.5rem"),
-                            dmc.Text(self.name, size="1.2rem"),
+                    get_icon(icon=self.icon, width="1.5rem"),
+                    dmc.Text(self.name, size="1.2rem"),
                     dmc.Badge("Not yet available", color="pink"),
                 ],
             ),
@@ -51,17 +51,17 @@ class DSCard:
 
 cards = [
     DSCard(
-        name="Mitwelten Pollinators",
-        icon=icons.bee,
-        text="Results of the Mitwelten Pollinator Study",
-        url="select/pollinator",
+        name="Birds & Pollinators by Taxonomy",
+        icon=icons.hierarchy,
+        text="Bird- and Pollinator detections from Mitwelten and GBIF",
+        url="select/taxon",
         color="teal",
     ),
     DSCard(
-        name="Mitwelten Birds",
-        icon=icons.bird,
-        text="Results of the Mitwelten Bird Study",
-        url="select/taxon",
+        name="Mitwelten Pollinators",
+        icon=icons.bee,
+        text="Results of the Mitwelten Pollinator Study by deployment or class",
+        url="select/pollinator",
         color="teal",
     ),
     DSCard(
@@ -85,16 +85,16 @@ cards = [
         url="select/env",
         color="lime",
     ),
-]
-
-cards_in_progress = [
     DSCard(
         name="GBIF Occurences",
         icon=icons.world_explore,
-        text="Seen species by other institutions",
-        url=None,
+        text="Detections recorded by other institutions (in Birds & Pollinators by Taxonomy)",
+        url="select/taxon",
         color="gray",
     ),
+]
+
+cards_in_progress = [
     DSCard(
         name="Location Characteristics",
         icon=icons.search_location,
