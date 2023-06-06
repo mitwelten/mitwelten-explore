@@ -13,7 +13,7 @@ def generate_selected_data_list(store_data):
     for i in range(len(store_data)):
         ds = to_typed_dataset(store_data[i])
         dashboard_buttons = []
-        if ds.type == DatasetType.birds:
+        if ds.type in [DatasetType.birds, DatasetType.gbif_observations]:
             dashboard_buttons.append(
                 dmc.Anchor(
                     dmc.Button(
@@ -33,6 +33,7 @@ def generate_selected_data_list(store_data):
             DatasetType.meteodata,
             DatasetType.pollinators,
             DatasetType.pax,
+            DatasetType.gbif_observations
         ]:
             dashboard_buttons.append(
                 dmc.Anchor(

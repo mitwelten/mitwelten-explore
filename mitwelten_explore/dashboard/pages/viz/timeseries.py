@@ -102,7 +102,8 @@ def layout(**qargs):
             viz_timeseries_select_modal(True, id=ids.select_dataset_modal)
         )
     vc = args.view_config
-    if args.dataset.get("type") in [
+    ds = to_typed_dataset(args.dataset)
+    if ds.type in [
         DatasetType.meteodata,
         DatasetType.env_humi,
         DatasetType.env_temp,
@@ -111,13 +112,13 @@ def layout(**qargs):
         agg_select = agg_fcn_select(id=ids.agg_select, value=vc.agg)
         tb_select = time_bucket_select(id=ids.bucket_select, value=vc.bucket)
         conf_select = confidence_threshold_select(id=ids.conf_select, visible=False)
-    elif args.dataset.get("type") in [DatasetType.birds, DatasetType.pollinators]:
+    elif ds.type in [DatasetType.birds, DatasetType.pollinators]:
         agg_select = agg_fcn_select(id=ids.agg_select, value=None, visible=False)
         tb_select = time_bucket_select(id=ids.bucket_select, value=vc.bucket)
         conf_select = confidence_threshold_select(
             id=ids.conf_select, value=vc.confidence
         )
-    elif args.dataset.get("type") == DatasetType.pax:
+    elif ds.type in [ DatasetType.pax, DatasetType.gbif_observations]:
         agg_select = agg_fcn_select(id=ids.agg_select, value=None, visible=False)
         tb_select = time_bucket_select(id=ids.bucket_select, value=vc.bucket)
         conf_select = confidence_threshold_select(

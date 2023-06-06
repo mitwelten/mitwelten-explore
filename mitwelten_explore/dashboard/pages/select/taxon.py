@@ -4,7 +4,7 @@ from dash.exceptions import PreventUpdate
 import dash_mantine_components as dmc
 from dashboard.aio_components.aio_list_component import  PagedListSearchableAIO
 from dashboard.models import RankEnum
-from dashboard.api_clients.taxonomy_client import get_taxon_by_level, get_parent_taxonomy, get_taxon_dataset
+from dashboard.api_clients.taxonomy_client import get_taxon_by_level, get_parent_taxonomy, get_taxon_dataset, get_gbif_taxon_dataset
 from dashboard.components.dataset_presentation import taxon_list_card
 from dashboard.components.modals import taxon_select_modal
 
@@ -24,6 +24,7 @@ class PageIds(object):
     species_modal= str(uuid.uuid4())
     modal_div = str(uuid.uuid4())
     add_dataset_role = str(uuid.uuid4())
+    add_gbif_dataset_role= str(uuid.uuid4())
 
 ids = PageIds()
 
@@ -78,7 +79,7 @@ def update_modal(buttons):
         raise PreventUpdate
     trg = ctx.triggered_id
     datum_id = trg.get("index")
-    return taxon_select_modal(datum_id, ids.add_dataset_role)
+    return taxon_select_modal(datum_id, ids.add_dataset_role, ids.add_gbif_dataset_role)
 
 
 @callback(
@@ -107,3 +108,28 @@ def update_modal(buttons, collection):
         print("failed to load!")
         return no_update #, generate_notification(title="Already in collection",message="the selected dataset is already stored in your collection",color="orange",icon="mdi:information-outline")
 
+@callback(
+    Output("traces_store", "data", allow_duplicate=True),
+    Input({"role": ids.add_gbif_dataset_role, "index": ALL}, "n_clicks"),
+    State("traces_store", "data"),
+    prevent_initial_call = True
+)
+def add_gbif_trace(buttons, collection):
+    if not any(buttons):
+        raise PreventUpdate
+    if collection is None:
+        collection = []
+    trg = ctx.triggered_id
+    taxon_key = trg.get("index")
+    try:
+        dataset = get_gbif_taxon_dataset(taxon_key)
+        if dataset is None:
+            raise PreventUpdate
+
+        if not dataset in collection:
+            collection.append(dataset)
+            return collection #, generate_notification(title="Added to collection",message="the selected dataset was added to your collection",color="green",icon="material-symbols:check-circle-outline")
+        raise PreventUpdate
+    except:
+        print("failed to load!")
+        return no_update #, generate_notification(title="Already in collection",message="the selected dataset is already stored in your collection",color="orange",icon="mdi:information-outline")

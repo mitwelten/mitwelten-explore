@@ -40,14 +40,6 @@ class Annotation:
         self.traces = traces
         self.id = id
 
-    def to_dict1(self):
-        return dict(
-            title=self.title,
-            content=self.md_content,
-            user_sub=self.user_sub,
-            time=self.timestamp.isoformat(),
-            url=self.url,
-        )
 
     def to_dict(self):
         timestamp = self.timestamp.isoformat()
@@ -70,7 +62,7 @@ class DatasetType(str, Enum):
     meteodata = "meteodata"
     birds = "birds"
     flowers = "flowers"
-    gbif_observations = "gbif_observations"
+    gbif_observations = "gbif"
     pollinators = "pollinators"
     pax = "pax"
     location = "location"
@@ -157,6 +149,61 @@ class Taxon:
     def get_id(self):
         return self.datum_id
 
+class GBIFTaxon:
+    def __init__(
+        self,
+        datum_id=None,
+        label_sci=None,
+        label_de=None,
+        label_en=None,
+        image_url=None,
+        rank=None,
+        lat_range = None,
+        lon_range = None,
+        **kwargs,
+    ):
+        self.datum_id = datum_id
+        self.label_de = label_de
+        self.label_en = label_en
+        self.label_sci = label_sci
+        self.image_url = image_url
+        self.rank = RankEnum(rank)
+        self.type = DatasetType.gbif_observations
+        self.lat_range = lat_range
+        self.lon_range = lon_range
+
+    def __gt__(self, other):
+        if not isinstance(other, Taxon):
+            return NotImplemented
+        return self.rank > other.rank
+
+    def to_dataset(self):
+        return dict(
+            type="gbif",
+            datum_id=self.datum_id,
+            label_de=self.label_de,
+            label_en=self.label_en,
+            label_sci=self.label_sci,
+            rank=self.rank.value,
+            lat_range = self.lat_range,
+            lon_range = self.lon_range,
+
+        )
+
+    def get_unit(self):
+        return self.rank
+
+    def get_title(self):
+        return self.label_sci
+
+    def get_location(self):
+        return "GBIF: Basel Area"
+
+    def get_icon(self):
+        return icon_urls.gbif
+
+    def get_id(self):
+        return self.datum_id
 
 class MeteoDataset:
     def __init__(
@@ -240,11 +287,17 @@ class PaxDataset:
     def get_id(self):
         return self.node_label
 
+class PollinatorClass(str, Enum):
+    fliege = "fliege"
+    wildbiene = "wildbiene"
+    schwebfliege = "schwebfliege"
+    honigbiene = "honigbiene"
+    hummel = "hummel"
 
 class PollinatorDataset:
     def __init__(self, deployment_id=None, pollinator_class=None, **kwargs):
         self.deployment_id = deployment_id
-        self.pollinator_class = pollinator_class
+        self.pollinator_class = PollinatorClass(pollinator_class) if pollinator_class is not None else None
         self.type = DatasetType.pollinators
         self.param_desc = "Detected Pollinators"
         self.unit = "Pollinators"
@@ -253,7 +306,7 @@ class PollinatorDataset:
         return dict(
             type=self.type.value,
             deployment_id=self.deployment_id,
-            pollinator_class=self.pollinator_class,
+            pollinator_class=self.pollinator_class.value if self.pollinator_class else None
         )
 
     def get_unit(self):
@@ -263,7 +316,7 @@ class PollinatorDataset:
         if self.pollinator_class is None:
             return "All Pollinators"
         else:
-            return self.pollinator_class.title()
+            return self.pollinator_class.value.title()
 
     def get_location(self):
         if isinstance(self.deployment_id, list):
@@ -503,6 +556,8 @@ def to_typed_dataset(dataset: dict):
         return EnvTempDataset(**dataset)
     elif dataset_type == DatasetType.pollinators:
         return PollinatorDataset(**dataset)
+    elif dataset_type == DatasetType.gbif_observations:
+        return GBIFTaxon(**dataset)
     else:
         return None
 

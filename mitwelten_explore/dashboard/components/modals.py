@@ -7,15 +7,18 @@ from dashboard.api_clients.third_party_clients import (
 )
 from dashboard.api_clients.taxonomy_client import get_parent_taxonomy
 from dashboard.api_clients.bird_results_client import get_detection_count
+from dashboard.api_clients.gbif_cache_client import get_gbif_detection_count
 from dashboard.components.labels import badge_de, badge_en
 from dashboard.components.selects import agg_fcn_select, confidence_threshold_select
 
 from dashboard.models import (
     Taxon,
+    GBIFTaxon,
     RankEnum,
     DatasetType,
     ViewConfiguration,
     PollinatorDataset,
+    to_typed_dataset,
 )
 from dashboard.styles import icons, get_icon
 from dash import dcc
@@ -40,6 +43,7 @@ def viz_timeseries_select_modal(opened, id="select_ts_modal"):
 
 
 def generate_viz_timeseries_select_modal_children(store_data):
+    print("todo: move to classes")
     if store_data is None:
         return []
 
@@ -47,6 +51,7 @@ def generate_viz_timeseries_select_modal_children(store_data):
     for i in range(len(store_data)):
         data = store_data[i]
         trace_type = data.get("type")
+        ds = to_typed_dataset(store_data[i])
         trace_id = None
         icon = None
         description = None
@@ -68,6 +73,13 @@ def generate_viz_timeseries_select_modal_children(store_data):
             unit = dmc.Badge(data.get("rank"), color="teal")
 
             location_name = dmc.Text("Mitwelten Deployments", size="sm")
+
+        elif ds.type == DatasetType.gbif_observations:
+            trace_id = dmc.Code(ds.get_id())
+            icon = get_icon(icon=ds.get_icon(), width=32)
+            description = dmc.Text(ds.get_title(), size="md")
+            unit = dmc.Badge(ds.get_unit(), color="teal")
+            location_name = dmc.Text(ds.get_location(), size="sm")
 
         elif trace_type == DatasetType.pax:
             trace_id = dmc.Code(data.get("node_label"))
@@ -149,11 +161,13 @@ def viz_compare_select_modal(id):
 
 
 def generate_viz_compare_select_modal_children(store_data, id_role):
+    print("todo: move to classes")
     if store_data is None:
         return []
 
     list_entries = []
     for i in range(len(store_data)):
+        ds = to_typed_dataset(store_data[i])
         data = store_data[i]
         trace_type = data.get("type")
         trace_id = None
@@ -162,7 +176,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
         location_name = None
         single_viz_url = None
         unit = None
-        if trace_type == DatasetType.meteodata:
+        if ds.type == DatasetType.meteodata:
             trace_id = dmc.Code(data.get("param_id"))
             icon = get_icon(icon=icons.meteoswiss, width=32)
             description = dmc.Text(data.get("param_desc"), size="md")
@@ -170,7 +184,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
 
             location_name = dmc.Text(data.get("station_name"), size="sm")
 
-        elif trace_type == DatasetType.birds:
+        elif ds.type == DatasetType.birds:
             trace_id = dmc.Code(data.get("datum_id"))
             icon = get_icon(icon="game-icons:seagull", width=32)
             description = dmc.Text(data.get("label_sci"), size="md")
@@ -178,7 +192,14 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
 
             location_name = dmc.Text("Mitwelten Deployments", size="sm")
 
-        elif trace_type == DatasetType.pax:
+        elif ds.type == DatasetType.gbif_observations:
+            trace_id = dmc.Code(ds.get_id())
+            icon = get_icon(icon=ds.get_icon(), width=32)
+            description = dmc.Text(ds.get_title(), size="md")
+            unit = dmc.Badge(ds.get_unit(), color="teal")
+            location_name = dmc.Text(ds.get_location(), size="sm")
+
+        elif ds.type == DatasetType.pax:
             trace_id = dmc.Code(data.get("node_label"))
             icon = get_icon(icon=icons.pax_counter, width=32)
             description = dmc.Text("Pax Counter", size="md")
@@ -188,7 +209,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
                 f"Mitwelten Deployment {data.get('deployment_id')}", size="sm"
             )
 
-        elif trace_type in [
+        elif ds.type in [
             DatasetType.env_humi,
             DatasetType.env_temp,
             DatasetType.env_moist,
@@ -202,7 +223,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
                 f"Mitwelten Deployment {data.get('deployment_id')}", size="sm"
             )
 
-        elif trace_type == DatasetType.pollinators:
+        elif ds.type == DatasetType.pollinators:
             ds = PollinatorDataset(**data)
             trace_id = dmc.Code(ds.get_unit())
             icon = get_icon(icon=icons.bee, width=32)
@@ -217,16 +238,21 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
             dmc.Grid(
                 [
                     dmc.Col(
-                        dmc.Checkbox(
-                            color="teal",
-                            id={"role": id_role, "index": str(data)},
-                            checked=False,
+                        dmc.Group(
+                            [
+                                dmc.Checkbox(
+                                    color="teal",
+                                    id={"role": id_role, "index": str(data)},
+                                    checked=False,
+                                ),
+                                icon,
+                                trace_id
+                            ]
                         ),
-                        span=1,
+                        span=2,
                     ),
                     # dmc.Col(dmc.Group([icon, trace_id]), span=2),
-                    dmc.Col(trace_id, span=2),
-                    dmc.Col(dmc.Group([description, unit]), span=6),
+                    dmc.Col(dmc.Group([description, unit]), span=7),
                     dmc.Col(
                         dmc.Group(
                             [
@@ -282,7 +308,7 @@ def share_modal(url):
     )
 
 
-def taxon_select_modal(taxon_id, id_role):
+def taxon_select_modal(taxon_id, id_role, gbif_add_id_role):
     taxon_tree = get_parent_taxonomy(taxon_key=taxon_id)
     taxon_tree.sort()
     selected_taxon = min(taxon_tree)
@@ -316,6 +342,7 @@ def taxon_select_modal(taxon_id, id_role):
         )
 
     mw_detections = get_detection_count(selected_taxon.datum_id, DEFAULT_CONFIDENCE)
+    gbif_detections = get_gbif_detection_count(selected_taxon.datum_id)
 
     label_de = (
         dmc.Group([badge_de, dmc.Text(selected_taxon.label_de)], spacing=3)
@@ -351,12 +378,25 @@ def taxon_select_modal(taxon_id, id_role):
                     dmc.Group(
                         [
                             dmc.Group([label_de, label_en]),
-                            dmc.Badge(
-                                f"{mw_detections} Mitwelten Detections",
-                                radius="xs",
-                                color="teal.6" if mw_detections > 0 else "gray",
-                                variant="outline",
-                                size="lg",
+                            dmc.Group(
+                                [
+                                    dmc.Badge(
+                                        f"{mw_detections} Mitwelten Detections",
+                                        radius="xs",
+                                        color="teal.6" if mw_detections > 0 else "gray",
+                                        variant="outline",
+                                        size="lg",
+                                    ),
+                                    dmc.Badge(
+                                        f"{gbif_detections} GBIF Observations",
+                                        radius="xs",
+                                        color="green"
+                                        if gbif_detections > 0
+                                        else "gray",
+                                        variant="outline",
+                                        size="lg",
+                                    ),
+                                ]
                             ),
                         ],
                         position="apart",
@@ -409,7 +449,7 @@ def taxon_select_modal(taxon_id, id_role):
                     dmc.Group(
                         [
                             dmc.Button(
-                                "Add to Collection",
+                                "Add Mitwelten Detections to Collection",
                                 color="teal.6",
                                 leftIcon=get_icon(icon=icons.bookmark, height=25),
                                 id={
@@ -417,13 +457,20 @@ def taxon_select_modal(taxon_id, id_role):
                                     "index": selected_taxon.datum_id,
                                 },
                             ),
+                            dmc.Button(
+                                "Add GBIF Observations to Collection",
+                                color="lime",
+                                leftIcon=get_icon(icon=icons.bookmark, height=25),
+                                id={
+                                    "role": gbif_add_id_role,
+                                    "index": selected_taxon.datum_id,
+                                },
+                            ),
                             dmc.Anchor(
                                 dmc.Button(
                                     "Go to Taxon Dashboard",
                                     color="teal.6",
-                                    leftIcon=get_icon(
-                                        icon=icons.dashboard, height=25
-                                    ),
+                                    leftIcon=get_icon(icon=icons.dashboard, height=25),
                                     rightIcon=get_icon(icon=icons.open_in_new_tab),
                                 ),
                                 href=f"{PATH_PREFIX}viz/taxon/{selected_taxon.datum_id}",
@@ -487,14 +534,22 @@ def dataset_config_modal(
     )
 
 
-def confirm_dialog(id,submit_id, text=None, title="Are you sure you want to continue"):
+def confirm_dialog(id, submit_id, text=None, title="Are you sure you want to continue"):
     return dmc.Modal(
         id=id,
         children=[
             dmc.Text(text),
             dmc.Space(h=20),
             dmc.Group(
-                [dmc.Button("Confirm", color="red", variant="outline", id=submit_id, n_clicks=0)],
+                [
+                    dmc.Button(
+                        "Confirm",
+                        color="red",
+                        variant="outline",
+                        id=submit_id,
+                        n_clicks=0,
+                    )
+                ],
                 position="right",
             ),
         ],

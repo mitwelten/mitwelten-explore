@@ -49,6 +49,7 @@ class Icons(object):
 
 class IconUrls(object):
     meteoswiss = "/app/assets/icons/meteoswiss.svg"
+    gbif = "/app/assets/icons/gbif.png"
 
 icon_urls = IconUrls()
 
