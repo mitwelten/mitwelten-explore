@@ -40,7 +40,6 @@ class Annotation:
         self.traces = traces
         self.id = id
 
-
     def to_dict(self):
         timestamp = self.timestamp.isoformat()
         return dict(
@@ -149,6 +148,7 @@ class Taxon:
     def get_id(self):
         return self.datum_id
 
+
 class GBIFTaxon:
     def __init__(
         self,
@@ -158,8 +158,8 @@ class GBIFTaxon:
         label_en=None,
         image_url=None,
         rank=None,
-        lat_range = None,
-        lon_range = None,
+        lat_range=None,
+        lon_range=None,
         **kwargs,
     ):
         self.datum_id = datum_id
@@ -185,9 +185,8 @@ class GBIFTaxon:
             label_en=self.label_en,
             label_sci=self.label_sci,
             rank=self.rank.value,
-            lat_range = self.lat_range,
-            lon_range = self.lon_range,
-
+            lat_range=self.lat_range,
+            lon_range=self.lon_range,
         )
 
     def get_unit(self):
@@ -204,6 +203,7 @@ class GBIFTaxon:
 
     def get_id(self):
         return self.datum_id
+
 
 class MeteoDataset:
     def __init__(
@@ -287,6 +287,7 @@ class PaxDataset:
     def get_id(self):
         return self.node_label
 
+
 class PollinatorClass(str, Enum):
     fliege = "fliege"
     wildbiene = "wildbiene"
@@ -294,10 +295,13 @@ class PollinatorClass(str, Enum):
     honigbiene = "honigbiene"
     hummel = "hummel"
 
+
 class PollinatorDataset:
     def __init__(self, deployment_id=None, pollinator_class=None, **kwargs):
         self.deployment_id = deployment_id
-        self.pollinator_class = PollinatorClass(pollinator_class) if pollinator_class is not None else None
+        self.pollinator_class = (
+            PollinatorClass(pollinator_class) if pollinator_class is not None else None
+        )
         self.type = DatasetType.pollinators
         self.param_desc = "Detected Pollinators"
         self.unit = "Pollinators"
@@ -306,7 +310,9 @@ class PollinatorDataset:
         return dict(
             type=self.type.value,
             deployment_id=self.deployment_id,
-            pollinator_class=self.pollinator_class.value if self.pollinator_class else None
+            pollinator_class=self.pollinator_class.value
+            if self.pollinator_class
+            else None,
         )
 
     def get_unit(self):
@@ -516,6 +522,8 @@ class UrlSearchArgs:
         confidence=None,
         time_from=None,
         time_to=None,
+        mw_data=None,
+        gbif_data=None,
         **kwargs,
     ) -> None:
         self.dataset = dataset if dataset is not None else trace
@@ -525,6 +533,8 @@ class UrlSearchArgs:
         self.time_from = kwargs.get("from") if "from" in kwargs else time_from
         self.time_to = kwargs.get("to") if "to" in kwargs else time_to
         self.confidence = float(confidence) if confidence else 0.7
+        self.mw_data = "true" in mw_data.lower() if mw_data is not None else None
+        self.gbif_data = "true" in gbif_data.lower() if gbif_data is not None else None
         if isinstance(self.time_from, str):
             self.time_from = datetime.datetime.fromisoformat(self.time_from)
         if isinstance(time_to, str):

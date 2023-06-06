@@ -7,7 +7,7 @@ import urllib
 import json
 from configuration import REDIS_HOST, REDIS_PORT, DATA_API_URL
 
-if REDIS_HOST and REDIS_PORT:
+if REDIS_HOST is not None and REDIS_PORT is not None:
     from redis import Redis
     from requests_cache import CachedSession, RedisCache
 

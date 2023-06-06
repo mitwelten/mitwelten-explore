@@ -1,6 +1,13 @@
 from h3 import h3
 import numpy as np
 
+def validate_coordinates(lat, lon):
+    if lon < 5.5 or lon > 9:
+        return False
+    if lat < 46.5  or lat > 49:
+        return False
+    return True
+
 def zoom_to_cell_resolution(zoom):
     # if zoom > 17.5:
     if zoom > 18.5:

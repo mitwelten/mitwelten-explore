@@ -23,6 +23,18 @@ from dashboard.api_clients.bird_results_client import (
     get_detection_locations,
     get_detection_time_of_day,
 )
+from dashboard.api_clients.pollinator_results_client import (
+    POLLINATOR_IDS,
+    get_polli_detection_dates_by_id,
+    get_polli_detection_locations_by_id,
+    get_polli_detection_tod_by_id,
+)
+from dashboard.api_clients.gbif_cache_client import (
+    get_gbif_detection_dates,
+    get_gbif_detection_locations,
+    get_gbif_detection_time_of_day,
+)
+
 from dashboard.api_clients.taxonomy_client import get_taxon
 from dashboard.api_clients.userdata_client import post_annotation
 from dashboard.utils.communication import (
@@ -31,7 +43,8 @@ from dashboard.utils.communication import (
     urlencode_dict,
     get_user_from_cookies,
 )
-
+from dashboard.utils.ts import merge_detections_dicts
+from dashboard.utils.geo_utils import validate_coordinates
 from dashboard.charts.time_series_charts import (
     generate_ts_figure,
     no_data_figure,
@@ -69,6 +82,7 @@ class PageIds(object):
     tod_chart_type = str(uuid4())
     subspecies_list = str(uuid4())
     taxon_card_div = str(uuid4())
+    data_src_select = str(uuid4())
 
 
 ids = PageIds()
@@ -97,6 +111,30 @@ affix = affix_menu(
 )
 
 
+def data_src_select(id, mitwelten=True, gbif=False):
+    options = ["Mitwelten", "GBIF"]
+    values = []
+    if mitwelten:
+        values.append("mitwelten")
+    if gbif:
+        values.append("gbif")
+    return dmc.Group(
+        [
+            dmc.Text("Source", size="sm"),
+            dmc.ChipGroup(
+                [
+                    dmc.Chip(x, value=x.lower(), variant="outline", color="teal.6")
+                    for x in options
+                ],
+                id=id,
+                value=values,
+                multiple=True,
+            ),
+        ],
+        spacing="xs",
+    )
+
+
 def layout(taxon_id=None, **qargs):
     query_args = parse_nested_qargs(qargs)
     if query_args.get("bucket") is None:
@@ -105,6 +143,13 @@ def layout(taxon_id=None, **qargs):
     vc = args.view_config
     tb_select = time_bucket_select(id=ids.bucket_select, value=vc.bucket)
     conf_select = confidence_threshold_select(id=ids.conf_select, value=vc.confidence)
+    if args.mw_data is None and args.gbif_data is None:
+        mitwelten = True
+        gbif = False
+    else:
+        mitwelten = args.mw_data if args.mw_data is not None else False
+        gbif = args.gbif_data if args.gbif_data is not None else False
+    src_select = data_src_select(ids.data_src_select, mitwelten=mitwelten, gbif=gbif)
     return dmc.Container(
         [
             html.Div(id=ids.share_modal_div),
@@ -126,6 +171,7 @@ def layout(taxon_id=None, **qargs):
                             [
                                 dmc.Group(
                                     [
+                                        src_select,
                                         conf_select,
                                         tb_select,
                                     ]
@@ -325,11 +371,12 @@ def update_tr_store(pn, search_args, relayout_event, reload_enabled):
     Output(ids.url, "search"),
     Input(ids.bucket_select, "value"),
     Input(ids.conf_select, "value"),
+    Input(ids.data_src_select, "value"),
     Input(traio.ids.store(traio.aio_id), "modified_timestamp"),
     State(traio.ids.store(traio.aio_id), "data"),
     State(ids.url, "search"),
 )
-def update_url_location(tb, conf, dr_trg, dr, search_args):
+def update_url_location(tb, conf, src, dr_trg, dr, search_args):
     query_args = parse_nested_qargs(qargs_to_dict(search_args))
 
     if isinstance(dr, list) and dr[0] is not None and dr[1] is not None:
@@ -340,6 +387,16 @@ def update_url_location(tb, conf, dr_trg, dr, search_args):
         query_args["to"] = dr_e
         if conf:
             query_args["confidence"] = conf
+        if isinstance(src, list):
+            if "mitwelten" in src:
+                query_args["mw_data"] = True
+            else:
+                query_args["mw_data"] = False
+            if "gbif" in src:
+                query_args["gbif_data"] = True
+            else:
+                query_args["gbif_data"] = False
+
         return f"?{urlencode_dict(query_args)}"
     raise PreventUpdate
 
@@ -351,7 +408,7 @@ def update_url_location(tb, conf, dr_trg, dr, search_args):
     Input(ids.url, "pathname"),
 )
 def update_title(pn):
-    if pn is not None:
+    if pn is not None and "viz/taxon" in pn:
         taxon_id = pn.split("/")[-1]
         selected_taxon = get_taxon(taxon_key=taxon_id)
         return (
@@ -368,6 +425,7 @@ def update_title(pn):
             ),
             taxon_viz_info_card(taxon_id),
         )
+    raise PreventUpdate
 
 
 # update main chart
@@ -381,29 +439,65 @@ def update_title(pn):
     prevent_initial_call=True,
 )
 def update_ts_chart(pn, search, theme, chart_type):
-    query_args = parse_nested_qargs(qargs_to_dict(search))
-    args = UrlSearchArgs(**query_args)
-    vc = args.view_config
-    taxon_id = pn.split("/")[-1]
-    det_dates = get_detection_dates(
-        taxon_id=taxon_id,
-        confidence=vc.confidence,
-        bucket_width=vc.bucket,
-        time_from=vc.time_from,
-        time_to=vc.time_to,
-    )
-    return (
-        generate_ts_figure(
-            times=det_dates.get("bucket"),
-            values=det_dates.get("detections"),
-            date_from=vc.time_from,
-            date_to=vc.time_to,
-            chart_type=chart_type,
-            marker_color=SINGLE_CHART_COLOR,
-            light_mode=theme,
-        ),
-        f"bucket: {vc.bucket}",
-    )
+    if pn is not None and "viz/taxon" in pn:
+        query_args = parse_nested_qargs(qargs_to_dict(search))
+        args = UrlSearchArgs(**query_args)
+        vc = args.view_config
+        taxon_id = pn.split("/")[-1]
+        det_dates = None
+        if args.mw_data:
+            det_dates = get_detection_dates(
+                taxon_id=taxon_id,
+                confidence=vc.confidence,
+                bucket_width=vc.bucket,
+                time_from=vc.time_from,
+                time_to=vc.time_to,
+            )
+            if int(taxon_id) in POLLINATOR_IDS:
+                det_dates_polli = get_polli_detection_dates_by_id(
+                    taxon_id=taxon_id,
+                    deployment_ids=None,
+                    confidence=vc.confidence,
+                    bucket_width=vc.bucket,
+                    time_from=vc.time_from,
+                    time_to=vc.time_to,
+                )
+                det_dates = merge_detections_dicts(det_dates, det_dates_polli)
+        if args.gbif_data:
+            gbif_det_dates = get_gbif_detection_dates(
+                taxon_id=taxon_id,
+                bucket_width=vc.bucket,
+                time_from=vc.time_from,
+                time_to=vc.time_to,
+            )
+            det_dates = merge_detections_dicts(det_dates, gbif_det_dates)
+
+        if det_dates is not None:
+            return (
+                generate_ts_figure(
+                    times=det_dates.get("bucket"),
+                    values=det_dates.get("detections"),
+                    date_from=vc.time_from,
+                    date_to=vc.time_to,
+                    chart_type=chart_type,
+                    marker_color=SINGLE_CHART_COLOR,
+                    light_mode=theme,
+                ),
+                f"bucket: {vc.bucket}",
+            )
+        return (
+            generate_ts_figure(
+                times=[],
+                values=[],
+                date_from=vc.time_from,
+                date_to=vc.time_to,
+                chart_type=chart_type,
+                marker_color=SINGLE_CHART_COLOR,
+                light_mode=theme,
+            ),
+            f"bucket: {vc.bucket}",
+        )
+    raise PreventUpdate
 
 
 # update hexbinmap & stat from controls
@@ -414,31 +508,72 @@ def update_ts_chart(pn, search, theme, chart_type):
     Input(ids.conf_select, "value"),
     Input(traio.ids.store(traio.aio_id), "data"),
     Input(ids.url, "pathname"),
+    Input(ids.url, "search"),
 )
-def update_map_stats(conf, time_range, pn):
-    if pn is not None:
+def update_map_stats(conf, time_range, pn, search):
+    if pn is not None and "viz/taxon" in pn:
         taxon_id = pn.split("/")[-1]
         if conf is None or time_range is None or time_range[0] is None:
             raise PreventUpdate
-        locations = get_detection_locations(
-            taxon_id=taxon_id,
-            confidence=conf,
-            time_from=time_range[0],
-            time_to=time_range[1],
-        )
+        query_args = parse_nested_qargs(qargs_to_dict(search))
+        args = UrlSearchArgs(**query_args)
         hexbin_data = {
             "latitude": [],
             "longitude": [],
             "val": [],
             "id": [],
         }
-        if isinstance(locations, list):
-            for l in locations:
-                hexbin_data["latitude"].append(l.get("location").get("lat"))
-                hexbin_data["longitude"].append(l.get("location").get("lon"))
-                hexbin_data["val"].append(l.get("detections"))
-                hexbin_data["id"].append(l.get("deployment_id"))
-            return hexbin_data, sum(hexbin_data.get("val")), len(hexbin_data["id"])
+        n_deployments = 0
+        if args.mw_data:
+            locations = get_detection_locations(
+                taxon_id=taxon_id,
+                confidence=conf,
+                time_from=time_range[0],
+                time_to=time_range[1],
+            )
+            if isinstance(locations, list):
+                for l in locations:
+                    latitude = l.get("location").get("lat")
+                    longitude = l.get("location").get("lon")
+                    if validate_coordinates(latitude, longitude):
+                        hexbin_data["latitude"].append(latitude)
+                        hexbin_data["longitude"].append(longitude)
+                        hexbin_data["val"].append(l.get("detections"))
+                        hexbin_data["id"].append(l.get("deployment_id"))
+            if int(taxon_id) in POLLINATOR_IDS:
+                locations_polli = get_polli_detection_locations_by_id(
+                    taxon_id=taxon_id,
+                    deployment_ids=None,
+                    confidence=conf,
+                    time_from=time_range[0],
+                    time_to=time_range[1],
+                )
+                if isinstance(locations_polli, list):
+                    for l in locations_polli:
+                        latitude = l.get("location").get("lat")
+                        longitude = l.get("location").get("lon")
+                        if validate_coordinates(latitude, longitude):
+                            hexbin_data["latitude"].append(latitude)
+                            hexbin_data["longitude"].append(longitude)
+                            hexbin_data["val"].append(l.get("detections"))
+                            hexbin_data["id"].append(l.get("deployment_id"))
+            n_deployments = len(hexbin_data["id"])
+        if args.gbif_data:
+            gbif_locations = get_gbif_detection_locations(
+                taxon_id=taxon_id,
+                time_from=time_range[0],
+                time_to=time_range[1],
+            )
+            if isinstance(gbif_locations, list):
+                for l in gbif_locations:
+                    latitude = l.get("location").get("lat")
+                    longitude = l.get("location").get("lon")
+                    if validate_coordinates(latitude, longitude):
+                        hexbin_data["latitude"].append(latitude)
+                        hexbin_data["longitude"].append(longitude)
+                        hexbin_data["val"].append(l.get("detections"))
+                        hexbin_data["id"].append(0)
+        return hexbin_data, sum(hexbin_data.get("val")), n_deployments
     raise PreventUpdate
 
 
@@ -446,27 +581,71 @@ def update_map_stats(conf, time_range, pn):
 @callback(
     Output(ids.time_of_day_chart, "figure"),
     Output(ids.tod_bucket_indicator, "children"),
-    Input(ids.conf_select, "value"),
-    Input(traio.ids.store(traio.aio_id), "data"),
     State(ids.url, "pathname"),
+    Input(ids.url, "search"),
     Input(ids.tod_chart_type, "value"),
     Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
     prevent_initial_call=True,
 )
-def update_time_of_day_chart(conf, tr, pn, chart_type, theme):
-    if isinstance(tr, list) and len(tr) == 2 and pn is not None:
+def update_time_of_day_chart(pn, search, chart_type, theme):
+    if pn is not None and "viz/taxon" in pn:
         taxon_id = pn.split("/")[-1]
-        tod_res = get_detection_time_of_day(
-            taxon_id=taxon_id,
-            confidence=conf,
-            bucket_width_m=DEFAULT_TOD_BUCKET_WIDTH,
-            time_from=tr[0],
-            time_to=tr[1],
-        )
+        query_args = parse_nested_qargs(qargs_to_dict(search))
+        args = UrlSearchArgs(**query_args)
+        vc = args.view_config
+        tod_res = None
+        if args.mw_data:
+            tod_res = get_detection_time_of_day(
+                taxon_id=taxon_id,
+                confidence=vc.confidence,
+                bucket_width_m=DEFAULT_TOD_BUCKET_WIDTH,
+                time_from=vc.time_from,
+                time_to=vc.time_to,
+            )
+            if int(taxon_id) in POLLINATOR_IDS:
+                tod_res_polli = get_polli_detection_tod_by_id(
+                    taxon_id=taxon_id,
+                    deployment_ids=None,
+                    confidence=vc.confidence,
+                    bucket_width_m=DEFAULT_TOD_BUCKET_WIDTH,
+                    time_from=vc.time_from,
+                    time_to=vc.time_to,
+                )
+                tod_res = merge_detections_dicts(
+                    tod_res,
+                    tod_res_polli,
+                    time_key="minuteOfDay",
+                    value_key="detections",
+                )
+        if args.gbif_data:
+            gbif_tod_res = get_gbif_detection_time_of_day(
+                taxon_id=taxon_id,
+                bucket_width_m=DEFAULT_TOD_BUCKET_WIDTH,
+                time_from=vc.time_from,
+                time_to=vc.time_to,
+            )
+            tod_res = merge_detections_dicts(
+                tod_res,
+                gbif_tod_res,
+                time_key="minuteOfDay",
+                value_key="detections",
+            )
+        if tod_res is not None:
+            return (
+                generate_time_of_day_scatter(
+                    minutes_of_day=tod_res.get("minuteOfDay"),
+                    values=tod_res.get("detections"),
+                    light_mode=theme,
+                    marker_color=SINGLE_CHART_COLOR,
+                    spike=True,
+                    chart_type=chart_type,
+                ),
+                f"bucket: {DEFAULT_TOD_BUCKET_WIDTH}m",
+            )
         return (
             generate_time_of_day_scatter(
-                minutes_of_day=tod_res.get("minuteOfDay"),
-                values=tod_res.get("detections"),
+                minutes_of_day=[],
+                values=[],
                 light_mode=theme,
                 marker_color=SINGLE_CHART_COLOR,
                 spike=True,
@@ -483,7 +662,7 @@ def update_time_of_day_chart(conf, tr, pn, chart_type, theme):
     Input(ids.url, "pathname"),
 )
 def update_subspecies_list(conf, pn):
-    if pn is not None:
+    if pn is not None and "viz/taxon" in pn:
         taxon_id = pn.split("/")[-1]
         species_counts = get_species_detection_count_by_parent(
             taxon_id=taxon_id, confidence=conf

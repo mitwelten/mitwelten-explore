@@ -7,6 +7,9 @@ from dashboard.api_clients.third_party_clients import (
 )
 from dashboard.api_clients.taxonomy_client import get_parent_taxonomy
 from dashboard.api_clients.bird_results_client import get_detection_count
+from dashboard.api_clients.pollinator_results_client import (
+    get_polli_detection_count_by_id,
+)
 from dashboard.api_clients.gbif_cache_client import get_gbif_detection_count
 from dashboard.components.labels import badge_de, badge_en
 from dashboard.components.selects import agg_fcn_select, confidence_threshold_select
@@ -246,7 +249,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
                                     checked=False,
                                 ),
                                 icon,
-                                trace_id
+                                trace_id,
                             ]
                         ),
                         span=2,
@@ -341,7 +344,15 @@ def taxon_select_modal(taxon_id, id_role, gbif_add_id_role):
             )
         )
 
-    mw_detections = get_detection_count(selected_taxon.datum_id, DEFAULT_CONFIDENCE)
+    mw_bird_detections = get_detection_count(
+        selected_taxon.datum_id, DEFAULT_CONFIDENCE
+    )
+    polli_detections = get_polli_detection_count_by_id(
+        selected_taxon.datum_id, DEFAULT_CONFIDENCE
+    )
+    mw_detections = mw_bird_detections if mw_bird_detections is not None else 0
+    if polli_detections is not None:
+        mw_detections += polli_detections
     gbif_detections = get_gbif_detection_count(selected_taxon.datum_id)
 
     label_de = (

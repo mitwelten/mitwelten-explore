@@ -12,9 +12,6 @@ theme_switch = ThemeSwitchAIO(
 )
 
 
-
-
-
 nav_logo_target = dmc.Anchor(
     dmc.Group(
         [
@@ -68,8 +65,8 @@ nav_dataset_target = dmc.Menu(
             [
                 dmc.MenuLabel("Datasets"),
                 dmc.MenuItem(
-                    "Mitwelten Birds",
-                    icon=get_icon(icons.bird, 24),
+                    "Detections by Taxonomy",
+                    icon=get_icon(icons.hierarchy, 24),
                     href=PATH_PREFIX + "select/taxon",
                 ),
                 dmc.MenuItem(
@@ -292,9 +289,7 @@ nav_user_element = dmc.Group(
                                 styles={"display": "none"},
                             ),
                             dmc.MediaQuery(
-                                get_icon(
-                                    icon=icons.arrow_down_expand, width=16
-                                ),
+                                get_icon(icon=icons.arrow_down_expand, width=16),
                                 smallerThan="sm",
                                 styles={"display": "none"},
                             ),
@@ -307,9 +302,7 @@ nav_user_element = dmc.Group(
                     [
                         dmc.MenuItem(
                             "My Annotations",
-                            icon=get_icon(
-                                icon=icons.annotation_bank, width=16
-                            ),
+                            icon=get_icon(icon=icons.annotation_bank, width=16),
                             href=PATH_PREFIX + "annotations?my_annotations=true",
                         ),
                         dmc.MenuItem(
