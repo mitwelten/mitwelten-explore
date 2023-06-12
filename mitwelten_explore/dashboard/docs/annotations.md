@@ -14,7 +14,7 @@ All annotations are listed in the [Annotations page](annotations).
 
 - Navigate to the dashboard which shows your discovery.
 - Set the time range that the interesting part of the data is clearly visible.
-- Click on the button on the lower right corner of a dashboard to expand the actions menu.
+- Click on the button <img src="assets/icons/more-two.svg" style="height:24px;" /> on the lower right corner of a dashboard to expand the actions menu.
 - Click on the add annotation button to open the annotation editor.
 - Enter a title for your discovery.
 - Write the content of your annotation.

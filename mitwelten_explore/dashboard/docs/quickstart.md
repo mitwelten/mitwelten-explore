@@ -161,7 +161,7 @@ The Dashboard contains following components:
 
 A Taxon Dashboard for the order Apodiformes is shown in the image below.
 
-<div style="padding:15px 30px 15px 15px">
+<div style="padding:15px 15px 15px 15px">
 <img src="assets/images/taxon_dashboard.png" style="maxWidth:75%;border:1px solid gray;" />
 </div>
 
@@ -170,9 +170,13 @@ A Taxon Dashboard for the order Apodiformes is shown in the image below.
 
 ## 5. Share a dashboard
 
+To share a dashboard view, click on the green button <img src="assets/icons/more-two.svg" style="height:24px;" /> in the lower right corner of a dashboard  to expand the actions menu, then click on the Share button <img src="assets/icons/share.svg" style="height:24px;" />. 
+
+A popup which contains a button *Copy to Clipboard* will appear. Click on it to copy the dashboard url to the clipboard.
+
 ---
 
 ## 6. Create an Annotation
 
-*TODO*
+See [Annotations](docs#annotations)
 
