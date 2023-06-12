@@ -143,7 +143,7 @@ class Taxon:
         return "Mitwelten Deployments"
 
     def get_icon(self):
-        return icons.bird
+        return icons.hierarchy
 
     def get_id(self):
         return self.datum_id

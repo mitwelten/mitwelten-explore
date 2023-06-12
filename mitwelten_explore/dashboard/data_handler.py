@@ -14,6 +14,8 @@ from dashboard.models import (
     GBIFTaxon,
 )
 from dashboard.utils.communication import CachedRequest, construct_url
+from dashboard.utils.ts import merge_detections_dicts
+from dashboard.utils.geo_utils import validate_coordinates
 
 from dashboard.api_clients.meteodata_client import (
     get_meteo_datasets,
@@ -41,12 +43,17 @@ from dashboard.api_clients.gbif_cache_client import (
     get_gbif_detection_dates,
     get_gbif_detection_locations,
     get_gbif_detection_time_of_day,
-    get_gbif_detection_count
+    get_gbif_detection_count,
 )
 from dashboard.api_clients.pollinator_results_client import (
     get_polli_detection_dates,
     get_polli_detection_tod,
     get_polli_detection_locations,
+    get_polli_detection_dates_by_id,
+    get_polli_detection_locations_by_id,
+    get_polli_detection_tod_by_id,
+    get_polli_detection_count_by_id,
+    POLLINATOR_IDS,
 )
 from configuration import DEFAULT_TOD_BUCKET_WIDTH
 
@@ -106,6 +113,7 @@ def load_ts_data(dataset, cfg, vc: ViewConfiguration, auth_cookie=None):
                 ]
             return dates, values
     elif ds.type == DatasetType.birds:
+        # include pollinators
         res = get_detection_dates(
             ds.datum_id,
             confidence=cfg.confidence,
@@ -113,6 +121,16 @@ def load_ts_data(dataset, cfg, vc: ViewConfiguration, auth_cookie=None):
             time_from=vc.time_from,
             time_to=vc.time_to,
         )
+        if int(ds.datum_id) in POLLINATOR_IDS:
+            res_polli = get_polli_detection_dates_by_id(
+                ds.datum_id,
+                deployment_ids=None,
+                confidence=cfg.confidence,
+                bucket_width=vc.bucket,
+                time_from=vc.time_from,
+                time_to=vc.time_to,
+            )
+            res = merge_detections_dicts(res, res_polli)
         if res is not None:
             dates = res.get("bucket")
             values = res.get("detections")
@@ -154,7 +172,9 @@ def load_ts_data(dataset, cfg, vc: ViewConfiguration, auth_cookie=None):
         return dates, values
     elif ds.type == DatasetType.pollinators:
         res = get_polli_detection_dates(
-            pollinator_class=ds.pollinator_class.value if ds.pollinator_class is not None else None,
+            pollinator_class=ds.pollinator_class.value
+            if ds.pollinator_class is not None
+            else None,
             deployment_ids=ds.deployment_id,
             confidence=cfg.confidence,
             bucket_width=vc.bucket,
@@ -258,12 +278,25 @@ def load_tod_data(
             time_from=vc.time_from,
             time_to=vc.time_to,
         )
+
+        if int(ds.datum_id) in POLLINATOR_IDS:
+            res_polli = get_polli_detection_tod_by_id(
+                ds.datum_id,
+                deployment_ids=None,
+                confidence=cfg.confidence,
+                bucket_width_m=bucket_width_m,
+                time_from=vc.time_from,
+                time_to=vc.time_to,
+            )
+            res = merge_detections_dicts(
+                res, res_polli, time_key="minuteOfDay", value_key="detections"
+            )
         minutes_of_day = res.get("minuteOfDay")
         values = res.get("detections")
         if cfg.normalize:
             values = [(v - min(values)) / (max(values) - min(values)) for v in values]
         return minutes_of_day, values
-    
+
     elif ds.type == DatasetType.gbif_observations:
         res = get_gbif_detection_time_of_day(
             taxon_id=ds.datum_id,
@@ -276,7 +309,7 @@ def load_tod_data(
         if cfg.normalize:
             values = [(v - min(values)) / (max(values) - min(values)) for v in values]
         return minutes_of_day, values
-    
+
     elif ds.type == DatasetType.meteodata:
         res = get_meteo_time_of_day(
             station_id=ds.station_id,
@@ -300,7 +333,9 @@ def load_tod_data(
 
     elif ds.type == DatasetType.pollinators:
         res = get_polli_detection_tod(
-            pollinator_class=ds.pollinator_class.value if ds.pollinator_class is not None else None,
+            pollinator_class=ds.pollinator_class.value
+            if ds.pollinator_class is not None
+            else None,
             deployment_ids=ds.deployment_id,
             confidence=vc.confidence,
             bucket_width_m=bucket_width_m,
@@ -379,7 +414,9 @@ def load_map_data(dataset, cfg, vc: ViewConfiguration, auth_cookie=None):
         return response
     elif ds.type == DatasetType.pollinators:
         locations = get_polli_detection_locations(
-            pollinator_class=ds.pollinator_class.value if ds.pollinator_class is not None else None,
+            pollinator_class=ds.pollinator_class.value
+            if ds.pollinator_class is not None
+            else None,
             deployment_ids=ds.deployment_id,
             confidence=cfg.confidence,
             time_from=vc.time_from,
@@ -395,20 +432,42 @@ def load_map_data(dataset, cfg, vc: ViewConfiguration, auth_cookie=None):
             return response
 
     elif ds.type == DatasetType.birds:
+        loc_dict = {"latitude": [], "longitude": [], "name": [], "id": []}
         locations = get_detection_locations(
             ds.datum_id,
             confidence=cfg.confidence,
             time_from=vc.time_from,
             time_to=vc.time_to,
         )
-        if locations:
-            response = {
-                "latitude": [l.get("location").get("lat") for l in locations],
-                "longitude": [l.get("location").get("lon") for l in locations],
-                "name": [f'deplpoyment {l.get("deployment_id")}' for l in locations],
-                "id": [l.get("deployment_id") for l in locations],
-            }
-            return response
+        locations_polli = None
+        if int(ds.datum_id) in POLLINATOR_IDS:
+            locations_polli = get_polli_detection_locations_by_id(
+                ds.datum_id,
+                deployment_ids=None,
+                confidence=cfg.confidence,
+                time_from=vc.time_from,
+                time_to=vc.time_to,
+            )
+
+        if locations is not None:
+            for l in locations:
+                latitude = l.get("location").get("lat")
+                longitude = l.get("location").get("lon")
+                if validate_coordinates(latitude, longitude):
+                    loc_dict["latitude"].append(latitude)
+                    loc_dict["longitude"].append(longitude)
+                    loc_dict["name"].append(f'deplpoyment {l.get("deployment_id")}')
+                    loc_dict["id"].append(l.get("deployment_id"))
+        if locations_polli is not None:
+            for l in locations_polli:
+                latitude = l.get("location").get("lat")
+                longitude = l.get("location").get("lon")
+                if validate_coordinates(latitude, longitude):
+                    loc_dict["latitude"].append(latitude)
+                    loc_dict["longitude"].append(longitude)
+                    loc_dict["name"].append(f'deplpoyment {l.get("deployment_id")}')
+                    loc_dict["id"].append(l.get("deployment_id"))
+        return loc_dict
     elif ds.type == DatasetType.gbif_observations:
         locations = get_gbif_detection_locations(
             ds.datum_id,
@@ -419,7 +478,7 @@ def load_map_data(dataset, cfg, vc: ViewConfiguration, auth_cookie=None):
             response = {
                 "latitude": [l.get("location").get("lat") for l in locations],
                 "longitude": [l.get("location").get("lon") for l in locations],
-                "name": [f'observation' for l in locations],
+                "name": [f"observation" for l in locations],
                 "id": [i for i in range(len(locations))],
             }
             return response
@@ -457,14 +516,28 @@ def load_statsagg_data(dataset, cfg, vc: ViewConfiguration = None, auth_cookie=N
         )
 
     elif ds.type == DatasetType.birds:
-        return {
-            "total_detections": get_detection_count(
+        total_detections = 0
+        bird_detections = get_detection_count(
+            taxon_id=ds.datum_id,
+            confidence=cfg.confidence,
+            time_from=vc.time_from,
+            time_to=vc.time_to,
+        )
+        total_detections = 0 if bird_detections is None else bird_detections
+        if int(ds.datum_id) in POLLINATOR_IDS:
+            polli_detection_count = get_polli_detection_count_by_id(
                 taxon_id=ds.datum_id,
                 confidence=cfg.confidence,
                 time_from=vc.time_from,
                 time_to=vc.time_to,
             )
-        }
+            total_detections = (
+                total_detections
+                if polli_detection_count is None
+                else total_detections + polli_detection_count
+            )
+
+        return {"total_detections": total_detections}
     elif ds.type == DatasetType.gbif_observations:
         return {
             "total_detections": get_gbif_detection_count(
@@ -489,7 +562,9 @@ def load_statsagg_data(dataset, cfg, vc: ViewConfiguration = None, auth_cookie=N
     elif ds.type == DatasetType.pollinators:
 
         polli_detections = get_polli_detection_dates(
-            pollinator_class=ds.pollinator_class.value if ds.pollinator_class is not None else None,
+            pollinator_class=ds.pollinator_class.value
+            if ds.pollinator_class is not None
+            else None,
             deployment_ids=ds.deployment_id,
             confidence=cfg.confidence,
             bucket_width=vc.bucket,

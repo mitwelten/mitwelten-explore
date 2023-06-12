@@ -129,10 +129,15 @@ def generate_selected_data_list(store_data):
                         ),
                     ],
                 ),
-                withBorder=False,
+                withBorder=True,
                 radius=0,
                 px=6,
-                style={"borderBottom": "1px solid gray"},
+                py=4,
+                style={
+                    "borderTop": "0px",
+                    "borderLeft": "0px",
+                    "borderRight": "0px",
+                    },
             )
         )
 
