@@ -189,7 +189,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
 
         elif ds.type == DatasetType.birds:
             trace_id = dmc.Code(data.get("datum_id"))
-            icon = get_icon(icon="game-icons:seagull", width=32)
+            icon = get_icon(ds.get_icon(), width=32)
             description = dmc.Text(data.get("label_sci"), size="md")
             unit = dmc.Badge(data.get("rank"), color="teal")
 
