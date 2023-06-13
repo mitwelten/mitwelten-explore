@@ -78,6 +78,8 @@ MULTI_VIZ_COLORSCALE = [
     "#7950F2",  # violet.6
     "#E64980",  # pink.6
     "#FD7E14",  # orange.6
+    "#FAB005",  # yellow.6
+    "#BE4BDB",  # grape.6
 ]
 
 SINGLE_CHART_COLOR = "#12B886"  #  #teal.6
