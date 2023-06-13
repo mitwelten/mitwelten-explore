@@ -12,7 +12,6 @@ from dashboard.models import UrlSearchArgs, to_typed_dataset
 from configuration import PATH_PREFIX
 
 
-
 def taxon_stat_card(total_det_id, n_deployments_id):
     return dmc.Card(
         children=dmc.Group(
@@ -157,7 +156,7 @@ def taxon_viz_info_card(taxon_id):
                                     },
                                 ),
                             ],
-                            spacing=0
+                            spacing=0,
                         ),
                         value="image",
                     ),
@@ -183,8 +182,9 @@ def taxon_viz_info_card(taxon_id):
             ),
         ],
         withBorder=True,
-        shadow="sm"
+        shadow="sm",
     )
+
 
 def dataset_info_cards(args: UrlSearchArgs, config_btn_role):
     if args.datasets is None or args.cfg is None:
@@ -197,54 +197,60 @@ def dataset_info_cards(args: UrlSearchArgs, config_btn_role):
         config = args.cfg[i]
         cfg_indicator_codes = []
         if config.confidence:
-            cfg_indicator_codes.append(
-                dmc.Code(f"confidence >= {config.confidence}")
-            )
+            cfg_indicator_codes.append(dmc.Code(f"confidence >= {config.confidence}"))
         if config.agg:
-            cfg_indicator_codes.append(
-                dmc.Code(f"{config.agg}()")
-            )
+            cfg_indicator_codes.append(dmc.Code(f"{config.agg}()"))
         if config.normalize:
-            cfg_indicator_codes.append(
-                dmc.Code("normalized")
-            )
+            cfg_indicator_codes.append(dmc.Code("normalized"))
+        config_button = dmc.ActionIcon(
+            get_icon(icon=icons.edit_pen),
+            id={"role": config_btn_role, "index": i},
+            variant="subtle",
+        )
         cards.append(
             dmc.Card(
                 dmc.Stack(
                     [
                         dmc.Stack(
                             [
-                                dmc.Group(
+                                dmc.ScrollArea(
                                     [
-                                        dmc.Text(ds.get_title(),weight=500,  size="sm"),
-                                        dmc.Badge(ds.get_unit(), color="indigo", size="sm"),
-                                    ], spacing=4
-                                ),
-                                dmc.Group(
-                                    [
-                                        get_icon(icon=icons.location_marker),
-                                        dmc.Text(ds.get_location(), size="xs"),
+                                        dmc.Text(
+                                            ds.get_title(),
+                                            weight=500,
+                                            size="sm",
+                                            className="text-nowrap",
+                                        ),
+                                        dmc.Space(h=3),
                                     ],
-                                    spacing=2,
+                                    style={"width": "99%"},
+                                    scrollbarSize=6,
                                 ),
-                            ],
-                            spacing=2
-                        ),
-                        dmc.Group(
-                            [
                                 dmc.Group(
-                                    cfg_indicator_codes
-                                ),
-                                dmc.ActionIcon(
-                                    get_icon(icon=icons.edit_pen),
-                                    id={"role": config_btn_role, "index": i},
-                                    variant="subtle",
+                                    [
+                                        dmc.Group(
+                                            [
+                                                get_icon(icon=icons.location_marker),
+                                                dmc.Text(ds.get_location(), size="xs"),
+                                                dmc.Badge(
+                                                    ds.get_unit(),
+                                                    color="indigo",
+                                                    size="sm",
+                                                ),
+                                            ],
+                                            spacing=2,
+                                        ),
+                                        config_button,
+                                    ],
+                                    spacing=4,
+                                    position="apart",
                                 ),
                             ],
-                            position="apart",
+                            spacing=2,
                         ),
+                        dmc.Group(cfg_indicator_codes),
                     ],
-                    spacing=4
+                    spacing=2,
                 ),
                 withBorder=True,
                 radius=0,
@@ -253,10 +259,8 @@ def dataset_info_cards(args: UrlSearchArgs, config_btn_role):
                     # "borderColor": MULTI_VIZ_COLORSCALE[i],
                     "border": f"1px solid {MULTI_VIZ_COLORSCALE[i]}",
                     "borderLeft": f"6px solid {MULTI_VIZ_COLORSCALE[i]}",
-
                 },
             )
         )
 
     return cards
-
