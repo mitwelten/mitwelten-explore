@@ -262,7 +262,7 @@ class PaxDataset:
         self.period_from = period_from
         self.period_to = period_to
         self.type = DatasetType.pax
-        self.param_desc = "PAX Count"
+        self.param_desc = "PAX Counter"
         self.unit = "PAX"
 
     def to_dataset(self):
@@ -276,7 +276,7 @@ class PaxDataset:
         return self.unit
 
     def get_title(self):
-        return self.param_desc
+        return f"{self.param_desc} {self.node_label}"
 
     def get_location(self):
         return f"Mitwelten Deployment {self.deployment_id}"
