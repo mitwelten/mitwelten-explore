@@ -100,7 +100,7 @@ class PageIds(object):
 
 
 ids = PageIds()
-traio = TimeRangeAIO(dates=[None,None])
+traio = TimeRangeAIO(dates=[None, None])
 annot_editor = TextEditorAIO()
 
 affix = affix_menu(
@@ -296,7 +296,7 @@ def layout(**qargs):
                                                     dmc.Card(
                                                         id=ids.corr_matrix_card,
                                                         withBorder=False,
-                                                        pl=0
+                                                        pl=0,
                                                     ),
                                                     dmc.Card(
                                                         id=ids.fft_card,
@@ -351,7 +351,7 @@ def layout(**qargs):
                     ),
                     dmc.Col(
                         [
-                            #dmc.Text("Datasets", weight=500, px=4),
+                            # dmc.Text("Datasets", weight=500, px=4),
                             dmc.Stack(id=ids.dataset_card_stack, spacing="xs"),
                         ],
                         className="col-lg-2",
@@ -473,7 +473,6 @@ def update_dataset_cards(search, pn):
 )
 def update_tr_store(pn, search_args, relayout_event, reload_enabled):
     if search_args is not None:
-        print("search args",search_args)
         query_args = qargs_to_dict(search_args)
         query_args_dr = [
             query_args.get("from", str(DEFAULT_TR_START.isoformat())),

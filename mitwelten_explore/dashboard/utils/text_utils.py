@@ -54,3 +54,40 @@ def markdown_to_plain_text(markdown_text):
     # Remove images
     markdown_text = re.sub(r"!\[([^\]]+)\]\([^)]+\)", r"\1", markdown_text)
     return markdown_text.strip()
+
+
+def split_dataset_title(title):
+    title = title.replace(":", " ")
+    words = title.split()
+    lines = [words[0]]
+    current_line = ""
+
+    for word in words[1:]:
+        if len(current_line) + len(word) + 1 < 18:
+            current_line += " " + word
+        else:
+            lines.append(current_line.strip())
+            current_line = word
+
+    if current_line:
+        lines.append(current_line.strip())
+
+    return lines
+
+
+def chart_dataset_label(title):
+    title_lines = split_dataset_title(title)
+    if len(title_lines) == 1:
+        return f"<b>{title_lines[0]}</b>"
+    else:
+        label = f"<b>{title_lines[0]}</b><br>"
+        small_lines = '<span style="font-size:9px;line-height: .4em;">'
+        for i in range(1, len(title_lines)):
+
+            if i == 1:
+                small_lines += f"{title_lines[i]}"
+            else:
+                small_lines += f"<br>{title_lines[i]}"
+        small_lines += "</span>"
+
+    return label + small_lines

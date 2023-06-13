@@ -1,5 +1,6 @@
 import plotly.graph_objects as go
 from dashboard.styles import MULTI_VIZ_COLORSCALE
+from dashboard.utils.text_utils import chart_dataset_label
 import pandas as pd
 from plotly.subplots import make_subplots
 import datetime
@@ -47,8 +48,8 @@ def correlation_matrix_heatmap(matrix, labels, light_mode=True):
     xlabels_short = [re.split(r" |:",str(x))[0] for x in xlabels]
     ylabels_short = [re.split(r" |:",str(x))[0] for x in ylabels]
     try:
-        xlabels_short = [f"{xlabels_short[i]}<br><sup>{xlabels[i].split(xlabels_short[i])[1]}</sup>" for i in range(len(xlabels))]
-        ylabels_short = [f"{ylabels_short[i]}<br><sup>{ylabels[i].split(ylabels_short[i])[1]}</sup>" for i in range(len(ylabels))]
+        xlabels_short = [chart_dataset_label(label) for label in xlabels]
+        ylabels_short = [chart_dataset_label(label) for label in ylabels]
     except:
         pass
     ylabels_idx = [i for i in range(len(labels)-1)]
@@ -70,8 +71,8 @@ def correlation_matrix_heatmap(matrix, labels, light_mode=True):
         shared_yaxes=True,
         vertical_spacing=0,
         horizontal_spacing=0,
-        column_widths=[0.35, 0.65],
-        row_heights=[0.9, 0.1],
+        column_widths=[0.25, 0.75],
+        row_heights=[0.8, 0.2],
     )
     fig.add_trace(
         go.Heatmap(
@@ -103,7 +104,7 @@ def correlation_matrix_heatmap(matrix, labels, light_mode=True):
             customdata=ylabels,
             mode="text",
             showlegend=False,
-            textfont=dict(color=MULTI_VIZ_COLORSCALE, size=13),
+            textfont=dict(color=MULTI_VIZ_COLORSCALE, size=12),
             textposition="middle center",
             hovertemplate="%{customdata}<extra></extra>",
         ),
@@ -117,7 +118,7 @@ def correlation_matrix_heatmap(matrix, labels, light_mode=True):
             text=xlabels_short,
             customdata=xlabels,
             mode="text",
-            textfont=dict(color=MULTI_VIZ_COLORSCALE[1:], size=13),
+            textfont=dict(color=MULTI_VIZ_COLORSCALE[1:], size=12),
             showlegend=False,
             hovertemplate="%{customdata}<extra></extra>",
         ),
@@ -136,7 +137,6 @@ def correlation_matrix_heatmap(matrix, labels, light_mode=True):
 
 
 def fft_single(amplitude, periods_s, light_mode):
-    print(amplitude[0], periods_s[0])
     fig = go.Figure()
     fig.update_layout(
         margin=dict(l=20, r=20, t=20, b=20),
