@@ -100,7 +100,7 @@ class PageIds(object):
 
 
 ids = PageIds()
-traio = TimeRangeAIO()
+traio = TimeRangeAIO(dates=[None,None])
 annot_editor = TextEditorAIO()
 
 affix = affix_menu(
@@ -192,7 +192,7 @@ def layout(**qargs):
                                     dcc.Graph(
                                         id=ids.main_chart,
                                         style={
-                                            "height": "42vh",
+                                            "height": "40vh",
                                         },
                                         config=dict(
                                             displayModeBar=False,
@@ -211,7 +211,6 @@ def layout(**qargs):
                         ]
                     ),
                 ],
-                className="border-bottom",
                 radius=0,
             ),
             dmc.Space(h=12),
@@ -297,6 +296,7 @@ def layout(**qargs):
                                                     dmc.Card(
                                                         id=ids.corr_matrix_card,
                                                         withBorder=False,
+                                                        pl=0
                                                     ),
                                                     dmc.Card(
                                                         id=ids.fft_card,
@@ -351,7 +351,7 @@ def layout(**qargs):
                     ),
                     dmc.Col(
                         [
-                            dmc.Text("Datasets", weight=500, px=4),
+                            #dmc.Text("Datasets", weight=500, px=4),
                             dmc.Stack(id=ids.dataset_card_stack, spacing="xs"),
                         ],
                         className="col-lg-2",
@@ -446,7 +446,7 @@ def generate_link(checkboxes, nc, search):
                 f"?{urlencode_dict(query_args)}",
             )  # initial_dataset_configs
 
-        return (n_selected < 2) or (n_selected > 5), no_update  # , no_update
+        return (n_selected < 2) or (n_selected > 7), no_update  # , no_update
     return no_update, no_update  # , no_update
 
 
@@ -473,6 +473,7 @@ def update_dataset_cards(search, pn):
 )
 def update_tr_store(pn, search_args, relayout_event, reload_enabled):
     if search_args is not None:
+        print("search args",search_args)
         query_args = qargs_to_dict(search_args)
         query_args_dr = [
             query_args.get("from", str(DEFAULT_TR_START.isoformat())),

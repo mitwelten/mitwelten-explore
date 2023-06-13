@@ -3,6 +3,7 @@ from dashboard.styles import MULTI_VIZ_COLORSCALE
 import pandas as pd
 from plotly.subplots import make_subplots
 import datetime
+import re
 
 rdbu_colors = [
     [0.0, "#F03E3E"],
@@ -43,8 +44,25 @@ def correlation_matrix_heatmap(matrix, labels, light_mode=True):
     text = [[f"{zj:.2f}" if zj != 0 else "" for zj in zi] for zi in z]
     ylabels = labels[:-1]
     xlabels = labels[1:]
-    xlabels_short = [str(x[0]).upper() for x in xlabels]
-    ylabels_short = [str(x[0]).upper() for x in ylabels]
+    xlabels_short = [re.split(r" |:",str(x))[0] for x in xlabels]
+    ylabels_short = [re.split(r" |:",str(x))[0] for x in ylabels]
+    try:
+        xlabels_short = [f"{xlabels_short[i]}<br><sup>{xlabels[i].split(xlabels_short[i])[1]}</sup>" for i in range(len(xlabels))]
+        ylabels_short = [f"{ylabels_short[i]}<br><sup>{ylabels[i].split(ylabels_short[i])[1]}</sup>" for i in range(len(ylabels))]
+    except:
+        pass
+    ylabels_idx = [i for i in range(len(labels)-1)]
+    xlabels_idx = [i for i in range(len(labels)-1)]
+    hovertemplate_matrix = []
+    for y in ylabels:
+        ylist = []
+        for x in xlabels:
+            ylist.append(f"{y}<br>{x}")
+
+        hovertemplate_matrix.append(ylist)
+
+
+        
     fig = make_subplots(
         cols=2,
         rows=2,
@@ -52,7 +70,7 @@ def correlation_matrix_heatmap(matrix, labels, light_mode=True):
         shared_yaxes=True,
         vertical_spacing=0,
         horizontal_spacing=0,
-        column_widths=[0.1, 0.9],
+        column_widths=[0.35, 0.65],
         row_heights=[0.9, 0.1],
     )
     fig.add_trace(
@@ -60,15 +78,16 @@ def correlation_matrix_heatmap(matrix, labels, light_mode=True):
             z=z,
             text=text,
             texttemplate="%{text}",
-            x=xlabels,
-            y=ylabels,
+            x=xlabels_idx,
+            y=ylabels_idx,
+            customdata=hovertemplate_matrix,
             colorscale=rdbu_colors,
             zmid=0,
             zmax=1,
             zmin=-1,
             ygap=2,
             xgap=2,
-            hovertemplate="%{x}<br>%{y}<br>Pearson Coefficient = <b>%{text}</b><extra></extra>",
+            hovertemplate="<sup>Datasets</sup><br><i>%{customdata}</i> <br>Pearson Coefficient: <b>%{text}</b><extra></extra>",
             showlegend=False,
             colorbar_title="Pearson correlation coefficient",
             colorbar_title_side="right",
@@ -78,26 +97,29 @@ def correlation_matrix_heatmap(matrix, labels, light_mode=True):
     )
     fig.add_trace(
         go.Scatter(
-            x=[-1 for i in range(4)],
-            y=ylabels,
+            x=[-1 for i in range(len(ylabels))],
+            y=ylabels_idx,
             text=ylabels_short,
+            customdata=ylabels,
             mode="text",
             showlegend=False,
-            textfont=dict(color=MULTI_VIZ_COLORSCALE, size=20),
-            hovertemplate="%{y}<extra></extra>",
+            textfont=dict(color=MULTI_VIZ_COLORSCALE, size=13),
+            textposition="middle center",
+            hovertemplate="%{customdata}<extra></extra>",
         ),
         row=1,
         col=1,
     )
     fig.add_trace(
         go.Scatter(
-            y=[-1 for i in range(4)],
-            x=xlabels,
+            y=[-1 for i in range(len(xlabels))],
+            x=xlabels_idx,
             text=xlabels_short,
+            customdata=xlabels,
             mode="text",
-            textfont=dict(color=MULTI_VIZ_COLORSCALE[1:], size=20),
+            textfont=dict(color=MULTI_VIZ_COLORSCALE[1:], size=13),
             showlegend=False,
-            hovertemplate="%{x}<extra></extra>",
+            hovertemplate="%{customdata}<extra></extra>",
         ),
         row=2,
         col=2,
@@ -165,7 +187,7 @@ def fft_multi(data,dataset_names = None, light_mode=True):
                 line_color = MULTI_VIZ_COLORSCALE[i],
                 line_width=2,
                 opacity=.8,
-                customdata=[None] + [str(datetime.timedelta(seconds=f)) for f in data[i][0]],
+                customdata=[str(datetime.timedelta(seconds=f)) for f in data[i][0]],
                 hovertemplate="<b>Period: %{customdata}</b><br>Amplitude: %{y} <br><extra></extra>",
                 showlegend=False if dataset_names is None else True,
                 name = dataset_names[i] if dataset_names is not None else None
