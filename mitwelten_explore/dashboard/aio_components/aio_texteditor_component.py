@@ -152,7 +152,7 @@ class TextEditorAIO(html.Div):
         self.aio_id = aio_id if aio_id is not None else str(uuid.uuid4())
         self.store_props = store_props.copy() if store_props else {}
 
-        default_html = """<p>describe what you have found...</p><br><br><br>"""
+        default_html = ""#"""<p>describe what you have found...</p><br><br><br>"""
         tabs = dmc.Tabs(
             [
                 dmc.Space(h=12),
@@ -179,7 +179,7 @@ class TextEditorAIO(html.Div):
                     [
                         dmc.Space(h=12),
                         dmc.TextInput(
-                            placeholder="My discovery",
+                            placeholder="Enter a title to publish this annotation",
                             id=self.ids.title_input(self.aio_id),
                             label="Title"
                             # debounce=100
@@ -298,6 +298,7 @@ class TextEditorAIO(html.Div):
             ],
         )
 
+    """
     # validate title
     @callback(
         Output(ids.title_input(MATCH), "error"),
@@ -307,7 +308,9 @@ class TextEditorAIO(html.Div):
         if value is not None:
             if len(value) > 0:
                 return None
-        return "Enter a Title"
+        else:
+            return "Enter a Title"
+    """
 
     # enable publish_btn
     @callback(

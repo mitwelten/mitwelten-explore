@@ -11,6 +11,7 @@
 .ql-editor {
    
     max-height: 35vh;
+    min-height: 20vh;
 
     
     /*max-height: max-content;*/
