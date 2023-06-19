@@ -65,14 +65,14 @@ def correlation_matrix_heatmap(matrix, labels, light_mode=True):
 
         
     fig = make_subplots(
-        cols=2,
-        rows=2,
+        cols=3,
+        rows=3,
         shared_xaxes=True,
         shared_yaxes=True,
         vertical_spacing=0,
         horizontal_spacing=0,
-        column_widths=[0.25, 0.75],
-        row_heights=[0.8, 0.2],
+        column_widths=[0.01,0.25, 0.74],
+        row_heights=[0.79, 0.2,0.01],
     )
     fig.add_trace(
         go.Heatmap(
@@ -94,18 +94,20 @@ def correlation_matrix_heatmap(matrix, labels, light_mode=True):
             colorbar_title_side="right",
         ),
         row=1,
-        col=2,
+        col=3,
     )
     fig.add_trace(
         go.Scatter(
             x=[-1 for i in range(len(ylabels))],
-            y=ylabels_idx,
-            text=ylabels_short,
+            y=[y for y in ylabels_idx],
             customdata=ylabels,
-            mode="text",
+            mode="markers",
+            marker=dict(
+                color=MULTI_VIZ_COLORSCALE,
+                size=30,
+                symbol="square"
+            ),
             showlegend=False,
-            textfont=dict(color=MULTI_VIZ_COLORSCALE, size=12),
-            textposition="middle center",
             hovertemplate="%{customdata}<extra></extra>",
         ),
         row=1,
@@ -113,17 +115,50 @@ def correlation_matrix_heatmap(matrix, labels, light_mode=True):
     )
     fig.add_trace(
         go.Scatter(
+            x=[-1 for i in range(len(ylabels))],
+            y=[y for y in ylabels_idx],
+            text=ylabels_short,
+            customdata=ylabels,
+            mode="text",
+            showlegend=False,
+            #textfont=dict(color=MULTI_VIZ_COLORSCALE, size=12),
+            textposition="middle center",
+            hovertemplate="%{customdata}<extra></extra>",
+        ),
+        row=1,
+        col=2,
+    )
+
+    fig.add_trace(
+        go.Scatter(
             y=[-1 for i in range(len(xlabels))],
             x=xlabels_idx,
             text=xlabels_short,
             customdata=xlabels,
             mode="text",
-            textfont=dict(color=MULTI_VIZ_COLORSCALE[1:], size=12),
+            #textfont=dict(color=MULTI_VIZ_COLORSCALE[1:], size=12),
             showlegend=False,
             hovertemplate="%{customdata}<extra></extra>",
         ),
         row=2,
-        col=2,
+        col=3,
+    )
+    fig.add_trace(
+        go.Scatter(
+            y=[-1 for i in range(len(xlabels))],
+            x=xlabels_idx,
+            customdata=xlabels,
+            mode="markers",
+            marker=dict(
+                color=MULTI_VIZ_COLORSCALE[1:],
+                size=30,
+                symbol="square"
+            ),
+            showlegend=False,
+            hovertemplate="%{customdata}<extra></extra>",
+        ),
+        row=3,
+        col=3,
     )
     fig.update_yaxes(visible=False)
     fig.update_xaxes(visible=False)

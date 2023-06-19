@@ -60,7 +60,7 @@ from dashboard.utils.ts import correlation_matrix, compute_fft, create_fft_bins
 from dashboard.styles import MULTI_VIZ_COLORSCALE, icons
 
 
-from configuration import PATH_PREFIX, DEFAULT_TR_START
+from configuration import PATH_PREFIX, DEFAULT_TR_START, DEFAULT_TOD_BUCKET_WIDTH
 
 dash.register_page(__name__, path_template="/viz/compare")
 
@@ -97,6 +97,7 @@ class PageIds(object):
     share_modal_div = str(uuid4())
     corr_matrix_card = str(uuid4())
     fft_card = str(uuid4())
+    tabs = str(uuid4())
 
 
 ids = PageIds()
@@ -217,136 +218,132 @@ def layout(**qargs):
             dmc.Grid(
                 [
                     dmc.Col(
-                        children=dmc.AccordionMultiple(
-                            children=[
-                                dmc.AccordionItem(
-                                    [
-                                        dmc.AccordionControl(
-                                            dmc.Text("Time Of Day", weight=500)
-                                        ),
-                                        dmc.AccordionPanel(
-                                            dmc.Card(
-                                                dmc.CardSection(
-                                                    [
-                                                        dmc.Group(
+                        children=[
+                            dmc.Tabs(
+                                color="teal",
+                                value="tod",
+                                # variant="outline",
+                                persistence=True,
+                                id=ids.tabs,
+                                radius=0,
+                                styles={
+                                    "tab": {
+                                        "paddingTop": 0,
+                                        "paddingBottom": 4,
+                                    }
+                                },
+                                children=[
+                                    dmc.TabsList(
+                                        [
+                                            dmc.Tab(
+                                                dmc.Text("Time Of Day", weight=500),
+                                                value="tod",
+                                            ),
+                                            dmc.Tab(
+                                                dmc.Text("Stats", weight=500),
+                                                value="stats",
+                                            ),
+                                            dmc.Tab(
+                                                dmc.Text("Analysis", weight=500),
+                                                value="analysis",
+                                            ),
+                                            dmc.Tab(
+                                                dmc.Text("Map", weight=500),
+                                                value="map",
+                                            ),
+                                        ],
+                                        grow=False,
+                                    ),
+                                    dmc.Space(h=8),
+                                    dmc.TabsPanel(
+                                        dmc.Card(
+                                            dmc.CardSection(
+                                                [
+                                                    dmc.Group(
+                                                        [
+                                                            dmc.Code(
+                                                                f"Bucket: {DEFAULT_TOD_BUCKET_WIDTH}m"
+                                                            ),
                                                             timeseries_chart_config_menu(
                                                                 chart_type_id=ids.tod_chart_type,
                                                                 layout_type_id=ids.tod_chart_layout,
                                                                 position="left-end",
                                                             ),
-                                                            pl=2,
-                                                            pt=2,
-                                                            className="position-absolute",
-                                                            style={
-                                                                "zIndex": 1000,
-                                                                "right": 0,
-                                                            },
-                                                            # position="right"
+                                                        ],
+                                                        # pl=2,
+                                                        # pt=2,
+                                                        pl=4,
+                                                        pr=4,
+                                                        # className="position-absolute",
+                                                        # style={"zIndex": 1000,"right": 0,},
+                                                        position="apart",
+                                                    ),
+                                                    dcc.Graph(
+                                                        id=ids.tod_chart,
+                                                        style={
+                                                            "height": "40vh"
+                                                        },  # "width":"50%"},
+                                                        className="compare_tod_chart",
+                                                        config=dict(
+                                                            displaylogo=False,
+                                                            modeBarButtonsToRemove=[
+                                                                "pan",
+                                                                "select",
+                                                                "lasso",
+                                                                "zoom",
+                                                                "dragmode",
+                                                                "autoscale",
+                                                                "zoomin",
+                                                                "zoomout",
+                                                            ],
                                                         ),
-                                                        dcc.Graph(
-                                                            id=ids.tod_chart,
-                                                            style={
-                                                                "height": "30vh"
-                                                            },  # "width":"50%"},
-                                                            className="compare_tod_chart",
-                                                            config=dict(
-                                                                displaylogo=False,
-                                                                modeBarButtonsToRemove=[
-                                                                    "pan",
-                                                                    "select",
-                                                                    "lasso",
-                                                                    "zoom",
-                                                                    "dragmode",
-                                                                    "autoscale",
-                                                                    "zoomin",
-                                                                    "zoomout",
-                                                                ],
-                                                            ),
-                                                        ),
-                                                    ]
+                                                    ),
+                                                ]
+                                            ),
+                                            className="bg-transparent"
+                                        ),
+                                        value="tod",
+                                    ),
+                                    dmc.TabsPanel(
+                                        dmc.Card(
+                                            id=ids.stats_card,
+                                            withBorder=True,
+                                        ),
+                                        value="stats",
+                                    ),
+                                    dmc.TabsPanel(
+                                        dmc.Group(
+                                            [
+                                                dmc.Card(
+                                                    id=ids.corr_matrix_card,
+                                                    withBorder=False,
+                                                    pl=0,
                                                 ),
+                                                dmc.Card(
+                                                    id=ids.fft_card,
+                                                    withBorder=False,
+                                                ),
+                                            ],
+                                            grow=True,
+                                        ),
+                                        value="analysis",
+                                    ),
+                                    dmc.TabsPanel(
+                                        dmc.Card(
+                                            dcc.Graph(
+                                                figure=generate_empty_map(),
+                                                id=ids.map_chart,
+                                                className="p-0",
+                                                style={"height": "40vh"},
                                             ),
                                             p=0,
+                                            radius=0
                                         ),
-                                    ],
-                                    value="tod",
-                                ),
-                                dmc.AccordionItem(
-                                    [
-                                        dmc.AccordionControl(
-                                            dmc.Text("Stats", weight=500)
-                                        ),
-                                        dmc.AccordionPanel(
-                                            dmc.Card(
-                                                id=ids.stats_card,
-                                                withBorder=True,
-                                            ),
-                                        ),
-                                    ],
-                                    value="stats",
-                                ),
-                                dmc.AccordionItem(
-                                    [
-                                        dmc.AccordionControl(
-                                            dmc.Text("Analysis", weight=500)
-                                        ),
-                                        dmc.AccordionPanel(
-                                            dmc.Group(
-                                                [
-                                                    dmc.Card(
-                                                        id=ids.corr_matrix_card,
-                                                        withBorder=False,
-                                                        pl=0,
-                                                    ),
-                                                    dmc.Card(
-                                                        id=ids.fft_card,
-                                                        withBorder=False,
-                                                    ),
-                                                ],
-                                                grow=True,
-                                            )
-                                        ),
-                                    ],
-                                    value="calcs",
-                                ),
-                                dmc.AccordionItem(
-                                    [
-                                        dmc.AccordionControl(
-                                            dmc.Text("Map", weight=500)
-                                        ),
-                                        dmc.AccordionPanel(
-                                            dmc.Card(
-                                                dcc.Graph(
-                                                    figure=generate_empty_map(),
-                                                    id=ids.map_chart,
-                                                    className="p-0",
-                                                    style={"height": "60vh"},
-                                                ),
-                                                p=0,
-                                            ),
-                                        ),
-                                    ],
-                                    value="map",
-                                ),
-                            ],
-                            value=["tod"],
-                            styles={
-                                "control": {
-                                    "padding": 4,
-                                    "paddingTop": 4,
-                                    "paddingBottom": 4,
-                                },
-                                "content": {
-                                    "padding": 0,
-                                },
-                                "item": {
-                                    "border": None,  # "5px solid red"
-                                    "borderRadius": 0,
-                                    "&[data-active]": {},
-                                    "marginTop": "4px",
-                                },
-                            },
-                        ),
+                                        value="map",
+                                    ),
+                                ],
+                            ),
+                        ],
                         className="col-lg-10",
                     ),
                     dmc.Col(
