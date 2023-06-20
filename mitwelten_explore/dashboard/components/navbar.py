@@ -182,7 +182,7 @@ nav_viz_target = dmc.Menu(
                 dmc.MenuItem(
                     "Map",
                     icon=get_icon(icons.map_chart, 16),
-                    color="gray",  # href=PATH_PREFIX + "viz/map",
+                    href=PATH_PREFIX + "viz/map",
                 ),
             ]
         ),

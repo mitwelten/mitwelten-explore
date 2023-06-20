@@ -22,7 +22,9 @@ colorscale2 = plotly.colors.make_colorscale(colors2)
 
 
 class LocationData:
-    def __init__(self, lat, lon, values, ids, name=None, agg_fcn="sum", visible=True):
+    def __init__(
+        self, lat=[], lon=[], values=[], ids=[], name=None, agg_fcn="sum", visible=True
+    ):
         self.lat = lat
         self.lon = lon
         self.values = values
@@ -278,14 +280,16 @@ def generate_choroplethmap(h3ids, values):
     )
 
 
-def generate_scattermap(lat, lon, ids, color="blue", size=7):
+def generate_scattermap(lat, lon, ids, color="blue", size=7, opacity=0.7):
     return go.Scattermapbox(
         lon=lon,
         lat=lat,
         text=ids,
         mode="markers",
         customdata=[{"id": d, "type": "point"} for d in ids],
-        marker={"size": size, "color": color, "opacity": 0.7},
+        marker={"size": size, "color": color, "opacity": opacity},
+        showlegend=False,
+        hoverinfo="skip"
         # hovertemplate="Deployment %{text}<br>Type: %{customdata}<extra></extra>",
     )
 
@@ -389,16 +393,22 @@ def generate_choroplethmap_label_overlay(h3ids, legends):
 
 
 def generate_choroplethmap_multi(
-    h3ids, values, name=None, colorscale=colorscale1, borderonly=False
+    h3ids,
+    values,
+    name=None,
+    colorscale=colorscale1,
+    borderonly=False,
+    zmin=None,
+    zmax=None,
 ):
     geojson = generate_geojson(h3ids)
+    zmin = zmin if zmin is not None else min(values)
+    zmax = zmax if zmax is not None else max(values)
     marker_line_color = (
         [
             get_continuous_color(
                 colorscale,
-                intermed=(v - min(values)) / (max(values) - min(values))
-                if (max(values) - min(values)) > 0
-                else 0,
+                intermed=(v - zmin) / (zmax - zmin) if (zmax - zmin) > 0 else 0,
             )
             if v is not None
             else "rgba(0,0,0,0)"
@@ -419,6 +429,8 @@ def generate_choroplethmap_multi(
         customdata=[{"n_deployments": d, "type": "cell"} for d in values],
         featureidkey="properties.h3index",
         colorscale=m_colorscale,
+        zmin=zmin,
+        zmax=zmax,
         marker_opacity=marker_opacity,
         marker_line_width=marker_line_width,
         marker_line_color=marker_line_color,
@@ -477,6 +489,9 @@ def generate_multi_h3hexbin_map(
     zoom=None,
     clat=None,
     clon=None,
+    scatter=False,
+    range0=None,
+    range1=None,
 ):
     ds0_visible = ds0.visible
     ds1_visible = ds1.visible
@@ -542,22 +557,42 @@ def generate_multi_h3hexbin_map(
     hover_labels = list(label_dict.values())
 
     hexbin_map = go.Figure()
+
     if ds0_visible and len(ds0.values) > 0:
+        zmin = min(values0)
+        zmax = max(values0)
+        zspan = zmax - zmin
+        if isinstance(range0, list) and len(range0) == 2:
+            zmax = int(zmin + (range0[1] / 100) * zspan)
+            zmin += int((range0[0] / 100) * zspan)
+
         hexbin_map.add_trace(
             generate_choroplethmap_multi(
-                locations0, values0, name=ds0.name, colorscale=colorscale1
+                locations0,
+                values0,
+                name=ds0.name,
+                colorscale=colorscale1,
+                zmin=zmin,
+                zmax=zmax,
             )
         )
         hexbin_map.add_trace(
             colorbar_trace(
-                min(values0),
-                max(values0),
+                zmin,
+                zmax,
                 title=ds0.name.split(" ")[0],
                 subtitle=" ".join(ds0.name.split(" ")[1:]),
                 colorscale=colorscale1,
             )
         )
     if ds1_visible and len(ds1.values) > 0:
+        zmin = min(values1)
+        zmax = max(values1)
+        zspan = zmax - zmin
+        if isinstance(range1, list) and len(range1) == 2:
+            zmax = int(zmin + (range1[1] / 100) * zspan)
+            zmin += int((range1[0] / 100) * zspan)
+
         hexbin_map.add_trace(
             generate_choroplethmap_multi(
                 locations1,
@@ -565,12 +600,14 @@ def generate_multi_h3hexbin_map(
                 name=ds1.name,
                 borderonly=True,
                 colorscale=colorscale2,
+                zmin=zmin,
+                zmax=zmax,
             )
         )
         hexbin_map.add_trace(
             colorbar_trace(
-                min(values1),
-                max(values1),
+                zmin,
+                zmax,
                 "bottom",
                 title=ds1.name.split(" ")[0],
                 subtitle=" ".join(ds1.name.split(" ")[1:]),
@@ -581,6 +618,25 @@ def generate_multi_h3hexbin_map(
         hexbin_map.add_trace(
             generate_choroplethmap_label_overlay(hover_locations, legends=hover_labels)
         )
+    if scatter:
+        if ds0_visible and len(ds0.values) > 0:
+            hexbin_map.add_trace(
+                generate_scattermap(ds0.lat, ds0.lon, ds0.ids, "black", 10, opacity=0.5)
+            )
+            hexbin_map.add_trace(
+                generate_scattermap(
+                    ds0.lat, ds0.lon, ds0.ids, MULTI_VIZ_COLORSCALE[0], 8
+                )
+            )
+        if ds1_visible and len(ds1.values) > 0:
+            hexbin_map.add_trace(
+                generate_scattermap(ds1.lat, ds1.lon, ds1.ids, "black", 10, opacity=0.5)
+            )
+            hexbin_map.add_trace(
+                generate_scattermap(
+                    ds1.lat, ds1.lon, ds1.ids, MULTI_VIZ_COLORSCALE[1], 7, opacity=1
+                )
+            )
 
     hexbin_map.update_xaxes(visible=False)
     hexbin_map.update_yaxes(visible=False)

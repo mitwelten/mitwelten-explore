@@ -64,6 +64,7 @@ class DatasetType(str, Enum):
     gbif_observations = "gbif"
     pollinators = "pollinators"
     pax = "pax"
+    multi_pax = "multi_pax"
     location = "location"
     env_temp = "env_temp"
     env_humi = "env_humi"
@@ -193,7 +194,7 @@ class GBIFTaxon:
         return self.rank
 
     def get_title(self):
-        return self.label_sci
+        return f"{self.label_sci} (GBIF)"
 
     def get_location(self):
         return "GBIF: Basel Area"
@@ -287,6 +288,41 @@ class PaxDataset:
     def get_id(self):
         return self.node_label
 
+class MultiPaxDataset:
+    def __init__(self, deployment_id = None, **kwargs):
+        self.deployment_id = deployment_id
+        self.type = DatasetType.multi_pax
+        self.param_desc = "PAX Counter"
+        self.unit = "PAX"
+        
+        
+    def get_location(self):
+        if isinstance(self.deployment_id, list):
+            if len(self.deployment_id) == 0:
+                return "Mitwelten Deployments"
+
+            if len(self.deployment_id) == 1:
+                return f"Mitwelten Deployment {self.deployment_id[0]}"
+            else:
+                return f"{len(self.deployment_id)} Mitwelten Deployments"
+        else:
+            return "Mitwelten Deployments"
+    def to_dataset(self):
+        return dict(
+            type=self.type.value,
+            deployment_id=self.deployment_id,
+        )
+    def get_unit(self):
+        return self.unit
+
+    def get_title(self):
+        return f"{self.param_desc} (s)"
+
+    def get_icon(self):
+        return icons.pax_counter
+
+    def get_id(self):
+        return "pax"
 
 class PollinatorClass(str, Enum):
     fliege = "fliege"
@@ -568,6 +604,8 @@ def to_typed_dataset(dataset: dict):
         return PollinatorDataset(**dataset)
     elif dataset_type == DatasetType.gbif_observations:
         return GBIFTaxon(**dataset)
+    elif dataset_type == DatasetType.multi_pax:
+        return MultiPaxDataset(**dataset)
     else:
         return None
 

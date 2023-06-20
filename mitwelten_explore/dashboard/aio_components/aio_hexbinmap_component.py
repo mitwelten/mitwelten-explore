@@ -145,6 +145,11 @@ class H3HexBinMapMultiAIO(html.Div):
             "subcomponent": "store",
             "aio_id": aio_id,
         }
+        config_store = lambda aio_id: {
+            "component": "H3HexBinMapMultiAIO",
+            "subcomponent": "config_store",
+            "aio_id": aio_id,
+        }
 
     ids = ids
 
@@ -161,6 +166,7 @@ class H3HexBinMapMultiAIO(html.Div):
         store_props=None,
         store_clicked_props=None,
         aio_id=None,
+        config={"scatter": False},
     ):
         self.aio_id = aio_id if aio_id is not None else str(uuid.uuid4())
         self.graph_props = (
@@ -186,6 +192,11 @@ class H3HexBinMapMultiAIO(html.Div):
                 dcc.Store(
                     data=data, id=self.ids.store(self.aio_id), **self.store_props
                 ),
+                dcc.Store(
+                    data=config,
+                    id=self.ids.config_store(self.aio_id),
+                    **self.store_props
+                ),
                 dcc.Graph(
                     figure=figure, id=self.ids.graph(self.aio_id), **self.graph_props
                 ),
@@ -197,24 +208,30 @@ class H3HexBinMapMultiAIO(html.Div):
         Input(ids.graph(MATCH), "relayoutData"),
         Input(ids.store(MATCH), "data"),
         State(ids.store(MATCH), "data"),
+        Input(ids.config_store(MATCH), "modified_timestamp"),
+        Input(ids.config_store(MATCH), "data"),
         # prevent_initial_callbacks=True,
     )
-    def update_hexbins(event_data, data_input, data):
+    def update_hexbins(event_data, data_input, data, config_trg, config):
         if ctx.triggered_id is None or data is None:
             raise PreventUpdate
-
         trg_subcomponents = [
             v.get("subcomponent") for v in list(ctx.triggered_prop_ids.values())
         ]
+        show_scatter = config.get("scatter", False) if config is not None else False
+        range0 = config.get("range0", None) if config is not None else None
+        range1 = config.get("range1", None) if config is not None else None
 
-        if "store" in trg_subcomponents:
+        if "store" in trg_subcomponents or "config_store" in trg_subcomponents:
             dataset0 = LocationData(**data[0])
             dataset1 = LocationData(**data[1])
             return generate_multi_h3hexbin_map(
                 ds0=dataset0,
                 ds1=dataset1,
+                scatter=show_scatter,
+                range0=range0,
+                range1=range1,
             )
-
         elif "graph" in trg_subcomponents:
             dataset0 = LocationData(**data[0])
             dataset1 = LocationData(**data[1])
@@ -222,6 +239,9 @@ class H3HexBinMapMultiAIO(html.Div):
                 return generate_multi_h3hexbin_map(
                     ds0=dataset0,
                     ds1=dataset1,
+                    scatter=show_scatter,
+                    range0=range0,
+                    range1=range1,
                 )
 
             zoomlvl = event_data.get("mapbox.zoom")
@@ -235,6 +255,9 @@ class H3HexBinMapMultiAIO(html.Div):
                 zoom=zoomlvl,
                 clat=center[0],
                 clon=center[1],
+                scatter=show_scatter,
+                range0=range0,
+                range1=range1,
             )
 
         raise PreventUpdate

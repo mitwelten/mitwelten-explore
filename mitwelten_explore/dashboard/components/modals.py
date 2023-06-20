@@ -22,6 +22,7 @@ from dashboard.models import (
     ViewConfiguration,
     PollinatorDataset,
     to_typed_dataset,
+    MultiPaxDataset,
 )
 from dashboard.styles import icons, get_icon
 from dash import dcc
@@ -172,8 +173,13 @@ def generate_viz_map_select_modal_children(store_data, id_role):
         if ds.type == DatasetType.birds:
             trace_id = dmc.Code(ds.datum_id)
             icon = get_icon(ds.get_icon(), width=32)
-            description = dmc.Text(ds.label_sci, size="md")
+            description_components = [dmc.Text(ds.label_sci, size="md")]
+            if ds.label_en:
+                description_components.append(dmc.Text(ds.label_en, size="xs"))
+            if ds.label_de:
+                description_components.append(dmc.Text(ds.label_de, size="xs"))
             unit = dmc.Badge(ds.rank.value, color="teal")
+            description = dmc.Group(description_components, spacing="xs")
             location_name = dmc.Text("Mitwelten Deployments", size="sm")
             list_entries.append(
                 dmc.Grid(
@@ -195,7 +201,6 @@ def generate_viz_map_select_modal_children(store_data, id_role):
                             ),
                             span=2,
                         ),
-                        # dmc.Col(dmc.Group([icon, trace_id]), span=2),
                         dmc.Col(dmc.Group([description, unit]), span=7),
                         dmc.Col(
                             dmc.Group(
@@ -210,6 +215,87 @@ def generate_viz_map_select_modal_children(store_data, id_role):
                     ]
                 )
             )
+        elif ds.type == DatasetType.gbif_observations:
+            trace_id = dmc.Code(ds.datum_id)
+            icon = get_icon(ds.get_icon(), width=32)
+            description = dmc.Text(ds.get_title(), size="md")
+            unit = dmc.Badge(ds.rank.value, color="teal")
+            location_name = dmc.Text(ds.get_location(), size="sm")
+            list_entries.append(
+                dmc.Grid(
+                    [
+                        dmc.Col(
+                            dmc.Group(
+                                [
+                                    dmc.Checkbox(
+                                        color="teal",
+                                        id={
+                                            "role": id_role,
+                                            "index": str(store_data[i]),
+                                        },
+                                        checked=False,
+                                    ),
+                                    icon,
+                                    trace_id,
+                                ]
+                            ),
+                            span=2,
+                        ),
+                        dmc.Col(dmc.Group([description, unit]), span=7),
+                        dmc.Col(
+                            dmc.Group(
+                                [
+                                    get_icon(icon=icons.location_marker),
+                                    location_name,
+                                ],
+                                spacing=4,
+                            ),
+                            span=3,
+                        ),
+                    ]
+                )
+            )
+    all_pax_ds = MultiPaxDataset()
+    trace_id = dmc.Code(all_pax_ds.get_id())
+    icon = get_icon(all_pax_ds.get_icon(), width=32)
+    description = dmc.Text(all_pax_ds.get_title(), size="md")
+    unit = dmc.Badge(all_pax_ds.get_unit(), color="teal")
+    location_name = dmc.Text(all_pax_ds.get_location(), size="sm")
+    list_entries.append(dmc.Text("Default datasets", weight=500, align="center"))
+    list_entries.append(
+        dmc.Grid(
+            [
+                dmc.Col(
+                    dmc.Group(
+                        [
+                            dmc.Checkbox(
+                                color="teal",
+                                id={
+                                    "role": id_role,
+                                    "index": str(all_pax_ds.to_dataset()),
+                                },
+                                checked=False,
+                            ),
+                            icon,
+                            trace_id,
+                        ]
+                    ),
+                    span=2,
+                ),
+                dmc.Col(dmc.Group([description, unit]), span=7),
+                dmc.Col(
+                    dmc.Group(
+                        [
+                            get_icon(icon=icons.location_marker),
+                            location_name,
+                        ],
+                        spacing=4,
+                    ),
+                    span=3,
+                ),
+            ]
+        )
+    )
     return list_entries
 
 

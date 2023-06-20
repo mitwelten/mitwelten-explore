@@ -18,6 +18,15 @@ def get_pax_tod(deployment_id,bucket_width_m,  time_from=None, time_to = None):
        
     return None
 
+def get_pax_locations(deployment_id=None, time_from=None, time_to = None):
+    url = construct_url(f"sensordata/pax_locations", {"from":time_from,"to":time_to})
+    res = cr.get(url)
+    if res.status_code == 200:
+        return res.json()
+       
+    return None
+
+
 def get_env_timeseries(deployment_id,measurement_type, aggregation, bucket_width,  time_from=None, time_to = None):
     url = construct_url(f"sensordata/{measurement_type}/{deployment_id}", {"aggregation":aggregation,"bucket_width":bucket_width, "from":time_from,"to":time_to})
     res = cr.get(url)

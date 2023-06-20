@@ -49,6 +49,8 @@ class Icons(object):
     weather = "fluent:weather-partly-cloudy-day-16-regular"
     hexagon_outline = "ic:outline-hexagon"
     hexagon_filled = "ic:twotone-hexagon"
+    switch_arrows = "mi:switch"
+    success_round = "ep:success-filled"
 
 class IconUrls(object):
     meteoswiss = "/app/assets/icons/meteoswiss.svg"
@@ -83,6 +85,15 @@ MULTI_VIZ_COLORSCALE = [
     "#FD7E14",  # orange.6
     "#FAB005",  # yellow.6
     "#BE4BDB",  # grape.6
+]
+MULTI_VIZ_COLORSCALE_MT = [
+    "blue.6",
+    "green.6",
+    "violet.6",
+    "pink.6",
+    "orange.6",
+    "yellow.6",
+    "grape.6",
 ]
 
 SINGLE_CHART_COLOR = "#12B886"  #  #teal.6

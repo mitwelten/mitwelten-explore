@@ -35,12 +35,20 @@ from dashboard.utils.communication import (
 )
 from dashboard.utils.geo_utils import validate_coordinates
 from dashboard.api_clients.bird_results_client import get_detection_locations
+from dashboard.api_clients.sensordata_client import get_pax_locations
 from dashboard.api_clients.pollinator_results_client import (
     POLLINATOR_IDS,
     get_polli_detection_locations_by_id,
 )
+from dashboard.api_clients.gbif_cache_client import get_gbif_detection_locations
 from dashboard.api_clients.userdata_client import post_annotation
-from dashboard.styles import icons, get_icon, SEQUENTIAL_COLORSCALES
+from dashboard.styles import (
+    icons,
+    get_icon,
+    SEQUENTIAL_COLORSCALES,
+    MULTI_VIZ_COLORSCALE,
+    MULTI_VIZ_COLORSCALE_MT,
+)
 from uuid import uuid4
 import json
 import datetime
@@ -61,11 +69,13 @@ class PageIds(object):
     apply_config_role = str(uuid4())
     confidence_select = str(uuid4())
     agg_select = str(uuid4())
-    normalize_checkbox = str(uuid4())
+    switch_datasets = str(uuid4())
     share_modal_div = str(uuid4())
     play_switch = str(uuid4())
-    interval = str(uuid4())
+    show_scatter = str(uuid4())
     affix_share = str(uuid4())
+    colorscale_slider_1 = str(uuid4())
+    colorscale_slider_2 = str(uuid4())
 
 
 ids = PageIds()
@@ -154,7 +164,10 @@ def layout(**qargs):
             annot_editor,
             # dcc.Interval(id=ids.interval,interval=5000, n_intervals=0),
             dmc.Group(
-                [dmc.Text("Spatial exploration", size="lg", weight=600), traio],
+                [
+                    dmc.Text("Spatial exploration", size="lg", weight=600),
+                    traio,
+                ],
                 position="apart",
             ),
             dmc.Space(h=8),
@@ -163,7 +176,81 @@ def layout(**qargs):
                     dmc.Col(multihexmap, className="col-md-10"),
                     dmc.Col(
                         [
+                            dmc.Text("Datasets", weight=500),
+                            dmc.Space(h=4),
                             dmc.Stack(id=ids.dataset_card_stack),
+                            dmc.Space(h=4),
+                            dmc.Center(
+                                dmc.Anchor(
+                                    id=ids.switch_datasets,
+                                    children=dmc.Button(
+                                        "Switch",
+                                        leftIcon=get_icon(icons.switch_arrows),
+                                        variant="subtle",
+                                    ),
+                                    href=None,
+                                    refresh=False,
+                                )
+                            ),
+                            dmc.Space(h=8),
+                            dmc.Divider(),
+                            dmc.Space(h=12),
+                            dmc.Text("Map configuration", weight=500),
+                            dmc.Space(h=12),
+                            dmc.Checkbox(
+                                label="Show Scatter Markers",
+                                id=ids.show_scatter,
+                                checked=False,
+                            ),
+                            dmc.Space(h=16),
+                            dmc.Text("Colorscale Finetuning", size="14px"),
+                            dmc.Space(h=8),
+                            dmc.Center(
+                                get_icon(
+                                    icons.hexagon_filled,
+                                    width="1.5rem",
+                                    color=MULTI_VIZ_COLORSCALE[0],
+                                ),
+                            ),
+                            dmc.RangeSlider(
+                                id=ids.colorscale_slider_1,
+                                value=[0, 100],
+                                minRange=0.1,
+                                step=0.1,
+                                min=0,
+                                max=100,
+                                precision=2,
+                                color=MULTI_VIZ_COLORSCALE_MT[0],
+                                marks=[
+                                    {"value": 20, "label": "20%"},
+                                    {"value": 50, "label": "50%"},
+                                    {"value": 80, "label": "80%"},
+                                ],
+                                mb=35,
+                            ),
+                            dmc.Center(
+                                get_icon(
+                                    icons.hexagon_outline,
+                                    width="1.5rem",
+                                    color=MULTI_VIZ_COLORSCALE[1],
+                                ),
+                            ),
+                            dmc.RangeSlider(
+                                id=ids.colorscale_slider_2,
+                                value=[0, 100],
+                                minRange=1,
+                                min=0,
+                                step=0.1,
+                                precision=2,
+                                max=100,
+                                color=MULTI_VIZ_COLORSCALE_MT[1],
+                                mb=35,
+                                marks=[
+                                    {"value": 20, "label": "20%"},
+                                    {"value": 50, "label": "50%"},
+                                    {"value": 80, "label": "80%"},
+                                ],
+                            ),
                         ],
                         className="col-md-2",
                     ),
@@ -229,8 +316,6 @@ def update_select_modal(is_open, data):
 )
 def generate_link(checkboxes, nc, search):
     trg = ctx.triggered_id
-    if search is not None:
-        print("len_search", len(search), search)
     if trg is not None:
         n_selected = sum(checkboxes)
         checked_elements = [i for i, x in enumerate(checkboxes) if x]
@@ -316,7 +401,7 @@ def update_map_store(search, pn):
         raise PreventUpdate
     # load dataset0
     locationdata = []
-    for i in [0, 1]:
+    for i in range(len(datasets)):
         ds = to_typed_dataset(datasets[i])
         if ds.type == DatasetType.birds:
             locations = get_detection_locations(
@@ -337,6 +422,29 @@ def update_map_store(search, pn):
                 if locations_polli is not None:
                     add_datapoints_to_locationdata(ds_location, locations_polli)
             locationdata.append(ds_location)
+        elif ds.type == DatasetType.multi_pax:
+            pax_locations = get_pax_locations(
+                deployment_id=ds.deployment_id,
+                time_from=args.view_config.time_from,
+                time_to=args.view_config.time_to,
+            )
+            if pax_locations is not None:
+
+                locationdata.append(resp_to_locationdata(pax_locations, ds.get_title()))
+        elif ds.type == DatasetType.gbif_observations:
+            gbif_locations = get_gbif_detection_locations(
+                taxon_id=ds.datum_id,
+                time_from=args.view_config.time_from,
+                time_to=args.view_config.time_to,
+            )
+            if gbif_locations is not None:
+
+                locationdata.append(
+                    resp_to_locationdata(gbif_locations, ds.get_title())
+                )
+
+        else:
+            locationdata.append(LocationData())
 
     return [l.to_dict() for l in locationdata]
 
@@ -443,16 +551,37 @@ def update_visibility(c1, c2, data):
     raise PreventUpdate
 
 
-"""@callback(
-    Output(traio.ids.date_step_right(traio.aio_id), "n_clicks"),
-    Input(ids.interval, "n_intervals"),
-    Input(ids.play_switch, "checked"),
-    State(traio.ids.date_step_right(traio.aio_id), "n_clicks"),
+@callback(
+    Output(multihexmap.ids.config_store(multihexmap.aio_id), "data"),
+    Input(ids.show_scatter, "checked"),
+    Input(ids.colorscale_slider_1, "value"),
+    Input(ids.colorscale_slider_2, "value"),
 )
-def start_play(ni, enabled, nc):
-    if enabled == True and ni is not None:
-        return 1 if nc is None else nc+1s
-    raise PreventUpdate"""
+def set_scatter_config(checked, range0, range1):
+    if ctx.triggered_id is not None:
+        return {"scatter": checked, "range0": range0, "range1": range1}
+
+
+# switch_datasets
+@callback(
+    Output(ids.switch_datasets, "href"),
+    Input(ids.url, "search"),
+    State(ids.url, "pathname"),
+)
+def update_switch_datasets_href(search, pn):
+    if not "viz/map" in pn:
+        raise PreventUpdate
+    query_args = parse_nested_qargs(qargs_to_dict(search))
+    datasets = query_args.get("datasets")
+    cfg = query_args.get("cfg")
+    if cfg is None or datasets is None:
+        raise PreventUpdate
+    datasets.reverse()
+    cfg.reverse()
+    query_args["datasets"] = datasets
+    query_args["cfg"] = cfg
+    return f"{pn}?{urlencode_dict(query_args)}"
+
 
 # share modal
 @callback(
@@ -515,11 +644,18 @@ def publish_annotation(nc, search, pathname, data):
                             dmc.Divider(pb=12),
                             dcc.Markdown(data.get("md_content")),
                         ],
-                        withBorder=True,
-                        style={"border": "1px solid green"},
+                        withBorder=False,
                     ),
                     opened=True,
-                    title="Annotation published!",
+                    title=dmc.Group(
+                        [
+                            dmc.Text("Annotation published!", weight=500),
+                            get_icon(
+                                icons.success_round, width="1.5rem", color="green"
+                            ),
+                        ],
+                        spacing="xs",
+                    ),
                     size="60%",
                     zIndex=1000,
                 ),
@@ -532,7 +668,7 @@ def publish_annotation(nc, search, pathname, data):
                         children="Something went wrong. Try again.", color="red"
                     ),
                     opened=True,
-                    title="Annotation published!",
+                    title="Annotation not published",
                     size="60%",
                     zIndex=1000,
                 ),

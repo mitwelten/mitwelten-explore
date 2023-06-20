@@ -33,7 +33,6 @@ def get_polli_detection_dates_by_id(
             ):  # 5 means that all classes are selected
                 for pc in pollinator_classes:
                     url += f"&pollinator_class={pc}"
-        print(url)
 
         res = cr.get(url)
         if res.status_code == 200:
@@ -64,7 +63,6 @@ def get_polli_detection_dates(
     if isinstance(deployment_ids, list) and len(deployment_ids) > 0:
         for d in deployment_ids:
             url += f"&deployment_ids={d}"
-    print(url)
 
     res = cr.get(url)
     if res.status_code == 200:
@@ -92,7 +90,6 @@ def get_polli_detection_locations_by_id(
             ):  # 5 means that all classes are selected
                 for pc in pollinator_classes:
                     url += f"&pollinator_class={pc}"
-        print(url)
         res = cr.get(url)
         if res.status_code == 200:
 
