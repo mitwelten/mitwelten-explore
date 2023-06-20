@@ -186,6 +186,105 @@ def taxon_viz_info_card(taxon_id):
     )
 
 
+def dataset_info_card(
+    args: UrlSearchArgs,
+    index,
+    config_btn_role,
+    visible_btn_id,
+    trace_icon=icons.hexagon_filled,
+    icon_color="gray",
+):
+    if args.datasets is None or args.cfg is None:
+        return None
+    if len(args.datasets) < index - 1:
+        return None
+    if not len(args.datasets) == len(args.cfg):
+        return None
+    ds = to_typed_dataset(args.datasets[index])
+    config = args.cfg[index]
+    visibility_btn = dmc.Chip(
+        "Visible", color="teal", id=visible_btn_id, checked=True, size="xs"
+    )
+    cfg_indicator_codes = [visibility_btn]
+    if config.confidence:
+        cfg_indicator_codes.append(dmc.Code(f"confidence >= {config.confidence}"))
+    if config.agg:
+        cfg_indicator_codes.append(dmc.Code(f"{config.agg}()"))
+    if config.normalize:
+        cfg_indicator_codes.append(dmc.Code("normalized"))
+
+    config_button = dmc.ActionIcon(
+        get_icon(icon=icons.edit_pen),
+        id={"role": config_btn_role, "index": index},
+        variant="subtle",
+    )
+
+    return dmc.Card(
+        dmc.Stack(
+            [
+                dmc.Stack(
+                    [
+                        dmc.ScrollArea(
+                            [
+                                dmc.Group(
+                                    [
+                                        get_icon(
+                                            trace_icon, width="1.5rem", color=icon_color
+                                        ),
+                                        dmc.Text(
+                                            [
+                                                ds.get_title(),
+                                            ],
+                                            weight=500,
+                                            size="sm",
+                                            className="text-nowrap",
+                                        ),
+                                    ],
+                                    noWrap=True,
+                                    spacing=2,
+                                ),
+                                dmc.Space(h=3),
+                            ],
+                            style={"width": "99%"},
+                            scrollbarSize=6,
+                        ),
+                        dmc.Group(
+                            [
+                                dmc.Group(
+                                    [
+                                        get_icon(icon=icons.location_marker),
+                                        dmc.Text(ds.get_location(), size="xs"),
+                                        dmc.Badge(
+                                            ds.get_unit(),
+                                            color="indigo",
+                                            size="sm",
+                                        ),
+                                    ],
+                                    spacing=2,
+                                ),
+                                config_button,
+                            ],
+                            spacing=4,
+                            position="apart",
+                        ),
+                    ],
+                    spacing=2,
+                ),
+                dmc.Group(cfg_indicator_codes),
+            ],
+            spacing=2,
+        ),
+        withBorder=True,
+        radius=0,
+        p=6,
+        style={
+            # "borderColor": MULTI_VIZ_COLORSCALE[index],
+            "border": f"1px solid {MULTI_VIZ_COLORSCALE[index]}",
+            "borderLeft": f"6px solid {MULTI_VIZ_COLORSCALE[index]}",
+        },
+    )
+
+
 def dataset_info_cards(args: UrlSearchArgs, config_btn_role):
     if args.datasets is None or args.cfg is None:
         return []

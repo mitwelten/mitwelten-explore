@@ -52,6 +52,22 @@ app.layout = dmc.MantineProvider(
     ],
 )
 
+# sync traces store
+@app.callback(
+    Output("traces_store", "data", allow_duplicate=True),
+    Input("traces_store", "modified_timestamp"),
+    State("traces_store", "data"),
+    prevent_initial_call=True,
+)
+def sync_collection(ts, data):
+    if data is None:
+
+        collection = get_collection(auth_cookie=flask.request.cookies.get("auth"))
+        return collection
+    if data is not None:
+        update_collection(datasets=data, auth_cookie=flask.request.cookies.get("auth"))
+    raise PreventUpdate
+
 
 @app.callback(
     Output("username_nav", "children"),
@@ -80,23 +96,6 @@ def update_mt_theme(value):
         return {"colorScheme": "dark"}
 
 
-# sync traces store
-@app.callback(
-    Output("traces_store", "data", allow_duplicate=True),
-    Input("traces_store", "modified_timestamp"),
-    State("traces_store", "data"),
-    prevent_initial_call=True,
-)
-def sync_collection(ts, data):
-    if data is None:
-
-        collection = get_collection(auth_cookie=flask.request.cookies.get("auth"))
-        return collection
-    if data is not None:
-        update_collection(datasets=data, auth_cookie=flask.request.cookies.get("auth"))
-    raise PreventUpdate
-
-
 @app.callback(
     Output("sidebar_selected_trace_number", "children"),
     Input("traces_store", "data"),
@@ -107,7 +106,7 @@ def update_sidebar(data):
         return "0"
     n_traces = len(data)
 
-    return str(n_traces)  
+    return str(n_traces)
 
 
 @app.callback(

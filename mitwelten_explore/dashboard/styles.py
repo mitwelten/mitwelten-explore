@@ -1,5 +1,6 @@
 from dash_iconify import DashIconify
 import dash_mantine_components as dmc
+import plotly.colors
 
 class Icons(object):
     share = "material-symbols:share"
@@ -46,6 +47,8 @@ class Icons(object):
     multi_chart = "material-symbols:ssid-chart-rounded"
     map_chart = "material-symbols:map-outline-rounded"
     weather = "fluent:weather-partly-cloudy-day-16-regular"
+    hexagon_outline = "ic:outline-hexagon"
+    hexagon_filled = "ic:twotone-hexagon"
 
 class IconUrls(object):
     meteoswiss = "/app/assets/icons/meteoswiss.svg"
@@ -83,3 +86,23 @@ MULTI_VIZ_COLORSCALE = [
 ]
 
 SINGLE_CHART_COLOR = "#12B886"  #  #teal.6
+
+SEQUENTIAL_COLORSCALES = [
+    plotly.colors.sequential.Blues,
+    plotly.colors.sequential.Blues,
+    plotly.colors.sequential.Greens,
+    plotly.colors.sequential.tempo,
+    plotly.colors.sequential.Bluered,
+    plotly.colors.diverging.Portland,
+    plotly.colors.sequential.YlOrRd,
+    plotly.colors.sequential.YlGnBu,
+    plotly.colors.sequential.deep_r,
+    plotly.colors.sequential.Viridis,
+    plotly.colors.sequential.Tealgrn,
+    plotly.colors.sequential.RdPu
+]
+
+TRANSPARENT_COLORSCALE = [
+    [0.0, "rgba(0,0,0,0)"],
+    [1.0, "rgba(0,0,0,0)"],
+]

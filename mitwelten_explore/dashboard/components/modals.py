@@ -163,6 +163,56 @@ def viz_compare_select_modal(id):
     )
 
 
+def generate_viz_map_select_modal_children(store_data, id_role):
+    if store_data is None:
+        return []
+    list_entries = []
+    for i in range(len(store_data)):
+        ds = to_typed_dataset(store_data[i])
+        if ds.type == DatasetType.birds:
+            trace_id = dmc.Code(ds.datum_id)
+            icon = get_icon(ds.get_icon(), width=32)
+            description = dmc.Text(ds.label_sci, size="md")
+            unit = dmc.Badge(ds.rank.value, color="teal")
+            location_name = dmc.Text("Mitwelten Deployments", size="sm")
+            list_entries.append(
+                dmc.Grid(
+                    [
+                        dmc.Col(
+                            dmc.Group(
+                                [
+                                    dmc.Checkbox(
+                                        color="teal",
+                                        id={
+                                            "role": id_role,
+                                            "index": str(store_data[i]),
+                                        },
+                                        checked=False,
+                                    ),
+                                    icon,
+                                    trace_id,
+                                ]
+                            ),
+                            span=2,
+                        ),
+                        # dmc.Col(dmc.Group([icon, trace_id]), span=2),
+                        dmc.Col(dmc.Group([description, unit]), span=7),
+                        dmc.Col(
+                            dmc.Group(
+                                [
+                                    get_icon(icon=icons.location_marker),
+                                    location_name,
+                                ],
+                                spacing=4,
+                            ),
+                            span=3,
+                        ),
+                    ]
+                )
+            )
+    return list_entries
+
+
 def generate_viz_compare_select_modal_children(store_data, id_role):
     print("todo: move to classes")
     if store_data is None:
@@ -524,10 +574,10 @@ def dataset_config_modal(
                 id=confidence_select_id, value=None, visible=False
             )
         )
-
-    children.append(
-        dmc.Checkbox(label="Normalize", checked=cfg.normalize, id=normalize_id),
-    )
+    if normalize_id:
+        children.append(
+            dmc.Checkbox(label="Normalize", checked=cfg.normalize, id=normalize_id),
+        )
     children.append(
         dmc.Group(
             dmc.Button(

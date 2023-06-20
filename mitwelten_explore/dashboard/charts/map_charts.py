@@ -1,4 +1,5 @@
 import plotly.graph_objects as go
+import plotly.colors
 from dashboard.utils.geo_utils import (
     generate_geojson,
     calculate_zoom_from_points,
@@ -7,7 +8,96 @@ from dashboard.utils.geo_utils import (
 )
 import numpy as np
 from configuration import DEFAULT_LAT, DEFAULT_LON, DEFAULT_ZOOM
-from dashboard.styles import MULTI_VIZ_COLORSCALE
+from dashboard.styles import (
+    MULTI_VIZ_COLORSCALE,
+    SEQUENTIAL_COLORSCALES,
+    TRANSPARENT_COLORSCALE,
+)
+
+
+colors1, _ = plotly.colors.convert_colors_to_same_type(SEQUENTIAL_COLORSCALES[0])
+colors2, _ = plotly.colors.convert_colors_to_same_type(SEQUENTIAL_COLORSCALES[1])
+colorscale1 = plotly.colors.make_colorscale(colors1)
+colorscale2 = plotly.colors.make_colorscale(colors2)
+
+
+class LocationData:
+    def __init__(self, lat, lon, values, ids, name=None, agg_fcn="sum", visible=True):
+        self.lat = lat
+        self.lon = lon
+        self.values = values
+        self.ids = ids
+        self.name = name
+        self.agg_fcn = agg_fcn
+        self.visible = visible
+
+    def to_dict(self):
+        return dict(
+            lat=self.lat,
+            lon=self.lon,
+            values=self.values,
+            ids=self.ids,
+            name=self.name,
+            agg_fcn=self.agg_fcn,
+            visible=self.visible,
+        )
+
+    def add_datapoint(self, lat, lon, value, id):
+        self.lat.append(lat)
+        self.lon.append(lon)
+        self.values.append(value)
+        self.ids.append(id)
+
+
+def agg_fcn_mapper(fcn):
+    if fcn == "mean":
+        return np.mean
+    else:
+        return np.sum
+
+
+def get_continuous_color(colorscale, intermed):
+    """
+    Plotly continuous colorscales assign colors to the range [0, 1]. This function computes the intermediate
+    color for any value in that range.
+
+    Plotly doesn't make the colorscales directly accessible in a common format.
+    Some are ready to use:
+
+        colorscale = plotly.colors.PLOTLY_SCALES["Greens"]
+
+    Others are just swatches that need to be constructed into a colorscale:
+
+        viridis_colors, scale = plotly.colors.convert_colors_to_same_type(plotly.colors.sequential.Viridis)
+        colorscale = plotly.colors.make_colorscale(viridis_colors, scale=scale)
+
+    :param colorscale: A plotly continuous colorscale defined with RGB string colors.
+    :param intermed: value in the range [0, 1]
+    :return: color in rgb string format
+    :rtype: str
+    """
+    if len(colorscale) < 1:
+        raise ValueError("colorscale must have at least one color")
+
+    if intermed <= 0 or len(colorscale) == 1:
+        return colorscale[0][1]
+    if intermed >= 1:
+        return colorscale[-1][1]
+
+    for cutoff, color in colorscale:
+        if intermed > cutoff:
+            low_cutoff, low_color = cutoff, color
+        else:
+            high_cutoff, high_color = cutoff, color
+            break
+
+    # noinspection PyUnboundLocalVariable
+    return plotly.colors.find_intermediate_color(
+        lowcolor=low_color,
+        highcolor=high_color,
+        intermed=((intermed - low_cutoff) / (high_cutoff - low_cutoff)),
+        colortype="rgb",
+    )
 
 
 # empty map
@@ -42,8 +132,8 @@ def generate_scatter_map_plot(lats, lons, names, ids, selected=None):
         mean_lat = DEFAULT_LAT
         mean_lon = DEFAULT_LON
     else:
-        not_0_lats = [lat for lat in lats if lat !=0.0]
-        not_0_lons = [lon for lon in lons if lon !=0.0]
+        not_0_lats = [lat for lat in lats if lat != 0.0]
+        not_0_lons = [lon for lon in lons if lon != 0.0]
         mean_lat = np.mean(not_0_lats)
         mean_lon = np.mean(not_0_lons)
     fig = go.Figure()
@@ -99,40 +189,37 @@ def generate_scatter_map_plot(lats, lons, names, ids, selected=None):
     return fig
 
 
-def generate_multi_scatter_map_plot(data:list):
-    if data is None or len(data)==0:
+def generate_multi_scatter_map_plot(data: list):
+    if data is None or len(data) == 0:
         return generate_empty_map()
     traces = []
     lats = []
     lons = []
-    
+
     for i in range(len(data)):
 
         traces.append(
             go.Scattermapbox(
-                    lon=data[i].get("longitude"),
-                    lat=data[i].get("latitude"),
-                    text=data[i].get("name"),
-                    customdata=data[i].get("id"),
-                    marker={"size": 15, "color": MULTI_VIZ_COLORSCALE[i], "opacity": 0.8},
-                    hovertemplate="%{text}<extra></extra>",
-                )
+                lon=data[i].get("longitude"),
+                lat=data[i].get("latitude"),
+                text=data[i].get("name"),
+                customdata=data[i].get("id"),
+                marker={"size": 15, "color": MULTI_VIZ_COLORSCALE[i], "opacity": 0.8},
+                hovertemplate="%{text}<extra></extra>",
+            )
         )
-        lons+=data[i].get("longitude")
-        lats+=data[i].get("latitude")
-
-    
+        lons += data[i].get("longitude")
+        lats += data[i].get("latitude")
 
     fig = go.Figure()
     for trace in traces:
         fig.add_trace(trace)
 
-    lats = [l for l in lats if l >40]
-    lons = [l for l in lons if l >1]
-    zoom = calculate_zoom_from_points(min(lats),max(lats),min(lons),max(lons))
-    center_lat = (max(lats)+min(lats))/2
-    center_lon = (max(lons)+min(lons))/2
-
+    lats = [l for l in lats if l > 40]
+    lons = [l for l in lons if l > 1]
+    zoom = calculate_zoom_from_points(min(lats), max(lats), min(lons), max(lons))
+    center_lat = (max(lats) + min(lats)) / 2
+    center_lon = (max(lons) + min(lons)) / 2
 
     fig.update_layout(
         plot_bgcolor="rgba(0,0,0,0)",
@@ -155,7 +242,9 @@ def generate_multi_scatter_map_plot(data:list):
         showlegend=False,
         margin=dict(l=0, r=0, t=0, b=0),
     )
-    fig.update_traces(cluster_enabled=True, cluster_size=10, cluster_opacity=0.8,cluster_maxzoom=20) # https://plotly.com/python/reference/scattermapbox/#scattermapbox-cluster
+    fig.update_traces(
+        cluster_enabled=True, cluster_size=10, cluster_opacity=0.8, cluster_maxzoom=20
+    )  # https://plotly.com/python/reference/scattermapbox/#scattermapbox-cluster
     return fig
 
 
@@ -278,5 +367,254 @@ def generate_h3hexbin_map(
             ],
         },
         showlegend=False,
+    )
+    return hexbin_map
+
+
+def generate_choroplethmap_label_overlay(h3ids, legends):
+    geojson = generate_geojson(h3ids)
+
+    return go.Choroplethmapbox(
+        geojson=geojson,
+        z=[0 for i in range(len(h3ids))],
+        text=legends,
+        locations=h3ids,
+        featureidkey="properties.h3index",
+        colorscale=TRANSPARENT_COLORSCALE,
+        marker_opacity=0,
+        hovertemplate="%{text}<extra></extra>",
+        showlegend=False,
+        showscale=False,
+    )
+
+
+def generate_choroplethmap_multi(
+    h3ids, values, name=None, colorscale=colorscale1, borderonly=False
+):
+    geojson = generate_geojson(h3ids)
+    marker_line_color = (
+        [
+            get_continuous_color(
+                colorscale,
+                intermed=(v - min(values)) / (max(values) - min(values))
+                if (max(values) - min(values)) > 0
+                else 0,
+            )
+            if v is not None
+            else "rgba(0,0,0,0)"
+            for v in values
+        ]
+        if borderonly
+        else "rgba(0,0,0,1)"
+    )
+    marker_opacity = 1 if borderonly else 0.7
+    marker_line_width = 4 if borderonly else 0
+    m_colorscale = TRANSPARENT_COLORSCALE if borderonly else colorscale
+    return go.Choroplethmapbox(
+        geojson=geojson,
+        z=values,
+        text=values,
+        locations=h3ids,
+        name=name,
+        customdata=[{"n_deployments": d, "type": "cell"} for d in values],
+        featureidkey="properties.h3index",
+        colorscale=m_colorscale,
+        marker_opacity=marker_opacity,
+        marker_line_width=marker_line_width,
+        marker_line_color=marker_line_color,
+        hovertemplate=str(name) + ": <b>%{z}</b><extra></extra>",
+        showlegend=False,
+        showscale=False,
+    )
+
+
+def colorbar_trace(
+    cmin, cmax, position="top", colorscale=colorscale1, title="trace", subtitle=""
+):
+    colorbar_dict = dict(
+        thicknessmode="pixels",
+        thickness=15,
+        # x=0.99,
+        # y=0.99 if position == "top" else 0.01,
+        # yanchor="top" if position == "top" else "bottom",
+        # xanchor="right",
+        # next to each other
+        # xanchor="right" if position == "top" else "left",
+        # yanchor="top",
+        # x=0.91,
+        # y=0.99,
+        # left-right
+        xanchor="left" if position == "top" else "right",
+        x=0.005 if position == "top" else 0.995,
+        y=0.995,
+        yanchor="top",
+        ypad=8,
+        xpad=8,
+        len=0.5,
+        bgcolor="rgba(245, 245, 245,0.8)",
+        outlinecolor="rgba(245, 245, 245,0)",
+        title=f"{title}<br><sup>{subtitle}</sup>",
+    )
+    return go.Scatter(
+        x=[None],
+        y=[None],
+        mode="markers",
+        marker=dict(
+            colorscale=colorscale,
+            showscale=True,
+            cmin=cmin,
+            cmax=cmax,
+            colorbar=colorbar_dict,
+        ),
+        showlegend=False,
+        hoverinfo="none",
+    )
+
+
+def generate_multi_h3hexbin_map(
+    ds0: LocationData,
+    ds1: LocationData,
+    zoom=None,
+    clat=None,
+    clon=None,
+):
+    ds0_visible = ds0.visible
+    ds1_visible = ds1.visible
+    if ds1_visible is False and ds0_visible is False:
+        return generate_empty_map()
+    concat_lats = ds0.lat + ds1.lat
+    concat_lons = ds0.lon + ds1.lon
+    if len(concat_lats) == 0 or len(concat_lons) == 0:
+        return generate_empty_map()
+
+    lat_min = np.min(concat_lats)
+    lat_max = np.max(concat_lats)
+    lon_min = np.min(concat_lons)
+    lon_max = np.max(concat_lons)
+    zoom = (
+        calculate_zoom_from_points(lat_min, lat_max, lon_min, lon_max)
+        if zoom is None
+        else zoom
+    )
+    if clat is None:
+
+        if len(concat_lats) > 1:
+            clat = (lat_max + lat_min) / 2
+            clon = (lon_max + lon_min) / 2
+        else:
+            clat = lat_max
+            clon = lon_max
+
+    resolution = zoom_to_cell_resolution(zoom)
+
+    aggregated0 = generate_clusters(
+        resolution=resolution,
+        lat=ds0.lat,
+        lon=ds0.lon,
+        values=ds0.values,
+        fun=agg_fcn_mapper(ds0.agg_fcn),
+    )
+    # aggregated0 = dict(sorted(aggregated0.items(), key=lambda item: item[1]))
+
+    locations0 = list(aggregated0.keys())
+    values0 = list(aggregated0.values())
+
+    aggregated1 = generate_clusters(
+        resolution=resolution,
+        lat=ds1.lat,
+        lon=ds1.lon,
+        values=ds1.values,
+        fun=agg_fcn_mapper(ds1.agg_fcn),
+    )
+    aggregated1 = dict(sorted(aggregated1.items(), key=lambda item: item[1]))
+    locations1 = list(aggregated1.keys())
+    values1 = list(aggregated1.values())
+    label_dict = aggregated0.copy()
+    for l in label_dict.keys():
+        label_dict[l] = f"{ds0.name}: <b>{label_dict[l]}</b><br>"
+    for l in aggregated1.keys():
+        if l in label_dict:
+            label_dict[l] += f"{ds1.name}: <b>{aggregated1[l]}</b>"
+        else:
+            label_dict[l] = f"<br>{ds1.name}: <b>{aggregated1[l]}</b>"
+
+    hover_locations = list(label_dict.keys())
+    hover_labels = list(label_dict.values())
+
+    hexbin_map = go.Figure()
+    if ds0_visible and len(ds0.values) > 0:
+        hexbin_map.add_trace(
+            generate_choroplethmap_multi(
+                locations0, values0, name=ds0.name, colorscale=colorscale1
+            )
+        )
+        hexbin_map.add_trace(
+            colorbar_trace(
+                min(values0),
+                max(values0),
+                title=ds0.name.split(" ")[0],
+                subtitle=" ".join(ds0.name.split(" ")[1:]),
+                colorscale=colorscale1,
+            )
+        )
+    if ds1_visible and len(ds1.values) > 0:
+        hexbin_map.add_trace(
+            generate_choroplethmap_multi(
+                locations1,
+                values1,
+                name=ds1.name,
+                borderonly=True,
+                colorscale=colorscale2,
+            )
+        )
+        hexbin_map.add_trace(
+            colorbar_trace(
+                min(values1),
+                max(values1),
+                "bottom",
+                title=ds1.name.split(" ")[0],
+                subtitle=" ".join(ds1.name.split(" ")[1:]),
+                colorscale=colorscale2,
+            )
+        )
+    if ds0_visible and ds1_visible:
+        hexbin_map.add_trace(
+            generate_choroplethmap_label_overlay(hover_locations, legends=hover_labels)
+        )
+
+    hexbin_map.update_xaxes(visible=False)
+    hexbin_map.update_yaxes(visible=False)
+    hexbin_map.update_layout(
+        clickmode="event",
+        margin=dict(l=0, r=0, t=0, b=0),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        hoverlabel_bgcolor="rgba(245, 245, 245,0.8)",
+        # template="plotly_dark",
+        mapbox={
+            "style": "white-bg",
+            "zoom": zoom,
+            "center": {"lat": clat, "lon": clon},
+            "layers": [
+                {
+                    "below": "traces",
+                    "sourcetype": "raster",
+                    "sourceattribution": '<a href="https://www.swisstopo.admin.ch/de/home.html" target="_blank">SwissTopo</a>',
+                    "source": [
+                        "https://wmts10.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/current/3857/{z}/{x}/{y}.jpeg"
+                    ],
+                },
+            ],
+        },
+        showlegend=True,
+        legend=dict(
+            itemsizing="constant",
+            orientation="h",
+            x=0.01,
+            y=0.01,
+            xanchor="left",
+            yanchor="bottom",
+            bgcolor="rgba(245, 245, 245,0.8)",
+        ),
     )
     return hexbin_map
