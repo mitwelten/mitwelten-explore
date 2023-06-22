@@ -485,6 +485,10 @@ def generate_multi_h3hexbin_map(
 ):
     ds0_visible = ds0.visible
     ds1_visible = ds1.visible
+    if len(ds0.values)==0:
+        ds0_visible = False
+    if len(ds1.values)==0:
+        ds1_visible = False
     if ds1_visible is False and ds0_visible is False:
         return generate_empty_map()
     concat_lats = ds0.lat + ds1.lat
@@ -705,71 +709,6 @@ def generate_bubblemap_hovertrace(lat, lon, ids, values, name=None, color="gray"
     )
 
 
-def generate_single_bubble_map(
-    ds0: LocationData,
-    zoom=None,
-    clat=None,
-    clon=None,
-):
-    if not ds0.visible or len(ds0.lat) == 0:
-        return generate_empty_map()
-    lat_min = np.min(ds0.lat)
-    lat_max = np.max(ds0.lat)
-    lon_min = np.min(ds0.lon)
-    lon_max = np.max(ds0.lon)
-    zoom = (
-        calculate_zoom_from_points(lat_min, lat_max, lon_min, lon_max)
-        if zoom is None
-        else zoom
-    )
-    if clat is None:
-
-        if len(ds0.lat) > 1:
-            clat = (lat_max + lat_min) / 2
-            clon = (lon_max + lon_min) / 2
-        else:
-            clat = lat_max
-            clon = lon_max
-    resolution = zoom_to_cell_resolution(zoom)
-    bubble_map = go.Figure()
-
-    ds0.sort(descending=True)
-    bubble_map.add_trace(
-        generate_bubblemap_trace(
-            lat=ds0.lat,
-            lon=ds0.lon,
-            ids=ds0.ids,
-            values=ds0.values,
-            color=MULTI_VIZ_COLORSCALE[0],
-        )
-    )
-    bubble_map.add_trace(
-        generate_bubblemap_hovertrace(
-            ds0.lat,
-            ds0.lon,
-            ds0.ids,
-            ds0.values,
-            name=ds0.name,
-            color=MULTI_VIZ_COLORSCALE[0],
-        )
-    )
-
-    bubble_map.update_layout(
-        margin=dict(l=0, r=0, t=0, b=0),
-        plot_bgcolor="rgba(0,0,0,0)",
-        paper_bgcolor="rgba(0,0,0,0)",
-        hoverlabel_bgcolor="rgba(245, 245, 245,0.8)",
-        mapbox={
-            "style": "white-bg",
-            "zoom": zoom,
-            "center": {"lat": clat, "lon": clon},
-            "layers": SWISSTOPO_LAYER,
-        },
-        showlegend=False,
-    )
-    return bubble_map
-
-
 def generate_multi_bubble_map(
     ds0: LocationData,
     ds1: LocationData,
@@ -779,6 +718,10 @@ def generate_multi_bubble_map(
 ):
     ds0_visible = ds0.visible
     ds1_visible = ds1.visible
+    if len(ds0.values)==0:
+        ds0_visible = False
+    if len(ds1.values)==0:
+        ds1_visible = False
     if ds1_visible is False and ds0_visible is False:
         return generate_empty_map()
     concat_lats = ds0.lat + ds1.lat

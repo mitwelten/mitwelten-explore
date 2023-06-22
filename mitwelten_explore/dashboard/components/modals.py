@@ -151,9 +151,9 @@ def generate_viz_timeseries_select_modal_children(store_data):
     return list_entries
 
 
-def viz_compare_select_modal(id):
+def viz_compare_select_modal(id, title="Select two or more datasets from your collection"):
     return dmc.Modal(
-        title=dmc.Text("Select two or more datasets from your collection", weight=500),
+        title=dmc.Text(title, weight=500),
         id=id,
         opened=True,
         size="80%",

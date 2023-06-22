@@ -59,6 +59,7 @@ class PageIds(object):
     url = str(uuid4())
     ds1_visible = str(uuid4())
     ds2_visible = str(uuid4())
+    ds_visible_role = str(uuid4())
     select_modal = str(uuid4())
     modal_select_checkbox_role = str(uuid4())
     apply_selection_btn = str(uuid4())
@@ -163,7 +164,7 @@ def layout(**qargs):
     if len(query_args) == 0:
         return dmc.Container(
             [
-                viz_compare_select_modal(id=ids.select_modal),
+                viz_compare_select_modal(id=ids.select_modal, title="Select one or two datasets from the list"),
                 dcc.Location(ids.url, refresh=True),
             ],
         )
@@ -172,6 +173,8 @@ def layout(**qargs):
         map_type_ctl = map_type_control("bubble")
     else:
         map_type_ctl = map_type_control()
+    
+    single_dataset = len(query_args.get("datasets"))==1
 
     return dmc.Container(
         [
@@ -243,7 +246,9 @@ def layout(**qargs):
                                     ),
                                     href=None,
                                     refresh=False,
-                                )
+                                ),
+                                style={"display": "none"} if single_dataset else None,
+
                             ),
                             dmc.Space(h=12),
                             dmc.Stack(
@@ -295,6 +300,8 @@ def layout(**qargs):
                                             width="1.5rem",
                                             color=MULTI_VIZ_COLORSCALE[1],
                                         ),
+                                        style={"display": "none"} if single_dataset else None,
+
                                     ),
                                     dmc.RangeSlider(
                                         id=ids.colorscale_slider_2,
@@ -311,6 +318,8 @@ def layout(**qargs):
                                             {"value": 50, "label": "50%"},
                                             {"value": 80, "label": "80%"},
                                         ],
+                                        style={"display": "none"} if single_dataset else None,
+
                                     ),
                                 ],
                             ),
@@ -355,7 +364,7 @@ def update_select_modal(is_open, data):
                             href=PATH_PREFIX + "select",
                         ),
                         dmc.Button(
-                            "Compare",
+                            "Go",
                             color="teal",
                             id=ids.apply_selection_btn,
                             disabled=True,
@@ -406,7 +415,7 @@ def generate_link(checkboxes, nc, search):
                 f"?{urlencode_dict(query_args)}",
             )
 
-        return n_selected != 2, no_update
+        return n_selected not in [1,2], no_update
     return no_update, no_update
 
 
@@ -478,9 +487,6 @@ def update_map_store(search, pn):
         raise PreventUpdate
     args = UrlSearchArgs(**parse_nested_qargs(qargs_to_dict(search)))
     datasets = args.datasets
-    if len(datasets) != 2:
-        print("len(datasets)!=2")
-        raise PreventUpdate
     if args.cfg is None:
         raise PreventUpdate
     # load dataset0
@@ -529,7 +535,6 @@ def update_map_store(search, pn):
 
         else:
             locationdata.append(LocationData())
-
     return [l.to_dict() for l in locationdata]
 
 
@@ -543,29 +548,34 @@ def update_dataset_cards(search, pn):
     if not "viz/map" in pn:
         raise PreventUpdate
     args = UrlSearchArgs(**parse_nested_qargs(qargs_to_dict(search)))
-    ds_cards = [
-        dataset_info_card(
-            args=args,
-            index=0,
-            config_btn_role=ids.dataset_config_role,
-            visible_btn_id=ids.ds1_visible,
-            trace_icon=icons.hexagon_filled,
-            icon_color=SEQUENTIAL_COLORSCALES[0][
-                int(len(SEQUENTIAL_COLORSCALES[0]) / 2) + 1
-            ],
-        ),
-        dataset_info_card(
-            args=args,
-            index=1,
-            config_btn_role=ids.dataset_config_role,
-            visible_btn_id=ids.ds2_visible,
-            trace_icon=icons.hexagon_outline,
-            icon_color=SEQUENTIAL_COLORSCALES[1][
-                int(len(SEQUENTIAL_COLORSCALES[1]) / 2) + 1
-            ],
-        ),
-    ]
-    return ds_cards
+    if args.datasets is not None:
+
+        ds_cards = [
+            dataset_info_card(
+                args=args,
+                index=0,
+                config_btn_role=ids.dataset_config_role,
+                visible_btn_id=dict(role=ids.ds_visible_role,index=0),#ids.ds1_visible,
+                trace_icon=icons.hexagon_filled,
+                icon_color=SEQUENTIAL_COLORSCALES[0][
+                    int(len(SEQUENTIAL_COLORSCALES[0]) / 2) + 1
+                ],
+            )]
+        if len(args.datasets)==2:
+            ds_cards.append(
+                dataset_info_card(
+                    args=args,
+                    index=1,
+                    config_btn_role=ids.dataset_config_role,
+                    visible_btn_id=dict(role=ids.ds_visible_role,index=1),#ids.ds2_visible,
+                    trace_icon=icons.hexagon_outline,
+                    icon_color=SEQUENTIAL_COLORSCALES[1][
+                        int(len(SEQUENTIAL_COLORSCALES[1]) / 2) + 1
+                    ],
+                )
+            )
+        return ds_cards
+    raise PreventUpdate
 
 
 # generate config modal
@@ -630,17 +640,21 @@ def hide_hexbinmap_control(value):
 
 @callback(
     Output(multihexmap.ids.store(multihexmap.aio_id), "data", allow_duplicate=True),
-    Input(ids.ds1_visible, "checked"),
-    Input(ids.ds2_visible, "checked"),
+    #Input(ids.ds1_visible, "checked"),
+    #Input(ids.ds2_visible, "checked"),
+    Input({"role":ids.ds_visible_role, "index":ALL},"checked"),
+    #Input({"role":ids.ds_visible_role, "index":1},"checked"),
     State(multihexmap.ids.store(multihexmap.aio_id), "data"),
     prevent_initial_call=True,
 )
-def update_visibility(c1, c2, data):
-    if data is not None:
-        if c1 is not None and c2 is not None:
-            data[0]["visible"] = c1
-            data[1]["visible"] = c2
-            return data
+def update_visibility(btns, data):
+    if data is not None and btns is not None:
+        if not len(btns)==len(data):
+            raise PreventUpdate
+
+        for i in range(len(data)):
+            data[i]["visible"] = btns[i]
+        return data
 
     raise PreventUpdate
 

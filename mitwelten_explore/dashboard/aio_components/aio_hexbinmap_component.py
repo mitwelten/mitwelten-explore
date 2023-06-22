@@ -223,7 +223,7 @@ class H3HexBinMapMultiAIO(html.Div):
         range0 = config.get("range0", None) if config is not None else None
         range1 = config.get("range1", None) if config is not None else None
         bubblemap = config.get("bubble", False) if config is not None else False
-        single_map = len(data) == 2
+        single_map = len(data) == 1
         dataset0 = LocationData(**data[0])
         dataset1 = LocationData(**data[1]) if not single_map else LocationData()
 
