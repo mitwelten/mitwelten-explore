@@ -49,11 +49,13 @@ from dashboard.charts.time_series_charts import (
     generate_ts_figure,
     no_data_figure,
     generate_time_of_day_scatter,
+    empty_figure,
 )
 from dashboard.components.chart_configuration import (
     timeseries_chart_config_menu,
     reload_control,
 )
+from dashboard.components.loading import chart_loading_overlay
 from dashboard.components.modals import share_modal
 from dashboard.models import UrlSearchArgs, Annotation
 
@@ -219,13 +221,14 @@ def layout(taxon_id=None, **qargs):
                                         position="apart",
                                     ),
                                     dmc.CardSection(
-                                        dmc.LoadingOverlay(
+                                        chart_loading_overlay(
                                             dcc.Graph(
                                                 figure=no_data_figure(annotation=None),
                                                 id=ids.time_series_chart,
                                                 style={"height": "30vh"},
                                                 config=dict(displayModeBar=False),
-                                            )
+                                            ),
+                                            position="right",
                                         ),
                                     ),
                                 ],
@@ -238,7 +241,9 @@ def layout(taxon_id=None, **qargs):
                                     dmc.Col(
                                         dmc.Card(
                                             children=dmc.CardSection(
-                                                hexbinmap,
+                                                chart_loading_overlay(
+                                                    hexbinmap,
+                                                ),
                                             ),
                                             withBorder=True,
                                             shadow="sm",
@@ -274,7 +279,7 @@ def layout(taxon_id=None, **qargs):
                                                     position="apart",
                                                 ),
                                                 dmc.CardSection(
-                                                    dmc.LoadingOverlay(
+                                                    chart_loading_overlay(
                                                         dcc.Graph(
                                                             figure=no_data_figure(
                                                                 annotation=None
@@ -284,7 +289,8 @@ def layout(taxon_id=None, **qargs):
                                                                 displayModeBar=False,
                                                             ),
                                                             style={"height": "100%"},
-                                                        )
+                                                        ),
+                                                        position="right",
                                                     ),
                                                 ),
                                             ],

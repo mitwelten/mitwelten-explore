@@ -40,11 +40,13 @@ from dashboard.components.affix import affix_menu, affix_button
 from dashboard.components.dataset_presentation import dataset_title
 from dashboard.components.navbar import ThemeSwitchAIO
 from dashboard.components.notifications import generate_notification
+from dashboard.components.loading import chart_loading_overlay
 from dashboard.styles import icons
 from configuration import PATH_PREFIX, DEFAULT_CONFIDENCE, DEFAULT_TR_START
 from dashboard.charts.time_series_charts import (
     generate_ts_figure,
     generate_time_of_day_scatter,
+    empty_figure,
 )
 from dashboard.charts.map_charts import generate_scatter_map_plot
 from dashboard.models import UrlSearchArgs, DatasetType, Annotation, to_typed_dataset
@@ -118,7 +120,7 @@ def layout(**qargs):
         conf_select = confidence_threshold_select(
             id=ids.conf_select, value=vc.confidence
         )
-    elif ds.type in [ DatasetType.pax, DatasetType.gbif_observations]:
+    elif ds.type in [DatasetType.pax, DatasetType.gbif_observations]:
         agg_select = agg_fcn_select(id=ids.agg_select, value=None, visible=False)
         tb_select = time_bucket_select(id=ids.bucket_select, value=vc.bucket)
         conf_select = confidence_threshold_select(
@@ -131,8 +133,6 @@ def layout(**qargs):
     return dmc.Container(
         [
             dcc.Location(id=ids.url, refresh=False),
-            dcc.Store(ids.store_ts_data),
-            dcc.Store(ids.store_tod_data),
             dcc.Store(ids.store_map_data),
             dcc.Store(ids.store_statsagg_data),
             html.Div(id=ids.share_modal_div),
@@ -183,13 +183,18 @@ def layout(**qargs):
                         ],
                         position="apart",
                     ),
-                    dmc.LoadingOverlay(
-                        dcc.Graph(
-                            id=ids.main_chart,
-                            style={
-                                "height": "40vh",
-                            },
-                        ),  # figure=generate_trace_from_args()),
+                    chart_loading_overlay(
+                        [
+                            dcc.Store(ids.store_ts_data),
+                            dcc.Graph(
+                                id=ids.main_chart,
+                                figure=empty_figure(),
+                                style={
+                                    "height": "40vh",
+                                },
+                            ),
+                        ],
+                        position="right",
                     ),
                 ],
                 withBorder=True,
@@ -221,9 +226,16 @@ def layout(**qargs):
                                         ],
                                         position="apart",
                                     ),
-                                    dcc.Graph(
-                                        id=ids.tod_chart,
-                                        style={"height": "33vh"},
+                                    chart_loading_overlay(
+                                        [
+                                            dcc.Store(ids.store_tod_data),
+                                            dcc.Graph(
+                                                id=ids.tod_chart,
+                                                style={"height": "33vh"},
+                                                figure=empty_figure(),
+                                            ),
+                                        ],
+                                        position="right",
                                     ),
                                 ],
                                 withBorder=True,

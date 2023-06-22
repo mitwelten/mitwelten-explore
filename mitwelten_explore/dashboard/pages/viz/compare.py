@@ -44,6 +44,7 @@ from dashboard.components.cards import dataset_info_cards
 from dashboard.charts.time_series_charts import (
     generate_multi_ts_figure,
     generate_multi_time_of_day_scatter,
+    empty_figure,
 )
 from dashboard.charts.map_charts import (
     generate_empty_map,
@@ -56,6 +57,7 @@ from dashboard.components.chart_configuration import (
 )
 from dashboard.components.affix import affix_menu, affix_button
 from dashboard.components.tables import statsagg_table
+from dashboard.components.loading import chart_loading_overlay
 from dashboard.utils.ts import correlation_matrix, compute_fft, create_fft_bins
 from dashboard.styles import MULTI_VIZ_COLORSCALE, icons
 
@@ -133,8 +135,8 @@ def layout(**qargs):
     return dmc.Container(
         [
             dcc.Location(ids.url, refresh=False),
-            dcc.Store(id=ids.ts_store),  # , storage_type="local"),
-            dcc.Store(id=ids.tod_store),  # , storage_type="local"),
+            # , storage_type="local"),
+            # , storage_type="local"),
             dcc.Store(id=ids.stats_store),
             dcc.Store(id=ids.map_store),
             html.Div(id=ids.config_modal_div),
@@ -188,9 +190,11 @@ def layout(**qargs):
                     ),
                     dmc.CardSection(
                         [
-                            dmc.LoadingOverlay(
+                            chart_loading_overlay(
                                 [
+                                    dcc.Store(id=ids.ts_store),
                                     dcc.Graph(
+                                        figure=empty_figure(),
                                         id=ids.main_chart,
                                         style={
                                             "height": "40vh",
@@ -207,7 +211,8 @@ def layout(**qargs):
                                             displaylogo=False,
                                         ),
                                     ),
-                                ]
+                                ],
+                                position="right",
                             ),
                         ]
                     ),
@@ -278,29 +283,36 @@ def layout(**qargs):
                                                         # style={"zIndex": 1000,"right": 0,},
                                                         position="apart",
                                                     ),
-                                                    dcc.Graph(
-                                                        id=ids.tod_chart,
-                                                        style={
-                                                            "height": "40vh"
-                                                        },  # "width":"50%"},
-                                                        className="compare_tod_chart",
-                                                        config=dict(
-                                                            displaylogo=False,
-                                                            modeBarButtonsToRemove=[
-                                                                "pan",
-                                                                "select",
-                                                                "lasso",
-                                                                "zoom",
-                                                                "dragmode",
-                                                                "autoscale",
-                                                                "zoomin",
-                                                                "zoomout",
-                                                            ],
-                                                        ),
+                                                    chart_loading_overlay(
+                                                        [
+                                                            dcc.Store(id=ids.tod_store),
+                                                            dcc.Graph(
+                                                                figure=empty_figure(),
+                                                                id=ids.tod_chart,
+                                                                style={
+                                                                    "height": "40vh"
+                                                                },  # "width":"50%"},
+                                                                className="compare_tod_chart",
+                                                                config=dict(
+                                                                    displaylogo=False,
+                                                                    modeBarButtonsToRemove=[
+                                                                        "pan",
+                                                                        "select",
+                                                                        "lasso",
+                                                                        "zoom",
+                                                                        "dragmode",
+                                                                        "autoscale",
+                                                                        "zoomin",
+                                                                        "zoomout",
+                                                                    ],
+                                                                ),
+                                                            ),
+                                                        ],
+                                                        position="right",
                                                     ),
                                                 ]
                                             ),
-                                            className="bg-transparent"
+                                            className="bg-transparent",
                                         ),
                                         value="tod",
                                     ),
@@ -337,7 +349,7 @@ def layout(**qargs):
                                                 style={"height": "40vh"},
                                             ),
                                             p=0,
-                                            radius=0
+                                            radius=0,
                                         ),
                                         value="map",
                                     ),
