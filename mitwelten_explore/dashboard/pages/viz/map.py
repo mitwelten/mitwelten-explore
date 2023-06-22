@@ -76,6 +76,8 @@ class PageIds(object):
     affix_share = str(uuid4())
     colorscale_slider_1 = str(uuid4())
     colorscale_slider_2 = str(uuid4())
+    map_config_stack = str(uuid4())
+    map_type_control = str(uuid4())
 
 
 ids = PageIds()
@@ -145,6 +147,17 @@ affix = affix_menu(
 )
 
 
+def map_type_control(value="hexbin"):
+    return dmc.SegmentedControl(
+        id=ids.map_type_control,
+        value=value,
+        data=[
+            {"value": "hexbin", "label": "Hexagons"},
+            {"value": "bubble", "label": "Bubbles"},
+        ],
+    )
+
+
 def layout(**qargs):
     query_args = parse_nested_qargs(qargs)
     if len(query_args) == 0:
@@ -154,6 +167,11 @@ def layout(**qargs):
                 dcc.Location(ids.url, refresh=True),
             ],
         )
+    bubble_map = query_args.get("maptype") == "bubble"
+    if bubble_map:
+        map_type_ctl = map_type_control("bubble")
+    else:
+        map_type_ctl = map_type_control()
 
     return dmc.Container(
         [
@@ -173,7 +191,42 @@ def layout(**qargs):
             dmc.Space(h=8),
             dmc.Grid(
                 [
-                    dmc.Col(multihexmap, className="col-md-10"),
+                    dmc.Col(
+                        dmc.LoadingOverlay(
+                            multihexmap,
+                            overlayOpacity=0,
+                            transitionDuration=400,
+                            loader=dmc.Card(
+                                dmc.Group(
+                                    [
+                                        dmc.Loader(
+                                            size="sm",
+                                            # variant="dots",
+                                            color="teal.5",
+                                            # color="gray.0",
+                                        ),
+                                        dmc.Text(
+                                            "Loading",
+                                            color="gray.9",
+                                            weight=500,
+                                            size="md",
+                                        ),
+                                    ],
+                                ),
+                                style={
+                                    "position": "absolute",
+                                    # "top": 10,
+                                    "bottom": 10,
+                                    # "left": "50%",
+                                    "left": 10,
+                                    "backgroundColor": "rgba(245, 245, 245,0.8)",
+                                },
+                                py=3,
+                                px=5,
+                            ),
+                        ),
+                        className="col-md-10",
+                    ),
                     dmc.Col(
                         [
                             dmc.Text("Datasets", weight=500),
@@ -184,7 +237,7 @@ def layout(**qargs):
                                 dmc.Anchor(
                                     id=ids.switch_datasets,
                                     children=dmc.Button(
-                                        "Switch",
+                                        "Switch Positions",
                                         leftIcon=get_icon(icons.switch_arrows),
                                         variant="subtle",
                                     ),
@@ -192,63 +245,73 @@ def layout(**qargs):
                                     refresh=False,
                                 )
                             ),
-                            dmc.Space(h=8),
-                            dmc.Divider(),
                             dmc.Space(h=12),
-                            dmc.Text("Map configuration", weight=500),
+                            dmc.Stack(
+                                [
+                                    dmc.Divider(),
+                                    dmc.Text("Map Type", weight=500),
+                                    map_type_ctl,
+                                ]
+                            ),
                             dmc.Space(h=12),
-                            dmc.Checkbox(
-                                label="Show Scatter Markers",
-                                id=ids.show_scatter,
-                                checked=False,
-                            ),
-                            dmc.Space(h=16),
-                            dmc.Text("Colorscale Finetuning", size="14px"),
-                            dmc.Space(h=8),
-                            dmc.Center(
-                                get_icon(
-                                    icons.hexagon_filled,
-                                    width="1.5rem",
-                                    color=MULTI_VIZ_COLORSCALE[0],
-                                ),
-                            ),
-                            dmc.RangeSlider(
-                                id=ids.colorscale_slider_1,
-                                value=[0, 100],
-                                minRange=0.1,
-                                step=0.1,
-                                min=0,
-                                max=100,
-                                precision=2,
-                                color=MULTI_VIZ_COLORSCALE_MT[0],
-                                marks=[
-                                    {"value": 20, "label": "20%"},
-                                    {"value": 50, "label": "50%"},
-                                    {"value": 80, "label": "80%"},
-                                ],
-                                mb=35,
-                            ),
-                            dmc.Center(
-                                get_icon(
-                                    icons.hexagon_outline,
-                                    width="1.5rem",
-                                    color=MULTI_VIZ_COLORSCALE[1],
-                                ),
-                            ),
-                            dmc.RangeSlider(
-                                id=ids.colorscale_slider_2,
-                                value=[0, 100],
-                                minRange=1,
-                                min=0,
-                                step=0.1,
-                                precision=2,
-                                max=100,
-                                color=MULTI_VIZ_COLORSCALE_MT[1],
-                                mb=35,
-                                marks=[
-                                    {"value": 20, "label": "20%"},
-                                    {"value": 50, "label": "50%"},
-                                    {"value": 80, "label": "80%"},
+                            dmc.Stack(
+                                id=ids.map_config_stack,
+                                style={"display": "none"} if bubble_map else None,
+                                children=[
+                                    dmc.Text("Map configuration", weight=500),
+                                    dmc.Checkbox(
+                                        label="Show Scatter Markers",
+                                        id=ids.show_scatter,
+                                        checked=False,
+                                    ),
+                                    dmc.Space(h=8),
+                                    dmc.Text("Colorscale Finetuning", size="14px"),
+                                    dmc.Center(
+                                        get_icon(
+                                            icons.hexagon_filled,
+                                            width="1.5rem",
+                                            color=MULTI_VIZ_COLORSCALE[0],
+                                        ),
+                                    ),
+                                    dmc.RangeSlider(
+                                        id=ids.colorscale_slider_1,
+                                        value=[0, 100],
+                                        minRange=0.1,
+                                        step=0.1,
+                                        min=0,
+                                        max=100,
+                                        precision=2,
+                                        color=MULTI_VIZ_COLORSCALE_MT[0],
+                                        marks=[
+                                            {"value": 20, "label": "20%"},
+                                            {"value": 50, "label": "50%"},
+                                            {"value": 80, "label": "80%"},
+                                        ],
+                                        mb=20,
+                                    ),
+                                    dmc.Center(
+                                        get_icon(
+                                            icons.hexagon_outline,
+                                            width="1.5rem",
+                                            color=MULTI_VIZ_COLORSCALE[1],
+                                        ),
+                                    ),
+                                    dmc.RangeSlider(
+                                        id=ids.colorscale_slider_2,
+                                        value=[0, 100],
+                                        minRange=1,
+                                        min=0,
+                                        step=0.1,
+                                        precision=2,
+                                        max=100,
+                                        color=MULTI_VIZ_COLORSCALE_MT[1],
+                                        mb=20,
+                                        marks=[
+                                            {"value": 20, "label": "20%"},
+                                            {"value": 50, "label": "50%"},
+                                            {"value": 80, "label": "80%"},
+                                        ],
+                                    ),
                                 ],
                             ),
                         ],
@@ -370,16 +433,37 @@ def update_tr_store(pn, search_args):
     Input(traio.ids.store(traio.aio_id), "modified_timestamp"),
     State(traio.ids.store(traio.aio_id), "data"),
     State(ids.url, "search"),
+    Input(ids.map_type_control, "value"),
 )
-def update_url_location(dr_trg, dr, search_args):
+def update_url_location(dr_trg, dr, search_args, map_type):
     query_args = parse_nested_qargs(qargs_to_dict(search_args))
     if isinstance(dr, list) and dr[0] is not None and dr[1] is not None:
         dr_s = dr[0]
         dr_e = dr[1]
         query_args["from"] = dr_s
         query_args["to"] = dr_e
+        if map_type is not None:
+            query_args["maptype"] = map_type
         return f"?{urlencode_dict(query_args)}"
     return no_update
+
+
+@callback(
+    Output(multihexmap.ids.config_store(multihexmap.aio_id), "data"),
+    Input(ids.show_scatter, "checked"),
+    Input(ids.colorscale_slider_1, "value"),
+    Input(ids.colorscale_slider_2, "value"),
+    Input(ids.map_type_control, "value"),
+)
+def set_scatter_config(checked, range0, range1, type):
+    if type is not None:
+        bubble = type == "bubble"
+        return {
+            "scatter": checked,
+            "range0": range0,
+            "range1": range1,
+            "bubble": bubble,
+        }
 
 
 # load map data
@@ -390,7 +474,7 @@ def update_url_location(dr_trg, dr, search_args):
     prevent_initial_call=True,
 )
 def update_map_store(search, pn):
-    if not "viz/map" in pn:
+    if not "viz/map" in pn or len(search) < 2:
         raise PreventUpdate
     args = UrlSearchArgs(**parse_nested_qargs(qargs_to_dict(search)))
     datasets = args.datasets
@@ -534,6 +618,16 @@ def apply_dataset_configuration(apply_btns, confidence, agg, search):
     raise PreventUpdate
 
 
+@callback(Output(ids.map_config_stack, "style"), Input(ids.map_type_control, "value"))
+def hide_hexbinmap_control(value):
+    if value is not None:
+        if value == "bubble":
+            return {"display": "none"}
+        else:
+            return None
+    raise PreventUpdate
+
+
 @callback(
     Output(multihexmap.ids.store(multihexmap.aio_id), "data", allow_duplicate=True),
     Input(ids.ds1_visible, "checked"),
@@ -549,17 +643,6 @@ def update_visibility(c1, c2, data):
             return data
 
     raise PreventUpdate
-
-
-@callback(
-    Output(multihexmap.ids.config_store(multihexmap.aio_id), "data"),
-    Input(ids.show_scatter, "checked"),
-    Input(ids.colorscale_slider_1, "value"),
-    Input(ids.colorscale_slider_2, "value"),
-)
-def set_scatter_config(checked, range0, range1):
-    if ctx.triggered_id is not None:
-        return {"scatter": checked, "range0": range0, "range1": range1}
 
 
 # switch_datasets

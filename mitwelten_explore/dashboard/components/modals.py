@@ -261,7 +261,7 @@ def generate_viz_map_select_modal_children(store_data, id_role):
     description = dmc.Text(all_pax_ds.get_title(), size="md")
     unit = dmc.Badge(all_pax_ds.get_unit(), color="teal")
     location_name = dmc.Text(all_pax_ds.get_location(), size="sm")
-    list_entries.append(dmc.Text("Default datasets", weight=500, align="center"))
+    list_entries.append(dmc.Text("Default Datasets", weight=500, align="center"))
     list_entries.append(
         dmc.Grid(
             [

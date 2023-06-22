@@ -20,6 +20,17 @@ colors2, _ = plotly.colors.convert_colors_to_same_type(SEQUENTIAL_COLORSCALES[1]
 colorscale1 = plotly.colors.make_colorscale(colors1)
 colorscale2 = plotly.colors.make_colorscale(colors2)
 
+SWISSTOPO_LAYER = [
+    {
+        "below": "traces",
+        "sourcetype": "raster",
+        "sourceattribution": '<a href="https://www.swisstopo.admin.ch/de/home.html" target="_blank">SwissTopo</a>',
+        "source": [
+            "https://wmts10.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/current/3857/{z}/{x}/{y}.jpeg"
+        ],
+    },
+]
+
 
 class LocationData:
     def __init__(
@@ -49,6 +60,12 @@ class LocationData:
         self.lon.append(lon)
         self.values.append(value)
         self.ids.append(id)
+
+    def sort(self, descending=False):
+        sorted_data = sorted(
+            zip(self.values, self.lon, self.lat, self.ids), reverse=descending
+        )
+        self.values, self.lon, self.lat, self.ids = zip(*sorted_data)
 
 
 def agg_fcn_mapper(fcn):
@@ -111,16 +128,7 @@ def generate_empty_map(zoom=DEFAULT_ZOOM, clat=DEFAULT_LAT, clon=DEFAULT_LON):
             "style": "white-bg",
             "zoom": zoom,
             "center": {"lat": clat, "lon": clon},
-            "layers": [
-                {
-                    "below": "traces",
-                    "sourcetype": "raster",
-                    "sourceattribution": '<a href="https://www.swisstopo.admin.ch/de/home.html" target="_blank">SwissTopo</a>',
-                    "source": [
-                        "https://wmts10.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/current/3857/{z}/{x}/{y}.jpeg"
-                    ],
-                },
-            ],
+            "layers": SWISSTOPO_LAYER,
         },
         showlegend=False,
     )
@@ -230,16 +238,7 @@ def generate_multi_scatter_map_plot(data: list):
             "style": "white-bg",
             "zoom": zoom,
             "center": {"lat": center_lat, "lon": center_lon},
-            "layers": [
-                {
-                    "below": "traces",
-                    "sourcetype": "raster",
-                    "sourceattribution": '<a href="https://www.swisstopo.admin.ch/de/home.html" target="_blank">SwissTopo</a>',
-                    "source": [
-                        "https://wmts10.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/current/3857/{z}/{x}/{y}.jpeg"
-                    ],
-                },
-            ],
+            "layers": SWISSTOPO_LAYER,
         },
         showlegend=False,
         margin=dict(l=0, r=0, t=0, b=0),
@@ -359,16 +358,7 @@ def generate_h3hexbin_map(
             "style": "white-bg",
             "zoom": zoom,
             "center": {"lat": clat, "lon": clon},
-            "layers": [
-                {
-                    "below": "traces",
-                    "sourcetype": "raster",
-                    "sourceattribution": '<a href="https://www.swisstopo.admin.ch/de/home.html" target="_blank">SwissTopo</a>',
-                    "source": [
-                        "https://wmts10.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/current/3857/{z}/{x}/{y}.jpeg"
-                    ],
-                },
-            ],
+            "layers": SWISSTOPO_LAYER,
         },
         showlegend=False,
     )
@@ -529,7 +519,6 @@ def generate_multi_h3hexbin_map(
         values=ds0.values,
         fun=agg_fcn_mapper(ds0.agg_fcn),
     )
-    # aggregated0 = dict(sorted(aggregated0.items(), key=lambda item: item[1]))
 
     locations0 = list(aggregated0.keys())
     values0 = list(aggregated0.values())
@@ -646,21 +635,11 @@ def generate_multi_h3hexbin_map(
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
         hoverlabel_bgcolor="rgba(245, 245, 245,0.8)",
-        # template="plotly_dark",
         mapbox={
             "style": "white-bg",
             "zoom": zoom,
             "center": {"lat": clat, "lon": clon},
-            "layers": [
-                {
-                    "below": "traces",
-                    "sourcetype": "raster",
-                    "sourceattribution": '<a href="https://www.swisstopo.admin.ch/de/home.html" target="_blank">SwissTopo</a>',
-                    "source": [
-                        "https://wmts10.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/current/3857/{z}/{x}/{y}.jpeg"
-                    ],
-                },
-            ],
+            "layers": SWISSTOPO_LAYER,
         },
         showlegend=True,
         legend=dict(
@@ -674,3 +653,215 @@ def generate_multi_h3hexbin_map(
         ),
     )
     return hexbin_map
+
+
+def generate_bubblemap_trace(
+    lat, lon, ids, values, color="blue", sizeref=9, opacity=0.7
+):
+    colorlist = []
+    scaled_values = [np.sqrt(v) for v in values]
+    for i in range(len(values)):
+        colorlist.append("rgba(0,0,0,0.65)")
+        colorlist.append(color)
+    lat = [val for val in lat for _ in (0, 1)]
+    lon = [val for val in lon for _ in (0, 1)]
+    ids = [val for val in ids for _ in (0, 1)]
+    sizeref = 2.0 * max(scaled_values) / (60**2)
+
+    vals = []
+    for v in scaled_values:
+        vals.append(max(v * 1.3, 21 * sizeref))
+        vals.append(max(v, 14 * sizeref))
+
+    return go.Scattermapbox(
+        lon=lon,
+        lat=lat,
+        text=ids,
+        mode="markers",
+        customdata=[{"id": d, "type": "point"} for d in ids],
+        marker=dict(
+            size=vals,
+            color=colorlist,
+            sizeref=sizeref,
+            sizemode="area",
+            opacity=opacity,
+            allowoverlap=False,
+        ),
+        showlegend=False,
+        hoverinfo="skip",
+    )
+
+
+def generate_bubblemap_hovertrace(lat, lon, ids, values, name=None, color="gray"):
+    return go.Scattermapbox(
+        lon=lon,
+        lat=lat,
+        text=values,
+        name=name,
+        mode="markers",
+        marker=dict(opacity=0, color=color),
+        hovertemplate="<b>%{text}</b>",
+        showlegend=False,
+    )
+
+
+def generate_single_bubble_map(
+    ds0: LocationData,
+    zoom=None,
+    clat=None,
+    clon=None,
+):
+    if not ds0.visible or len(ds0.lat) == 0:
+        return generate_empty_map()
+    lat_min = np.min(ds0.lat)
+    lat_max = np.max(ds0.lat)
+    lon_min = np.min(ds0.lon)
+    lon_max = np.max(ds0.lon)
+    zoom = (
+        calculate_zoom_from_points(lat_min, lat_max, lon_min, lon_max)
+        if zoom is None
+        else zoom
+    )
+    if clat is None:
+
+        if len(ds0.lat) > 1:
+            clat = (lat_max + lat_min) / 2
+            clon = (lon_max + lon_min) / 2
+        else:
+            clat = lat_max
+            clon = lon_max
+    resolution = zoom_to_cell_resolution(zoom)
+    bubble_map = go.Figure()
+
+    ds0.sort(descending=True)
+    bubble_map.add_trace(
+        generate_bubblemap_trace(
+            lat=ds0.lat,
+            lon=ds0.lon,
+            ids=ds0.ids,
+            values=ds0.values,
+            color=MULTI_VIZ_COLORSCALE[0],
+        )
+    )
+    bubble_map.add_trace(
+        generate_bubblemap_hovertrace(
+            ds0.lat,
+            ds0.lon,
+            ds0.ids,
+            ds0.values,
+            name=ds0.name,
+            color=MULTI_VIZ_COLORSCALE[0],
+        )
+    )
+
+    bubble_map.update_layout(
+        margin=dict(l=0, r=0, t=0, b=0),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        hoverlabel_bgcolor="rgba(245, 245, 245,0.8)",
+        mapbox={
+            "style": "white-bg",
+            "zoom": zoom,
+            "center": {"lat": clat, "lon": clon},
+            "layers": SWISSTOPO_LAYER,
+        },
+        showlegend=False,
+    )
+    return bubble_map
+
+
+def generate_multi_bubble_map(
+    ds0: LocationData,
+    ds1: LocationData,
+    zoom=None,
+    clat=None,
+    clon=None,
+):
+    ds0_visible = ds0.visible
+    ds1_visible = ds1.visible
+    if ds1_visible is False and ds0_visible is False:
+        return generate_empty_map()
+    concat_lats = ds0.lat + ds1.lat
+    concat_lons = ds0.lon + ds1.lon
+    if len(concat_lats) == 0 or len(concat_lons) == 0:
+        return generate_empty_map()
+
+    lat_min = np.min(concat_lats)
+    lat_max = np.max(concat_lats)
+    lon_min = np.min(concat_lons)
+    lon_max = np.max(concat_lons)
+    zoom = (
+        calculate_zoom_from_points(lat_min, lat_max, lon_min, lon_max)
+        if zoom is None
+        else zoom
+    )
+    if clat is None:
+
+        if len(concat_lats) > 1:
+            clat = (lat_max + lat_min) / 2
+            clon = (lon_max + lon_min) / 2
+        else:
+            clat = lat_max
+            clon = lon_max
+
+    resolution = zoom_to_cell_resolution(zoom)
+    bubble_map = go.Figure()
+
+    if ds0_visible and len(ds0.values) > 0:
+        ds0.sort(descending=True)
+        bubble_map.add_trace(
+            generate_bubblemap_trace(
+                lat=ds0.lat,
+                lon=ds0.lon,
+                ids=ds0.ids,
+                values=ds0.values,
+                color=MULTI_VIZ_COLORSCALE[0],
+            )
+        )
+        bubble_map.add_trace(
+            generate_bubblemap_hovertrace(
+                ds0.lat,
+                ds0.lon,
+                ds0.ids,
+                ds0.values,
+                name=ds0.name,
+                color=MULTI_VIZ_COLORSCALE[0],
+            )
+        )
+
+    if ds1_visible and len(ds1.values) > 0:
+        ds1.sort(descending=True)
+        bubble_map.add_trace(
+            generate_bubblemap_trace(
+                lat=ds1.lat,
+                lon=ds1.lon,
+                ids=ds1.ids,
+                values=ds1.values,
+                color=MULTI_VIZ_COLORSCALE[1],
+            )
+        )
+        bubble_map.add_trace(
+            generate_bubblemap_hovertrace(
+                ds1.lat,
+                ds1.lon,
+                ds1.ids,
+                ds1.values,
+                name=ds1.name,
+                color=MULTI_VIZ_COLORSCALE[1],
+            )
+        )
+
+    bubble_map.update_layout(
+        margin=dict(l=0, r=0, t=0, b=0),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        hoverlabel_bgcolor="rgba(245, 245, 245,0.8)",
+        mapbox={
+            "style": "white-bg",
+            "zoom": zoom,
+            "center": {"lat": clat, "lon": clon},
+            "layers": SWISSTOPO_LAYER,
+        },
+        showlegend=False,
+    )
+    return bubble_map

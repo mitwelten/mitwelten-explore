@@ -6,6 +6,7 @@ from dashboard.charts.map_charts import (
     generate_empty_map,
     generate_h3hexbin_map,
     generate_multi_h3hexbin_map,
+    generate_multi_bubble_map,
     LocationData,
 )
 from configuration import DEFAULT_LAT, DEFAULT_LON, DEFAULT_ZOOM
@@ -206,8 +207,8 @@ class H3HexBinMapMultiAIO(html.Div):
     @callback(
         Output(ids.graph(MATCH), "figure"),
         Input(ids.graph(MATCH), "relayoutData"),
+        Input(ids.store(MATCH), "modified_timestamp"),
         Input(ids.store(MATCH), "data"),
-        State(ids.store(MATCH), "data"),
         Input(ids.config_store(MATCH), "modified_timestamp"),
         Input(ids.config_store(MATCH), "data"),
         # prevent_initial_callbacks=True,
@@ -221,10 +222,17 @@ class H3HexBinMapMultiAIO(html.Div):
         show_scatter = config.get("scatter", False) if config is not None else False
         range0 = config.get("range0", None) if config is not None else None
         range1 = config.get("range1", None) if config is not None else None
+        bubblemap = config.get("bubble", False) if config is not None else False
+        single_map = len(data) == 2
+        dataset0 = LocationData(**data[0])
+        dataset1 = LocationData(**data[1]) if not single_map else LocationData()
 
         if "store" in trg_subcomponents or "config_store" in trg_subcomponents:
-            dataset0 = LocationData(**data[0])
-            dataset1 = LocationData(**data[1])
+            if bubblemap:
+                return generate_multi_bubble_map(
+                    ds0=dataset0,
+                    ds1=dataset1,
+                )
             return generate_multi_h3hexbin_map(
                 ds0=dataset0,
                 ds1=dataset1,
@@ -232,18 +240,24 @@ class H3HexBinMapMultiAIO(html.Div):
                 range0=range0,
                 range1=range1,
             )
-        elif "graph" in trg_subcomponents:
-            dataset0 = LocationData(**data[0])
-            dataset1 = LocationData(**data[1])
-            if event_data.get("autosize") == True:
-                return generate_multi_h3hexbin_map(
-                    ds0=dataset0,
-                    ds1=dataset1,
-                    scatter=show_scatter,
-                    range0=range0,
-                    range1=range1,
-                )
 
+        elif "graph" in trg_subcomponents:
+            if event_data.get("autosize") == True:
+                if bubblemap:
+                    return generate_multi_bubble_map(
+                        ds0=dataset0,
+                        ds1=dataset1,
+                    )
+                else:
+                    return generate_multi_h3hexbin_map(
+                        ds0=dataset0,
+                        ds1=dataset1,
+                        scatter=show_scatter,
+                        range0=range0,
+                        range1=range1,
+                    )
+            if bubblemap:
+                raise PreventUpdate
             zoomlvl = event_data.get("mapbox.zoom")
             center_coords = event_data.get("mapbox.center")
             if None in [zoomlvl, center_coords]:
