@@ -74,6 +74,8 @@ def compute_fft(amplitude, times):
 
     values = np.arange(int(n / 2))
     tp = n * ((times[1] - times[0]).seconds)
+    if tp == 0:
+        return None, None
     frequencies = values / tp
     periods_s = [round(1 / f) for f in frequencies[1:]]
     aft = list(np.abs(ft))
@@ -82,6 +84,8 @@ def compute_fft(amplitude, times):
 
 
 def create_fft_bins(aft, time_periods_s, n_bins=256, agg_fcn=np.max):
+    if aft is None or time_periods_s is None:
+        return [None], [0]
     minf = min(time_periods_s)
     maxf = max(time_periods_s)
     lgs = np.logspace(np.log10(maxf), np.log10(minf), n_bins, endpoint=True)

@@ -1,6 +1,8 @@
 import dash_mantine_components as dmc
 from dashboard.styles import get_icon
+
 # TODO: move icons to styles.icons
+
 
 def confidence_threshold_select(id, value=None, visible=True, **kwargs):
     return dmc.Select(
@@ -42,6 +44,7 @@ def time_bucket_select(id, value=None, **kwargs):
             {"value": "30min", "label": "30 Minutes"},
             {"value": "1h", "label": "1 Hour"},
             {"value": "2h", "label": "2 Hour"},
+            {"value": "3h", "label": "3 Hour"},
             {"value": "6h", "label": "6 Hour"},
             {"value": "12h", "label": "12 Hour"},
             {"value": "1d", "label": "1 Day"},
