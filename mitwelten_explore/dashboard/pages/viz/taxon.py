@@ -55,7 +55,7 @@ from dashboard.components.chart_configuration import (
     timeseries_chart_config_menu,
     reload_control,
 )
-from dashboard.components.loading import chart_loading_overlay
+from dashboard.components.overlays import chart_loading_overlay
 from dashboard.components.modals import share_modal
 from dashboard.models import UrlSearchArgs, Annotation
 

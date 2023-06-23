@@ -31,3 +31,31 @@ def chart_loading_overlay(children, position="left"):
             px=5,
         ),
     )
+
+
+def tooltip(
+    children,
+    text,
+    position="left",
+    floating=False,
+    arrow=True,
+    opendelay=100,
+    color="indigo.9",
+):
+    if floating:
+        return dmc.FloatingTooltip(
+            children=children,
+            label=text,
+            position=position,
+            withArrow=arrow,
+            color=color,
+        )
+    else:
+        return dmc.Tooltip(
+            children=children,
+            label=dmc.Text(text, weight=300),
+            position=position,
+            withArrow=arrow,
+            openDelay=opendelay,
+            color=color,
+        )

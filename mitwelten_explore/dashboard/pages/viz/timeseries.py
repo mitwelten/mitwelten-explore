@@ -40,7 +40,7 @@ from dashboard.components.affix import affix_menu, affix_button
 from dashboard.components.dataset_presentation import dataset_title
 from dashboard.components.navbar import ThemeSwitchAIO
 from dashboard.components.notifications import generate_notification
-from dashboard.components.loading import chart_loading_overlay
+from dashboard.components.overlays import chart_loading_overlay
 from dashboard.styles import icons
 from configuration import PATH_PREFIX, DEFAULT_CONFIDENCE, DEFAULT_TR_START
 from dashboard.charts.time_series_charts import (

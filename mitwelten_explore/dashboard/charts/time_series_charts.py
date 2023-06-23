@@ -103,6 +103,7 @@ def generate_multi_ts_figure(
                     marker_color=MULTI_VIZ_COLORSCALE[i],
                     showlegend=False,
                     mode="lines",
+                    hovertemplate="%{x}<br><b>%{y}</b><extra></extra>",
                 )
             )
     elif chart_type == "scatter":
@@ -114,6 +115,7 @@ def generate_multi_ts_figure(
                     marker_color=MULTI_VIZ_COLORSCALE[i],
                     showlegend=False,
                     mode="markers",
+                    hovertemplate="%{x}<br><b>%{y}</b><extra></extra>",
                 )
             )
     elif chart_type == "area":
@@ -126,6 +128,7 @@ def generate_multi_ts_figure(
                     showlegend=False,
                     mode="lines",
                     fill="tozeroy",
+                    hovertemplate="%{x}<br><b>%{y}</b><extra></extra>",
                 )
             )
     elif chart_type == "bar":
@@ -137,6 +140,7 @@ def generate_multi_ts_figure(
                         y=data[i][1],
                         marker_color=MULTI_VIZ_COLORSCALE[i],
                         showlegend=False,
+                        hovertemplate="%{x}<br><b>%{y}</b><extra></extra>",
                     )
                 )
         else:
@@ -145,6 +149,7 @@ def generate_multi_ts_figure(
                 # create scattergl lines
                 times_scatter = []
                 values_scatter = []
+                customdata = []
                 for j in range(len(data[i][0])):
                     times_scatter.append(data[i][0][j])
                     times_scatter.append(data[i][0][j])
@@ -152,12 +157,17 @@ def generate_multi_ts_figure(
                     values_scatter.append(0)
                     values_scatter.append(data[i][1][j])
                     values_scatter.append(None)
+                    customdata.append(data[i][1][j])
+                    customdata.append(data[i][1][j])
+                    customdata.append("")
                 traces.append(
                     go.Scattergl(
                         x=times_scatter,
                         y=values_scatter,
                         marker_color=MULTI_VIZ_COLORSCALE[i],
+                        customdata=customdata,
                         mode="lines",
+                        hovertemplate="%{x}<br><b>%{customdata}</b><extra></extra>",
                     )
                 )
 

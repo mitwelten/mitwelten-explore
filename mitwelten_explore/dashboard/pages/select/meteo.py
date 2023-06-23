@@ -2,7 +2,7 @@ import dash
 from dash import dcc, callback, Input, Output, State, ctx, no_update, ALL
 from dash.exceptions import PreventUpdate
 import dash_mantine_components as dmc
-from dashboard.styles import get_icon
+from dashboard.styles import get_icon, icons
 from dashboard.aio_components.aio_list_component import PagedListSearchableAIO
 from dashboard.data_handler import (
     get_meteo_stations,
@@ -11,14 +11,27 @@ from dashboard.data_handler import (
 )
 from dashboard.charts.map_charts import generate_scatter_map_plot
 from dashboard.utils.communication import urlencode_dict
+from dashboard.utils.text_utils import format_datetime
 from dashboard.components.notifications import generate_notification
+from dashboard.components.overlays import tooltip
 from dashboard.models import MeteoDataset
 from configuration import PATH_PREFIX
 import json
+from uuid import uuid4
 
 dash.register_page(
     __name__,
 )
+
+
+class PageIds(object):
+    meteo_stn_select = str(uuid4())
+    meteo_unit_select = str(uuid4())
+    map = str(uuid4())
+    select_btn_role = str(uuid4())
+
+
+ids = PageIds()
 
 
 def get_station_select_data():
@@ -64,12 +77,14 @@ def get_dataset_list(station_id=None, unit=None):
             unit=param.get("unit"),
             station_name=param.get("station_name"),
         ).to_dataset()
+        last_measurement = param.get("last_measurement")
+        last_measurement_str = format_datetime(last_measurement)
         single_viz_url = (
             f"{PATH_PREFIX}viz/timeseries?{urlencode_dict(dict(trace=trace_dict))}"
         )
         stn_badge = dmc.Group(
             [
-                get_icon(icon="material-symbols:location-on-outline"),
+                get_icon(icon=icons.location_marker),
                 dmc.Text(param.get("station_name"), size="md"),
             ],
             spacing=0,
@@ -96,6 +111,11 @@ def get_dataset_list(station_id=None, unit=None):
                                     dmc.Text(
                                         param.get("param_id"), size="xs", color="dimmed"
                                     ),
+                                    dmc.Text(
+                                        f"Last Datapoint: {last_measurement_str}",
+                                        size="xs",
+                                        color="dimmed",
+                                    ),
                                 ],
                                 style={"rowGap": "4px"},
                             ),
@@ -105,32 +125,36 @@ def get_dataset_list(station_id=None, unit=None):
                             [
                                 dmc.Group(
                                     [
-                                        dmc.Anchor(
+                                        tooltip(
+                                            dmc.Anchor(
+                                                dmc.Button(
+                                                    "Viz",
+                                                    leftIcon=get_icon(
+                                                        icon=icons.line_chart, width=20
+                                                    ),
+                                                    color="indigo.6",
+                                                    variant="outline",
+                                                ),
+                                                href=single_viz_url,
+                                                target="_blank",
+                                            ),
+                                            "Explore this dataset",
+                                        ),
+                                        tooltip(
                                             dmc.Button(
-                                                "Viz",
-                                                leftIcon=get_icon(
-                                                    icon="ph:chart-scatter", width=20
+                                                get_icon(
+                                                    icon=icons.bookmark,
+                                                    width=20,
                                                 ),
                                                 color="indigo.6",
-                                                variant="outline",
+                                                variant="subtle",
+                                                px=4,
+                                                id={
+                                                    "role": ids.select_btn_role,
+                                                    "index": json.dumps(trace_dict),
+                                                },
                                             ),
-                                            href=single_viz_url,
-                                            target="_blank",
-                                        ),
-                                        dmc.Button(
-                                            # "Collect",
-                                            get_icon(
-                                                icon="material-symbols:bookmark-outline-rounded",
-                                                width=20,
-                                            ),
-                                            color="indigo.6",
-                                            variant="subtle",
-                                            px=4,
-                                            # compact=True,
-                                            id={
-                                                "role": "select_button",
-                                                "index": json.dumps(trace_dict),
-                                            },
+                                            "Add dataset to your collection",
                                         ),
                                     ],
                                     spacing="xs",
@@ -148,8 +172,34 @@ def get_dataset_list(station_id=None, unit=None):
     return list_entries
 
 
+listitem_skeleton = dmc.Card(
+    dmc.Grid(
+        [
+            dmc.Col(
+                [
+                    dmc.Skeleton(
+                        width="100%",
+                        height=18,
+                    ),
+                    dmc.Space(h=4),
+                    dmc.Skeleton(width="35%", height=11),
+                ],
+                span=11,
+            ),
+            dmc.Col(dmc.Skeleton(width="100%", height=32), span=1),
+        ],
+    ),
+    withBorder=True,
+    radius=0,
+    style=dict(borderBottom="0px", borderLeft="0px", borderRight="0px"),
+    py=6,
+)
+
 plaio_meteo = PagedListSearchableAIO(
-    height="90vh", items=get_dataset_list(), items_per_page=30, 
+    height="90vh",
+    items_per_page=30,
+    use_loadingoverlay=False,
+    items=[listitem_skeleton] * 10,  # get_dataset_list(),
 )
 
 
@@ -166,14 +216,12 @@ def layout(**qargs):
                                 [
                                     dmc.Col(
                                         dmc.Select(
-                                            id="meteo_stn_select",
+                                            id=ids.meteo_stn_select,
                                             label="Meteo Station",
                                             data=get_station_select_data(),
                                             searchable=True,
                                             clearable=True,
-                                            icon=get_icon(
-                                                icon="material-symbols:location-on-outline"
-                                            ),
+                                            icon=get_icon(icon=icons.location_marker),
                                             placeholder="Station",
                                         ),
                                         className="col-sm-6",
@@ -185,7 +233,7 @@ def layout(**qargs):
                                             clearable=True,
                                             placeholder="Unit",
                                             label="Unit",
-                                            id="meteo_unit_select",
+                                            id=ids.meteo_unit_select,
                                         ),
                                         className="col-sm-6",
                                     ),
@@ -205,7 +253,7 @@ def layout(**qargs):
                                             dmc.AccordionPanel(
                                                 dcc.Graph(
                                                     figure=generate_station_map_plot(),
-                                                    id="meteo_map",
+                                                    id=ids.map,
                                                     config=dict(
                                                         displayModeBar=True,
                                                         # scrollZoom=False,
@@ -230,7 +278,15 @@ def layout(**qargs):
                         # span=4,
                         className="col-lg-5",
                     ),
-                    dmc.Col([dmc.Space(h=12), plaio_meteo], className="col-lg-7"),
+                    dmc.Col(
+                        [
+                            dmc.Space(h=12),
+                            dmc.LoadingOverlay(
+                                plaio_meteo, transitionDuration=200, overlayOpacity=0
+                            ),
+                        ],
+                        className="col-lg-7",
+                    ),
                 ]
             ),
         ],
@@ -239,8 +295,8 @@ def layout(**qargs):
 
 
 @callback(
-    Output("meteo_stn_select", "value"),
-    Input("meteo_map", "clickData"),
+    Output(ids.meteo_stn_select, "value"),
+    Input(ids.map, "clickData"),
 )
 def show_clicked(cd):
     if cd is not None:
@@ -255,8 +311,8 @@ def show_clicked(cd):
 
 
 @callback(
-    Output("meteo_map", "figure"),
-    Input("meteo_stn_select", "value"),
+    Output(ids.map, "figure"),
+    Input(ids.meteo_stn_select, "value"),
 )
 def highlight_selected(value):
     if value is not None:
@@ -266,8 +322,8 @@ def highlight_selected(value):
 
 @callback(
     Output(plaio_meteo.ids.store(plaio_meteo.aio_id), "data"),
-    Input("meteo_stn_select", "value"),
-    Input("meteo_unit_select", "value"),
+    Input(ids.meteo_stn_select, "value"),
+    Input(ids.meteo_unit_select, "value"),
 )
 def update_dataset_list(stn, unit):
     return get_dataset_list(station_id=stn, unit=unit)
@@ -276,7 +332,7 @@ def update_dataset_list(stn, unit):
 @callback(
     Output("traces_store", "data", allow_duplicate=True),
     Output("noti_container", "children", allow_duplicate=True),
-    Input({"role": "select_button", "index": ALL}, "n_clicks"),
+    Input({"role": ids.select_btn_role, "index": ALL}, "n_clicks"),
     State("traces_store", "data"),
     prevent_initial_call=True,
 )
@@ -291,10 +347,20 @@ def add_dataset(buttons, collection):
         trace = json.loads(collection_str)
         if not trace in collection:
             collection.append(trace)
-            return collection, generate_notification(title="Added to collection",message="the selected dataset was added to your collection",color="green",icon="material-symbols:check-circle-outline")
+            return collection, generate_notification(
+                title="Added to collection",
+                message="the selected dataset was added to your collection",
+                color="green",
+                icon="material-symbols:check-circle-outline",
+            )
         raise PreventUpdate
     except:
         print("failed to load!")
-        return no_update, generate_notification(title="Already in collection",message="the selected dataset is already stored in your collection",color="orange",icon="mdi:information-outline")
+        return no_update, generate_notification(
+            title="Already in collection",
+            message="the selected dataset is already stored in your collection",
+            color="orange",
+            icon="mdi:information-outline",
+        )
 
     raise PreventUpdate

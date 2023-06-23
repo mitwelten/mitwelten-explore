@@ -2,7 +2,13 @@ import dash_mantine_components as dmc
 from configuration import PATH_PREFIX
 from dashboard.utils.communication import urlencode_dict
 from dashboard.styles import icons, get_icon
-from dashboard.models import DatasetType, PollinatorDataset, to_typed_dataset
+from dashboard.models import (
+    DatasetType,
+    PollinatorDataset,
+    to_typed_dataset,
+    default_view_config,
+)
+from dashboard.components.overlays import tooltip
 
 
 def generate_selected_data_list(store_data):
@@ -13,6 +19,19 @@ def generate_selected_data_list(store_data):
     for i in range(len(store_data)):
         ds = to_typed_dataset(store_data[i])
         dashboard_buttons = []
+        if ds.type in [DatasetType.birds, DatasetType.gbif_observations]:
+
+            dashboard_buttons.append(
+                dmc.Anchor(
+                    dmc.Button(
+                        "Map",
+                        color="cyan.6",
+                        variant="outline",
+                        leftIcon=get_icon(icon=icons.map_chart, width=24),
+                    ),
+                    href=f"{PATH_PREFIX}viz/map?{urlencode_dict(dict(datasets=[ds.to_dataset()],cfg=[default_view_config(ds.to_dataset())]))}",
+                ),
+            )
         if ds.type == DatasetType.birds:
             dashboard_buttons.append(
                 dmc.Anchor(
@@ -111,14 +130,18 @@ def generate_selected_data_list(store_data):
                                 dmc.Group(
                                     dashboard_buttons
                                     + [
-                                        dmc.Button(
-                                            get_icon(icon=icons.trash, width=24),
-                                            color="red",
-                                            px=4,
-                                            id={
-                                                "role": "remove_from_collection_btn",
-                                                "index": i,
-                                            },
+                                        tooltip(
+                                            dmc.Button(
+                                                get_icon(icon=icons.trash, width=24),
+                                                color="red",
+                                                px=4,
+                                                id={
+                                                    "role": "remove_from_collection_btn",
+                                                    "index": i,
+                                                },
+                                            ),
+                                            "Remove this dataset from your collection",
+                                            color="red.9",
                                         ),
                                     ],
                                     pr=12,
@@ -137,7 +160,7 @@ def generate_selected_data_list(store_data):
                     "borderTop": "0px",
                     "borderLeft": "0px",
                     "borderRight": "0px",
-                    },
+                },
             )
         )
 

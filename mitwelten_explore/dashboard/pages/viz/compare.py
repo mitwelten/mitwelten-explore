@@ -57,7 +57,7 @@ from dashboard.components.chart_configuration import (
 )
 from dashboard.components.affix import affix_menu, affix_button
 from dashboard.components.tables import statsagg_table
-from dashboard.components.loading import chart_loading_overlay
+from dashboard.components.overlays import chart_loading_overlay
 from dashboard.utils.ts import correlation_matrix, compute_fft, create_fft_bins
 from dashboard.styles import MULTI_VIZ_COLORSCALE, icons
 

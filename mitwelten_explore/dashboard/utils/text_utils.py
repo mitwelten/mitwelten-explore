@@ -2,6 +2,15 @@ import datetime
 import re
 
 
+def format_datetime(datetime_str):
+    if not isinstance(datetime_str, datetime.datetime):
+        try:
+            datetime_str = datetime.datetime.fromisoformat(datetime_str)
+        except:
+            return None
+    return datetime_str.strftime("%d.%m.%Y %H:%M")
+
+
 def beautify_timedelta(td: datetime.timedelta):
     days = td.days
     if days > 14:
