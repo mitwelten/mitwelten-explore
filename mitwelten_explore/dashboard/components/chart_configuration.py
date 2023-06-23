@@ -1,5 +1,6 @@
 import dash_mantine_components as dmc
 from dashboard.styles import icons, get_icon
+from dashboard.components.overlays import tooltip
 
 TS_CHART_TYPES = [
     ["line", dmc.Group([get_icon(icon=icons.line_chart, width=20), "Line"])],
@@ -18,13 +19,18 @@ TS_CHART_LAYOUTS = [
 
 
 def reload_control(reload_on_zoom_id):
-    return dmc.Switch(
-        onLabel=get_icon(icon=icons.sync_on, width=16),
-        offLabel=get_icon(icon=icons.sync_off, width=16),
+    return tooltip(
+        dmc.Switch(
+            onLabel=get_icon(icon=icons.sync_on, width=16),
+            offLabel=get_icon(icon=icons.sync_off, width=16),
+            color="teal.6",
+            checked=True,
+            id=reload_on_zoom_id,
+            persistence=True,
+        ),
+        "Update time range on zoom-in",
         color="teal.6",
-        checked=True,
-        id=reload_on_zoom_id,
-        persistence=True,
+        position="left-start",
     )
 
 
@@ -83,20 +89,25 @@ def timeseries_chart_config_menu(
         menu_dd_children.append(dmc.MenuLabel("Layout"))
         menu_dd_children.append(layout_type_radiogroup)
 
-    return dmc.Menu(
-        [
-            dmc.MenuTarget(
-                dmc.ActionIcon(
-                    get_icon(
-                        icon=icons.burger_menu,
-                        width=20,
-                    ),
-                    variant="subtle",
-                    color="teal",
-                    size=24,
-                )
-            ),
-            dmc.MenuDropdown(menu_dd_children),
-        ],
-        **kwargs
+    return tooltip(
+        dmc.Menu(
+            [
+                dmc.MenuTarget(
+                    dmc.ActionIcon(
+                        get_icon(
+                            icon=icons.burger_menu,
+                            width=20,
+                        ),
+                        variant="subtle",
+                        color="teal",
+                        size=24,
+                    )
+                ),
+                dmc.MenuDropdown(menu_dd_children),
+            ],
+            **kwargs
+        ),
+        "Chart Configuration",
+        color="teal.6",
+        position="bottom-end",
     )
