@@ -50,7 +50,7 @@ class TimeRangeAIO(html.Div):
     def __init__(
         self,
         dates=["2020-05-01", str(datetime.datetime.now().date())],
-        store_props= None,#dict(storage_type="local"),
+        store_props=None,  # dict(storage_type="local"),
         aio_id=None,
     ):
         self.aio_id = aio_id if aio_id is not None else str(uuid.uuid4())
@@ -70,17 +70,23 @@ class TimeRangeAIO(html.Div):
                 ),
                 dmc.Group(
                     [
-                        dmc.ActionIcon(
-                            DashIconify(icon="material-symbols:arrow-left", height=30),
-                            size=36,
-                            variant="default",
-                            radius=0,
-                            id=self.ids.date_step_left(self.aio_id),
-                            style={
-                                "border-top-left-radius": "4px",
-                                "border-bottom-left-radius": "4px",
-                                "border-right": "none",
-                            },
+                        dmc.MediaQuery(
+                            dmc.ActionIcon(
+                                DashIconify(
+                                    icon="material-symbols:arrow-left", height=30
+                                ),
+                                size=36,
+                                variant="default",
+                                radius=0,
+                                id=self.ids.date_step_left(self.aio_id),
+                                style={
+                                    "border-top-left-radius": "4px",
+                                    "border-bottom-left-radius": "4px",
+                                    "border-right": "none",
+                                },
+                            ),
+                            smallerThan="md",
+                            styles={"display": "none"},
                         ),
                         dmc.DateRangePicker(
                             id=self.ids.date_range_picker(self.aio_id),
@@ -92,49 +98,68 @@ class TimeRangeAIO(html.Div):
                             clearable=False,
                             radius=0,
                         ),
-                        dmc.ActionIcon(
-                            DashIconify(icon="material-symbols:arrow-right", height=30),
-                            size=36,
-                            variant="default",
-                            radius=0,
-                            id=self.ids.date_step_right(self.aio_id),
-                            className="border-start-0",
-                            style={
-                                "border-top-right-radius": "4px",
-                                "border-bottom-right-radius": "4px",
-                                "border-left": "none",
-                            },
+                        dmc.MediaQuery(
+                            dmc.ActionIcon(
+                                DashIconify(
+                                    icon="material-symbols:arrow-right", height=30
+                                ),
+                                size=36,
+                                variant="default",
+                                radius=0,
+                                id=self.ids.date_step_right(self.aio_id),
+                                className="border-start-0",
+                                style={
+                                    "border-top-right-radius": "4px",
+                                    "border-bottom-right-radius": "4px",
+                                    "border-left": "none",
+                                },
+                            ),
+                            smallerThan="md",
+                            styles={"display": "none"},
                         ),
-                        dmc.Space(w=8),
-                        dmc.ActionIcon(
-                            DashIconify(icon="bi:zoom-out"),
-                            size=36,
-                            variant="default",
-                            radius=0,
-                            id=self.ids.date_zoom_out(self.aio_id),
-                            style={
-                                "border-top-left-radius": "4px",
-                                "border-bottom-left-radius": "4px",
-                            },
+                        dmc.MediaQuery(
+                            dmc.Space(w=8),
+                            smallerThan="lg",
+                            styles={"display": "none"},
                         ),
-                        dmc.ActionIcon(
-                            DashIconify(icon="bi:zoom-in"),
-                            size=36,
-                            variant="default",
-                            radius=0,
-                            id=self.ids.date_zoom_in(self.aio_id),
-                            style={
-                                "border-top-right-radius": "4px",
-                                "border-bottom-right-radius": "4px",
-                                "border-left": "none",
-                            },
+                        dmc.MediaQuery(
+                            dmc.ActionIcon(
+                                DashIconify(icon="bi:zoom-out"),
+                                size=36,
+                                variant="default",
+                                radius=0,
+                                id=self.ids.date_zoom_out(self.aio_id),
+                                style={
+                                    "border-top-left-radius": "4px",
+                                    "border-bottom-left-radius": "4px",
+                                },
+                            ),
+                            smallerThan="lg",
+                            styles={"display": "none"},
+                        ),
+                        dmc.MediaQuery(
+                            dmc.ActionIcon(
+                                DashIconify(icon="bi:zoom-in"),
+                                size=36,
+                                variant="default",
+                                radius=0,
+                                id=self.ids.date_zoom_in(self.aio_id),
+                                style={
+                                    "border-top-right-radius": "4px",
+                                    "border-bottom-right-radius": "4px",
+                                    "border-left": "none",
+                                },
+                            ),
+                            smallerThan="lg",
+                            styles={"display": "none"},
                         ),
                     ],
                     spacing=0,
-                    noWrap=True
+                    noWrap=True,
                 ),
             ]
         )
+
     @callback(
         Output(ids.store(MATCH), "data"),
         Input(ids.date_range_picker(MATCH), "value"),
@@ -147,8 +172,7 @@ class TimeRangeAIO(html.Div):
             except:
                 dr_s = datetime.datetime.strptime(dr[0], "%Y-%m-%d")
                 dr_e = datetime.datetime.strptime(dr[1], "%Y-%m-%d")
-            return [dr_s.isoformat(),dr_e.isoformat()]
-        
+            return [dr_s.isoformat(), dr_e.isoformat()]
 
     @callback(
         Output(ids.date_range_picker(MATCH), "value"),
@@ -159,7 +183,7 @@ class TimeRangeAIO(html.Div):
         Input(ids.store_set(MATCH), "data"),
         State(ids.date_range_picker(MATCH), "value"),
     )
-    def update_dr_from_controls(left, right, zoom_out, zoom_in,store_data, dr):
+    def update_dr_from_controls(left, right, zoom_out, zoom_in, store_data, dr):
         trg = ctx.triggered_id
         if trg is not None:
             trg = trg.subcomponent
@@ -199,9 +223,10 @@ class TimeRangeAIO(html.Div):
 
                 if math.ceil(td.days) == 2:
 
-                    return [dr_s.date(), dr_e.date() - datetime.timedelta(days=step_days)]
+                    return [
+                        dr_s.date(),
+                        dr_e.date() - datetime.timedelta(days=step_days),
+                    ]
                 else:
                     return no_update
         return no_update
-
-
