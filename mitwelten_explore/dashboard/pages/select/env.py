@@ -9,7 +9,7 @@ from dashboard.aio_components.aio_list_component import PagedListSearchableAIO
 from dashboard.components.dataset_presentation import env_deployment_select_cards
 from dashboard.api_clients.deployments_client import get_deployments
 from dashboard.charts.map_charts import generate_scatter_map_plot
-from dashboard.components.notifications import generate_notification
+
 
 class PageIds(object):
     deployment_select = str(uuid4())
@@ -17,12 +17,21 @@ class PageIds(object):
     add_trace = str(uuid4())
     plaio_id = str(uuid4())
 
+
 ids = PageIds()
+
 
 def get_deployment_select_data():
     deployments = get_deployments(type_query="env.")
 
-    return [{"value": d.get("deployment_id"), "label": f"deployment-{d.get('deployment_id')}"} for d in deployments]
+    return [
+        {
+            "value": d.get("deployment_id"),
+            "label": f"deployment-{d.get('deployment_id')}",
+        }
+        for d in deployments
+    ]
+
 
 def generate_station_map_plot(selected=None):
     deployments = get_deployments(type_query="env.")
@@ -37,14 +46,19 @@ def generate_station_map_plot(selected=None):
         ids.append(d.get("deployment_id"))
     return generate_scatter_map_plot(lats, lons, names, ids, selected)
 
+
 dash.register_page(__name__, path="/select/env")
 
 initial_page_items = []
-for depl_cards in [env_deployment_select_cards(d, id_role=ids.add_trace) for d in get_deployments(type_query="env.")]:
-            initial_page_items+=depl_cards
+for depl_cards in [
+    env_deployment_select_cards(d, id_role=ids.add_trace)
+    for d in get_deployments(type_query="env.")
+]:
+    initial_page_items += depl_cards
 plaio = PagedListSearchableAIO(
     height="90vh", items=initial_page_items, items_per_page=30
 )
+
 
 def layout(**qargs):
     return dmc.Container(
@@ -64,14 +78,11 @@ def layout(**qargs):
                                             data=get_deployment_select_data(),
                                             searchable=True,
                                             clearable=True,
-                                            icon=get_icon(
-                                                icon=icons.location_marker
-                                            ),
+                                            icon=get_icon(icon=icons.location_marker),
                                             placeholder="Deployment",
                                         ),
                                         className="col-sm-6",
                                     ),
-                                    
                                 ]
                             ),
                             dmc.Space(h=20),
@@ -120,6 +131,7 @@ def layout(**qargs):
         fluid=True,
     )
 
+
 @callback(
     Output(ids.deployment_select, "value"),
     Input(ids.map, "clickData"),
@@ -135,6 +147,7 @@ def show_clicked(cd):
                     return deployment_id
     raise PreventUpdate
 
+
 @callback(
     Output(ids.map, "figure"),
     Input(ids.deployment_select, "value"),
@@ -144,6 +157,7 @@ def highlight_selected(value):
         return generate_station_map_plot(value)
     return generate_station_map_plot()
 
+
 @callback(
     Output(plaio.ids.store(plaio.aio_id), "data"),
     Input(ids.deployment_select, "value"),
@@ -152,20 +166,25 @@ def update_dataset_list(deployment_id):
     cards = []
 
     if deployment_id:
-        for depl_cards in [env_deployment_select_cards(d, id_role=ids.add_trace) for d in get_deployments(type_query="env.", deployment_id=deployment_id)]:
-            cards+=depl_cards
+        for depl_cards in [
+            env_deployment_select_cards(d, id_role=ids.add_trace)
+            for d in get_deployments(type_query="env.", deployment_id=deployment_id)
+        ]:
+            cards += depl_cards
         return cards
     else:
-        for depl_cards in [env_deployment_select_cards(d, id_role=ids.add_trace) for d in get_deployments(type_query="env.")]:
-            cards+=depl_cards
+        for depl_cards in [
+            env_deployment_select_cards(d, id_role=ids.add_trace)
+            for d in get_deployments(type_query="env.")
+        ]:
+            cards += depl_cards
         return cards
 
 
 @callback(
-    Output("traces_store", "data", allow_duplicate=True),
-    Output("noti_container", "children", allow_duplicate=True),
+    Output("trace_add_store", "data", allow_duplicate=True),
     Input({"role": ids.add_trace, "index": ALL}, "n_clicks"),
-    State("traces_store", "data"),
+    State("trace_add_store", "data"),
     prevent_initial_call=True,
 )
 def add_dataset(buttons, collection):
@@ -179,9 +198,9 @@ def add_dataset(buttons, collection):
         trace = json.loads(collection_str)
         if not trace in collection:
             collection.append(trace)
-            return collection, generate_notification(title="Added to collection",message="the selected dataset was added to your collection",color="green",icon="material-symbols:check-circle-outline")
+            return collection  # , generate_notification(title="Added to collection",message="the selected dataset was added to your collection",color="green",icon="material-symbols:check-circle-outline")
         raise PreventUpdate
     except:
-        return no_update, generate_notification(title="Already in collection",message="the selected dataset is already stored in your collection",color="orange",icon="mdi:information-outline")
+        return no_update  # , generate_notification(title="Already in collection",message="the selected dataset is already stored in your collection",color="orange",icon="mdi:information-outline")
 
     raise PreventUpdate

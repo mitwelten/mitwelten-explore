@@ -12,7 +12,6 @@ from dashboard.data_handler import (
 from dashboard.charts.map_charts import generate_scatter_map_plot
 from dashboard.utils.communication import urlencode_dict
 from dashboard.utils.text_utils import format_datetime
-from dashboard.components.notifications import generate_notification
 from dashboard.components.overlays import tooltip
 from dashboard.models import MeteoDataset
 from configuration import PATH_PREFIX
@@ -330,10 +329,9 @@ def update_dataset_list(stn, unit):
 
 
 @callback(
-    Output("traces_store", "data", allow_duplicate=True),
-    Output("noti_container", "children", allow_duplicate=True),
+    Output("trace_add_store", "data", allow_duplicate=True),
     Input({"role": ids.select_btn_role, "index": ALL}, "n_clicks"),
-    State("traces_store", "data"),
+    State("trace_add_store", "data"),
     prevent_initial_call=True,
 )
 def add_dataset(buttons, collection):
@@ -347,20 +345,10 @@ def add_dataset(buttons, collection):
         trace = json.loads(collection_str)
         if not trace in collection:
             collection.append(trace)
-            return collection, generate_notification(
-                title="Added to collection",
-                message="the selected dataset was added to your collection",
-                color="green",
-                icon="material-symbols:check-circle-outline",
-            )
+            return collection
         raise PreventUpdate
     except:
         print("failed to load!")
-        return no_update, generate_notification(
-            title="Already in collection",
-            message="the selected dataset is already stored in your collection",
-            color="orange",
-            icon="mdi:information-outline",
-        )
+        return no_update
 
     raise PreventUpdate

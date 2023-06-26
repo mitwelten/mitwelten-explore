@@ -9,7 +9,6 @@ from dashboard.aio_components.aio_list_component import PagedListSearchableAIO
 from dashboard.components.dataset_presentation import pollinator_dataset_card
 from dashboard.api_clients.deployments_client import get_deployments
 from dashboard.charts.map_charts import generate_scatter_map_plot
-from dashboard.components.notifications import generate_notification
 
 dash.register_page(__name__, path="/select/pollinator")
 
@@ -22,6 +21,7 @@ class PageIds(object):
     polli_class_select = str(uuid4())
     dataset_card_div = str(uuid4())
     add_dataset_role = str(uuid4())
+
 
 ids = PageIds()
 
@@ -51,9 +51,6 @@ def generate_station_map_plot(selected=None):
     return generate_scatter_map_plot(lats, lons, names, ids, selected)
 
 
-
-
-
 def layout(**qargs):
     return dmc.Container(
         [
@@ -62,7 +59,6 @@ def layout(**qargs):
                     dmc.Col(
                         children=[
                             dmc.Text("Pollinator Datasets", weight=700, size="lg"),
-                            
                             dmc.Space(h=12),
                             dmc.MultiSelect(
                                 id=ids.deployment_select,
@@ -112,7 +108,16 @@ def layout(**qargs):
                             dmc.Select(
                                 id=ids.polli_class_select,
                                 label="Pollinator Class",
-                                data=[{"label":p.title(),"value":p} for p in ["fliege", "wildbiene", "schwebfliege", "honigbiene", "hummel"]],
+                                data=[
+                                    {"label": p.title(), "value": p}
+                                    for p in [
+                                        "fliege",
+                                        "wildbiene",
+                                        "schwebfliege",
+                                        "honigbiene",
+                                        "hummel",
+                                    ]
+                                ],
                                 searchable=True,
                                 clearable=True,
                                 icon=get_icon(icon=icons.bee),
@@ -122,7 +127,10 @@ def layout(**qargs):
                         # span=4,
                         className="col-lg-5",
                     ),
-                    dmc.Col([dmc.Space(h=12), html.Div(id=ids.dataset_card_div)], className="col-lg-7"),
+                    dmc.Col(
+                        [dmc.Space(h=12), html.Div(id=ids.dataset_card_div)],
+                        className="col-lg-7",
+                    ),
                 ]
             ),
         ],
@@ -166,16 +174,18 @@ def highlight_selected(value):
 @callback(
     Output(ids.dataset_card_div, "children"),
     Input(ids.deployment_select, "value"),
-    Input(ids.polli_class_select, "value")
+    Input(ids.polli_class_select, "value"),
 )
 def update_ds_card(deployments, polli_class):
-    return pollinator_dataset_card(id_role=ids.add_trace,deployment_ids=deployments, pollinator_class=polli_class)
+    return pollinator_dataset_card(
+        id_role=ids.add_trace, deployment_ids=deployments, pollinator_class=polli_class
+    )
+
 
 @callback(
-    Output("traces_store", "data", allow_duplicate=True),
-    Output("noti_container", "children", allow_duplicate=True),
+    Output("trace_add_store", "data", allow_duplicate=True),
     Input({"role": ids.add_trace, "index": ALL}, "n_clicks"),
-    State("traces_store", "data"),
+    State("trace_add_store", "data"),
     prevent_initial_call=True,
 )
 def add_dataset(buttons, collection):
@@ -189,7 +199,7 @@ def add_dataset(buttons, collection):
         trace = json.loads(collection_str)
         if not trace in collection:
             collection.append(trace)
-            return collection, generate_notification(title="Added to collection",message="the selected dataset was added to your collection",color="green",icon="material-symbols:check-circle-outline")
+            return collection  # , generate_notification(title="Added to collection",message="the selected dataset was added to your collection",color="green",icon="material-symbols:check-circle-outline")
         raise PreventUpdate
     except:
-        return no_update, generate_notification(title="Already in collection",message="the selected dataset is already stored in your collection",color="orange",icon="mdi:information-outline")
+        return no_update  # , generate_notification(title="Already in collection",message="the selected dataset is already stored in your collection",color="orange",icon="mdi:information-outline")

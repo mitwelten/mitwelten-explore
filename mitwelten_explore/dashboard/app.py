@@ -17,8 +17,10 @@ import flask
 from configuration import *
 from dashboard.components.navbar import nav_bar, ThemeSwitchAIO
 from dashboard.components.modals import confirm_dialog
+from dashboard.components.notifications import generate_notification
 from dashboard.utils.communication import get_user_from_cookies
 from dashboard.api_clients.userdata_client import update_collection, get_collection
+from dashboard.models import to_typed_dataset
 
 app = Dash(
     __name__,
@@ -40,6 +42,7 @@ app.layout = dmc.MantineProvider(
             [
                 dcc.Interval(id="keepalive_interval", interval=30 * 1000),
                 dcc.Store(id="traces_store", data=None, storage_type="memory"),
+                dcc.Store(id="trace_add_store", data=None, storage_type="memory"),
                 html.Div(id="keepalive_div"),
                 dcc.Location("url", refresh=True),
                 nav_bar,
@@ -55,17 +58,61 @@ app.layout = dmc.MantineProvider(
 # sync traces store
 @app.callback(
     Output("traces_store", "data", allow_duplicate=True),
+    Output("trace_add_store", "data", allow_duplicate=True),
+    Output("noti_container", "children", allow_duplicate=True),
     Input("traces_store", "modified_timestamp"),
     State("traces_store", "data"),
+    Input("trace_add_store", "modified_timestamp"),
+    Input("trace_add_store", "data"),
     prevent_initial_call=True,
 )
-def sync_collection(ts, data):
-    if data is None:
+def sync_collection(ts, data, data_add_ts, data_add):
+    trg = ctx.triggered_id
+    if trg == "traces_store":
 
-        collection = get_collection(auth_cookie=flask.request.cookies.get("auth"))
-        return collection
-    if data is not None:
-        update_collection(datasets=data, auth_cookie=flask.request.cookies.get("auth"))
+        if data is None:
+
+            collection = get_collection(auth_cookie=flask.request.cookies.get("auth"))
+            return collection, no_update, no_update
+        if data is not None:
+            update_collection(
+                datasets=data, auth_cookie=flask.request.cookies.get("auth")
+            )
+            raise PreventUpdate
+    elif trg == "trace_add_store" and data_add is not None:
+        if data is None:
+            raise PreventUpdate
+        if isinstance(data_add, list) and len(data_add) > 0:
+            data_add = data_add[0]
+        ds = to_typed_dataset(data_add)
+        if data_add in data:
+            return (
+                no_update,
+                None,
+                generate_notification(
+                    title=f"{ds.get_title()} is already in your collection",
+                    message="the selected dataset is already stored in your collection",
+                    color="orange",
+                    icon="mdi:information-outline",
+                ),
+            )
+        else:
+
+            data.append(data_add)
+            update_collection(
+                datasets=data, auth_cookie=flask.request.cookies.get("auth")
+            )
+            return (
+                data,
+                None,
+                generate_notification(
+                    title=f"{ds.get_title()} added to collection",
+                    message="the selected dataset was added to your collection",
+                    color="green",
+                    icon="material-symbols:check-circle-outline",
+                ),
+            )
+
     raise PreventUpdate
 
 
