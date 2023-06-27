@@ -10,7 +10,7 @@ from dashboard.aio_components.aio_texteditor_component import TextEditorAIO
 from dashboard.components.navbar import ThemeSwitchAIO
 from uuid import uuid4
 import datetime
-from dashboard.components.affix import affix_menu, affix_button
+from dashboard.components.affix import affix_menu, affix_button, datasource_affix
 from dashboard.components.selects import (
     confidence_threshold_select,
     time_bucket_select,
@@ -55,10 +55,10 @@ from dashboard.components.chart_configuration import (
     timeseries_chart_config_menu,
     reload_control,
 )
-from dashboard.components.overlays import chart_loading_overlay
+from dashboard.components.overlays import chart_loading_overlay, datasource_indicator
 from dashboard.components.modals import share_modal
-from dashboard.models import UrlSearchArgs, Annotation
-
+from dashboard.models import UrlSearchArgs, Annotation, Taxon, GBIFTaxon, RankEnum
+from dashboard.data_handler import get_data_sources
 from dashboard.styles import icons, SINGLE_CHART_COLOR
 from configuration import DEFAULT_TR_START, DEFAULT_TOD_BUCKET_WIDTH, PATH_PREFIX
 
@@ -85,6 +85,7 @@ class PageIds(object):
     subspecies_list = str(uuid4())
     taxon_card_div = str(uuid4())
     data_src_select = str(uuid4())
+    datasource_indicator = str(uuid4())
 
 
 ids = PageIds()
@@ -156,6 +157,7 @@ def layout(taxon_id=None, **qargs):
         [
             html.Div(id=ids.share_modal_div),
             annot_editor,
+            datasource_affix(ids.datasource_indicator),
             affix,
             dcc.Location(ids.url, refresh=False),
             dmc.Grid(
@@ -677,6 +679,34 @@ def update_subspecies_list(conf, pn):
             species_counts, confidence=conf, selected_species_id=taxon_id
         )
 
+    raise PreventUpdate
+
+
+# update datasource indicator
+@callback(
+    Output(ids.datasource_indicator, "children"),
+    Input(ids.url, "search"),
+    State(ids.url, "pathname"),
+)
+def update_datasource(search, pn):
+    if not "viz/taxon" in pn or len(search) < 2:
+        raise PreventUpdate
+    taxon_id = pn.split("/")[-1]
+    if taxon_id is not None:
+        query_args = parse_nested_qargs(qargs_to_dict(search))
+        url_args = UrlSearchArgs(**query_args)
+        url_args.datasets = []
+        if url_args.gbif_data == True:
+            url_args.datasets.append(
+                GBIFTaxon(datum_id=taxon_id, rank=RankEnum.species).to_dataset()
+            )
+        if url_args.mw_data == True:
+            url_args.datasets.append(
+                Taxon(datum_id=taxon_id, rank=RankEnum.species).to_dataset()
+            )
+
+        datasources = get_data_sources(url_args)
+        return datasource_indicator(datasources)
     raise PreventUpdate
 
 

@@ -31,16 +31,17 @@ from dashboard.data_handler import (
     get_time_of_day_from_qargs,
     get_locations_from_qargs,
     get_statsagg_from_qargs,
+    get_data_sources,
 )
 from dashboard.components.chart_configuration import (
     timeseries_chart_config_menu,
     reload_control,
 )
-from dashboard.components.affix import affix_menu, affix_button
+from dashboard.components.affix import affix_menu, affix_button, datasource_affix
 from dashboard.components.dataset_presentation import dataset_title
 from dashboard.components.navbar import ThemeSwitchAIO
 from dashboard.components.notifications import generate_notification
-from dashboard.components.overlays import chart_loading_overlay
+from dashboard.components.overlays import chart_loading_overlay, datasource_indicator
 from dashboard.styles import icons
 from configuration import PATH_PREFIX, DEFAULT_CONFIDENCE, DEFAULT_TR_START
 from dashboard.charts.time_series_charts import (
@@ -75,6 +76,7 @@ class PageIds(object):
     tod_chart = str(uuid4())
     tod_chart_type = str(uuid4())
     map_chart = str(uuid4())
+    datasource_indicator = str(uuid4())
 
 
 ids = PageIds()
@@ -137,6 +139,7 @@ def layout(**qargs):
             dcc.Store(ids.store_statsagg_data),
             html.Div(id=ids.share_modal_div),
             annot_editor,
+            datasource_affix(ids.datasource_indicator),
             affix,
             # Header: name and filters
             dmc.Grid(
@@ -553,6 +556,20 @@ def update_map_plot(search_args):
             location_info.get("name"),
             location_info.get("id"),
         )
+
+
+# update datasource indicator
+@callback(
+    Output(ids.datasource_indicator, "children"),
+    Input(ids.url, "search"),
+    State(ids.url, "pathname"),
+)
+def update_datasource(search, pn):
+    if not "viz/timeseries" in pn or len(search) < 2:
+        raise PreventUpdate
+    query_args = parse_nested_qargs(qargs_to_dict(search))
+    datasources = get_data_sources(UrlSearchArgs(**query_args))
+    return datasource_indicator(datasources)
 
 
 # share modal

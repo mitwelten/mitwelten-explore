@@ -2,6 +2,7 @@ from dash_iconify import DashIconify
 import dash_mantine_components as dmc
 import plotly.colors
 
+
 class Icons(object):
     share = "material-symbols:share"
     add_annotation = "material-symbols:add-comment-outline"
@@ -51,10 +52,13 @@ class Icons(object):
     hexagon_filled = "ic:twotone-hexagon"
     switch_arrows = "mi:switch"
     success_round = "ep:success-filled"
+    copyright = "ic:baseline-copyright"
+
 
 class IconUrls(object):
     meteoswiss = "/app/assets/icons/meteoswiss.svg"
     gbif = "/app/assets/icons/gbif.png"
+
 
 icon_urls = IconUrls()
 
@@ -62,14 +66,14 @@ icon_urls = IconUrls()
 icons = Icons()
 
 
-def get_icon(icon=None,width=None, **kwargs):
+def get_icon(icon=None, width=None, **kwargs):
 
     if "/assets/icons" in icon:
         if width:
 
-            return dmc.Avatar(src=icon,size=width,**kwargs)
+            return dmc.Avatar(src=icon, size=width, **kwargs)
         else:
-            return dmc.Avatar(src=icon,**kwargs)
+            return dmc.Avatar(src=icon, **kwargs)
     else:
         if width:
             return DashIconify(icon=icon, width=width, **kwargs)
@@ -110,7 +114,7 @@ SEQUENTIAL_COLORSCALES = [
     plotly.colors.sequential.deep_r,
     plotly.colors.sequential.Viridis,
     plotly.colors.sequential.Tealgrn,
-    plotly.colors.sequential.RdPu
+    plotly.colors.sequential.RdPu,
 ]
 
 TRANSPARENT_COLORSCALE = [

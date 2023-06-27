@@ -39,6 +39,7 @@ from dashboard.data_handler import (
     load_tod_data,
     load_map_data,
     load_statsagg_data,
+    get_data_sources,
 )
 from dashboard.components.cards import dataset_info_cards
 from dashboard.charts.time_series_charts import (
@@ -55,9 +56,9 @@ from dashboard.components.chart_configuration import (
     timeseries_chart_config_menu,
     reload_control,
 )
-from dashboard.components.affix import affix_menu, affix_button
+from dashboard.components.affix import affix_menu, affix_button, datasource_affix
 from dashboard.components.tables import statsagg_table
-from dashboard.components.overlays import chart_loading_overlay
+from dashboard.components.overlays import chart_loading_overlay, datasource_indicator
 from dashboard.utils.ts import correlation_matrix, compute_fft, create_fft_bins
 from dashboard.styles import MULTI_VIZ_COLORSCALE, icons
 
@@ -100,6 +101,7 @@ class PageIds(object):
     corr_matrix_card = str(uuid4())
     fft_card = str(uuid4())
     tabs = str(uuid4())
+    datasource_indicator = str(uuid4())
 
 
 ids = PageIds()
@@ -129,6 +131,7 @@ def layout(**qargs):
                 dcc.Store(id=ids.ts_store),  # , storage_type="local"),
                 dcc.Store(id=ids.stats_store),
                 dcc.Store(id=ids.map_store, data=None),
+                datasource_affix(ids.datasource_indicator),
             ],
         )
     args = UrlSearchArgs(**query_args)
@@ -141,6 +144,7 @@ def layout(**qargs):
             dcc.Store(id=ids.map_store),
             html.Div(id=ids.config_modal_div),
             html.Div(id=ids.share_modal_div),
+            datasource_affix(ids.datasource_indicator),
             affix,
             annot_editor,
             dmc.Group(
@@ -869,6 +873,20 @@ def apply_dataset_configuration(apply_btns, confidence, agg, norm, search):
         # return no_update, f"?{urlencode_dict(query_args)}"
         return f"?{urlencode_dict(query_args)}", False
     raise PreventUpdate
+
+
+# update datasource indicator
+@callback(
+    Output(ids.datasource_indicator, "children"),
+    Input(ids.url, "search"),
+    State(ids.url, "pathname"),
+)
+def update_datasource(search, pn):
+    if not "viz/compare" in pn or len(search) < 2:
+        raise PreventUpdate
+    query_args = parse_nested_qargs(qargs_to_dict(search))
+    datasources = get_data_sources(UrlSearchArgs(**query_args))
+    return datasource_indicator(datasources)
 
 
 # share modal

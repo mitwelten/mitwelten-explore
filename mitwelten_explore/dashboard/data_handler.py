@@ -44,6 +44,7 @@ from dashboard.api_clients.gbif_cache_client import (
     get_gbif_detection_locations,
     get_gbif_detection_time_of_day,
     get_gbif_detection_count,
+    get_gbif_datasets,
 )
 from dashboard.api_clients.pollinator_results_client import (
     get_polli_detection_dates,
@@ -579,3 +580,44 @@ def load_statsagg_data(dataset, cfg, vc: ViewConfiguration = None, auth_cookie=N
 
     else:
         return {"no data": True}
+
+
+def get_data_sources(args: UrlSearchArgs):
+    datasets = []
+    if args.datasets is not None:
+        for ds in args.datasets:
+            datasets.append(to_typed_dataset(ds))
+    if args.dataset is not None:
+        datasets.append(to_typed_dataset(args.dataset))
+    dataset_types = list(set([ds.type for ds in datasets]))
+    mitwelten_datasets = []
+    meteoswiss_datasets = []
+    gbif_datasets = []
+    for ds in datasets:
+        if ds.type == DatasetType.gbif_observations:
+            for datasource in get_gbif_datasets(
+                ds.datum_id, args.view_config.time_from, args.view_config.time_to
+            ):
+                if datasource not in gbif_datasets:
+                    gbif_datasets.append(datasource)
+        elif ds.type == DatasetType.meteodata:
+            if len(meteoswiss_datasets) == 0:
+                meteoswiss_datasets.append(
+                    dict(
+                        name="Meteoschweiz",
+                        reference="https://www.meteoschweiz.admin.ch/",
+                    )
+                )
+        else:
+            if len(mitwelten_datasets) == 0:
+                mitwelten_datasets.append(
+                    dict(name="Mitwelten", reference="https://www.mitwelten.org")
+                )
+    datasource_dict = {}
+    if len(mitwelten_datasets) > 0:
+        datasource_dict["SNF Mitwelten"] = mitwelten_datasets
+    if len(meteoswiss_datasets) > 0:
+        datasource_dict["Meteoschweiz"] = meteoswiss_datasets
+    if len(gbif_datasets) > 0:
+        datasource_dict["GBIF Datasets"] = gbif_datasets
+    return datasource_dict

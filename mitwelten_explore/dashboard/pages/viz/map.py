@@ -16,10 +16,10 @@ from dashboard.components.modals import (
     dataset_config_modal,
     share_modal,
 )
-from dashboard.components.affix import affix_menu, affix_button
-
+from dashboard.components.affix import affix_menu, affix_button, datasource_affix
+from dashboard.components.overlays import datasource_indicator
 from dashboard.components.cards import dataset_info_card
-from dashboard.data_handler import load_map_data
+from dashboard.data_handler import load_map_data, get_data_sources
 from dashboard.models import (
     UrlSearchArgs,
     to_typed_dataset,
@@ -79,6 +79,7 @@ class PageIds(object):
     colorscale_slider_2 = str(uuid4())
     map_config_stack = str(uuid4())
     map_type_control = str(uuid4())
+    datasource_indicator = str(uuid4())
 
 
 ids = PageIds()
@@ -164,7 +165,10 @@ def layout(**qargs):
     if len(query_args) == 0:
         return dmc.Container(
             [
-                viz_compare_select_modal(id=ids.select_modal, title="Select one or two datasets from the list"),
+                viz_compare_select_modal(
+                    id=ids.select_modal,
+                    title="Select one or two datasets from the list",
+                ),
                 dcc.Location(ids.url, refresh=True),
             ],
         )
@@ -173,14 +177,15 @@ def layout(**qargs):
         map_type_ctl = map_type_control("bubble")
     else:
         map_type_ctl = map_type_control()
-    
-    single_dataset = len(query_args.get("datasets"))==1
+
+    single_dataset = len(query_args.get("datasets")) == 1
 
     return dmc.Container(
         [
             dcc.Location(ids.url, refresh=False),
             html.Div(id=ids.config_modal_div),
             html.Div(id=ids.share_modal_div),
+            datasource_affix(ids.datasource_indicator),
             affix,
             annot_editor,
             # dcc.Interval(id=ids.interval,interval=5000, n_intervals=0),
@@ -248,7 +253,6 @@ def layout(**qargs):
                                     refresh=False,
                                 ),
                                 style={"display": "none"} if single_dataset else None,
-
                             ),
                             dmc.Space(h=12),
                             dmc.Stack(
@@ -300,8 +304,9 @@ def layout(**qargs):
                                             width="1.5rem",
                                             color=MULTI_VIZ_COLORSCALE[1],
                                         ),
-                                        style={"display": "none"} if single_dataset else None,
-
+                                        style={"display": "none"}
+                                        if single_dataset
+                                        else None,
                                     ),
                                     dmc.RangeSlider(
                                         id=ids.colorscale_slider_2,
@@ -318,8 +323,9 @@ def layout(**qargs):
                                             {"value": 50, "label": "50%"},
                                             {"value": 80, "label": "80%"},
                                         ],
-                                        style={"display": "none"} if single_dataset else None,
-
+                                        style={"display": "none"}
+                                        if single_dataset
+                                        else None,
                                     ),
                                 ],
                             ),
@@ -415,7 +421,7 @@ def generate_link(checkboxes, nc, search):
                 f"?{urlencode_dict(query_args)}",
             )
 
-        return n_selected not in [1,2], no_update
+        return n_selected not in [1, 2], no_update
     return no_update, no_update
 
 
@@ -555,19 +561,24 @@ def update_dataset_cards(search, pn):
                 args=args,
                 index=0,
                 config_btn_role=ids.dataset_config_role,
-                visible_btn_id=dict(role=ids.ds_visible_role,index=0),#ids.ds1_visible,
+                visible_btn_id=dict(
+                    role=ids.ds_visible_role, index=0
+                ),  # ids.ds1_visible,
                 trace_icon=icons.hexagon_filled,
                 icon_color=SEQUENTIAL_COLORSCALES[0][
                     int(len(SEQUENTIAL_COLORSCALES[0]) / 2) + 1
                 ],
-            )]
-        if len(args.datasets)==2:
+            )
+        ]
+        if len(args.datasets) == 2:
             ds_cards.append(
                 dataset_info_card(
                     args=args,
                     index=1,
                     config_btn_role=ids.dataset_config_role,
-                    visible_btn_id=dict(role=ids.ds_visible_role,index=1),#ids.ds2_visible,
+                    visible_btn_id=dict(
+                        role=ids.ds_visible_role, index=1
+                    ),  # ids.ds2_visible,
                     trace_icon=icons.hexagon_outline,
                     icon_color=SEQUENTIAL_COLORSCALES[1][
                         int(len(SEQUENTIAL_COLORSCALES[1]) / 2) + 1
@@ -640,23 +651,33 @@ def hide_hexbinmap_control(value):
 
 @callback(
     Output(multihexmap.ids.store(multihexmap.aio_id), "data", allow_duplicate=True),
-    #Input(ids.ds1_visible, "checked"),
-    #Input(ids.ds2_visible, "checked"),
-    Input({"role":ids.ds_visible_role, "index":ALL},"checked"),
-    #Input({"role":ids.ds_visible_role, "index":1},"checked"),
+    Input({"role": ids.ds_visible_role, "index": ALL}, "checked"),
     State(multihexmap.ids.store(multihexmap.aio_id), "data"),
     prevent_initial_call=True,
 )
 def update_visibility(btns, data):
     if data is not None and btns is not None:
-        if not len(btns)==len(data):
+        if not len(btns) == len(data):
             raise PreventUpdate
-
         for i in range(len(data)):
             data[i]["visible"] = btns[i]
         return data
 
     raise PreventUpdate
+
+
+# update datasource indicator
+@callback(
+    Output(ids.datasource_indicator, "children"),
+    Input(ids.url, "search"),
+    State(ids.url, "pathname"),
+)
+def update_datasource(search, pn):
+    if not "viz/map" in pn or len(search) < 2:
+        raise PreventUpdate
+    query_args = parse_nested_qargs(qargs_to_dict(search))
+    datasources = get_data_sources(UrlSearchArgs(**query_args))
+    return datasource_indicator(datasources)
 
 
 # switch_datasets

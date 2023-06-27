@@ -3,10 +3,11 @@ from dashboard.styles import icons, get_icon
 import uuid
 
 
-def affix_br(children, horizontal=False):
+def datasource_affix(id):
     return dmc.Affix(
-        dmc.Group(children=children) if horizontal else dmc.Stack(children=children),
-        position={"bottom": 20, "right": 20},
+        dmc.Loader(color="gray", size="xs", variant="dots"),
+        id=id,
+        position={"bottom": 1, "left": 20},
     )
 
 
@@ -19,6 +20,7 @@ def affix_button(id, icon):
         color="teal",
         id=id,
     )
+
 
 def affix_menu(menu_children, id=str(uuid.uuid4())):
     return dmc.Affix(

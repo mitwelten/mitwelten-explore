@@ -1,4 +1,5 @@
 import dash_mantine_components as dmc
+from dashboard.styles import icons, get_icon
 
 
 def chart_loading_overlay(children, position="left"):
@@ -59,3 +60,49 @@ def tooltip(
             openDelay=opendelay,
             color=color,
         )
+
+
+def datasource_indicator(datasources: dict):
+    children = []
+    titles = []
+    for key in datasources.keys():
+        titles.append(dmc.Text(key, size="xs"))
+        for ds in datasources[key]:
+            children.append(
+                dmc.Anchor(
+                    dmc.Text(
+                        [ds.get("name"), " ", get_icon(icons.open_in_new_tab)],
+                        size="xs",
+                    ),
+                    href=ds.get("reference"),
+                    target="_blank",
+                )
+            )
+
+    return dmc.HoverCard(
+        withArrow=False,
+        shadow="md",
+        children=[
+            dmc.HoverCardTarget(
+                dmc.Group(
+                    [
+                        dmc.Group(
+                            [
+                                get_icon(icons.copyright),
+                                dmc.Text("data:", size="sm", weight=300),
+                            ],
+                            spacing=3,
+                        ),
+                    ]
+                    + titles,
+                    spacing="sm",
+                )
+            ),
+            dmc.HoverCardDropdown(
+                [
+                    dmc.Text("Data Sources", weight=500),
+                    dmc.Stack(children, spacing=3),
+                ]
+            ),
+        ],
+    )
