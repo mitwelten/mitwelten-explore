@@ -3,7 +3,7 @@ import dash_mantine_components as dmc
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import ThemeSwitchAIO
 from configuration import *
-from dashboard.styles import icons, get_icon
+from dashboard.styles import icons, get_icon, nav_style_inactive
 
 theme_switch = ThemeSwitchAIO(
     aio_id="theme",
@@ -26,6 +26,8 @@ nav_logo_target = dmc.Anchor(
             ),
         ],
         spacing=2,
+        style=nav_style_inactive,
+        id="nav_header_home",
     ),
     href=PATH_PREFIX,
     variant="text",
@@ -52,13 +54,11 @@ nav_dataset_target = dmc.Menu(
                         styles={"display": "none"},
                     ),
                 ],
-                id="nav_group_data",
                 spacing=4,
-                style={"cursor": "pointer"},
+                style=nav_style_inactive,
+                # id={"role":"navbar_target", "index":"select"},
+                id="nav_header_select",
                 className=None,
-                # pl=4,
-                # pr=12,
-                # py=6,
             ),
         ),
         dmc.MenuDropdown(
@@ -131,7 +131,8 @@ nav_collection_target = dmc.Anchor(
             ),
         ],
         spacing=4,
-        id="nav_group_collection",
+        id="nav_header_collection",
+        style=nav_style_inactive,
         noWrap=True,
     ),
     href=PATH_PREFIX + "collection",
@@ -161,9 +162,8 @@ nav_viz_target = dmc.Menu(
                     ),
                 ],
                 spacing=4,
-                style={"cursor": "pointer"},
-                # {"cursor": "pointer"},
-                id="nav_group_viz",
+                style=nav_style_inactive,
+                id="nav_header_viz",
             ),
         ),
         dmc.MenuDropdown(
@@ -191,27 +191,6 @@ nav_viz_target = dmc.Menu(
     zIndex=500,
 )
 
-nav_docs_target = dmc.Anchor(
-    dmc.Group(
-        [
-            dmc.MediaQuery(
-                dmc.Text("Docs", weight=500),
-                smallerThan="lg",
-                styles={"display": "none"},
-            ),
-            dmc.MediaQuery(
-                get_icon(icons.info, width=24),
-                largerThan="lg",
-                styles={"display": "none"},
-            ),
-        ],
-        spacing="xs",
-    ),
-    href=PATH_PREFIX + "docs",
-    variant="text",
-)
-
-
 nav_annotations_target = dmc.Anchor(
     dmc.Group(
         [
@@ -227,11 +206,35 @@ nav_annotations_target = dmc.Anchor(
             ),
         ],
         spacing="xs",
-        id="nav_group_annotations",
+        id="nav_header_annotations",
+        style=nav_style_inactive,
     ),
     href=PATH_PREFIX + "annotations",
     variant="text",
 )
+
+nav_docs_target = dmc.Anchor(
+    dmc.Group(
+        [
+            dmc.MediaQuery(
+                dmc.Text("Docs", weight=500),
+                smallerThan="lg",
+                styles={"display": "none"},
+            ),
+            dmc.MediaQuery(
+                get_icon(icons.info, width=24),
+                largerThan="lg",
+                styles={"display": "none"},
+            ),
+        ],
+        spacing="xs",
+        style=nav_style_inactive,
+        id="nav_header_docs",
+    ),
+    href=PATH_PREFIX + "docs",
+    variant="text",
+)
+
 
 nav_settings_target = dmc.Menu(
     [

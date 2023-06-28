@@ -53,6 +53,9 @@ class Icons(object):
     switch_arrows = "mi:switch"
     success_round = "ep:success-filled"
     copyright = "ic:baseline-copyright"
+    license_cc = "cib:creative-commons"
+    license_cc_pd = "cib:creative-commons-pd"
+    license_cc0 = "cib:creative-commons-zero"
 
 
 class IconUrls(object):
@@ -121,3 +124,16 @@ TRANSPARENT_COLORSCALE = [
     [0.0, "rgba(0,0,0,0)"],
     [1.0, "rgba(0,0,0,0)"],
 ]
+
+
+nav_style_active = {
+    "cursor": "pointer",
+    "height": "39px",
+    "borderBottom": "3px solid #4C6EF5",
+    "borderTop": "3px solid rgba(0,0,0,0)",
+}
+nav_style_inactive = {
+    "cursor": "pointer",
+    "height": "39px",
+    "borderTop": "3px solid rgba(0,0,0,0)",
+}

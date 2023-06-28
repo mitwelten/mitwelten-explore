@@ -21,6 +21,7 @@ from dashboard.components.notifications import generate_notification
 from dashboard.utils.communication import get_user_from_cookies
 from dashboard.api_clients.userdata_client import update_collection, get_collection
 from dashboard.models import to_typed_dataset
+from dashboard.styles import nav_style_active, nav_style_inactive
 
 app = Dash(
     __name__,
@@ -28,6 +29,7 @@ app = Dash(
     suppress_callback_exceptions=True,
     requests_pathname_prefix=PATH_PREFIX,
     external_stylesheets=[HLJS_STYLESHEET],
+    update_title=None,
 )
 
 notification_provider = dmc.NotificationsProvider(
@@ -41,10 +43,11 @@ app.layout = dmc.MantineProvider(
         dmc.Container(
             [
                 dcc.Interval(id="keepalive_interval", interval=30 * 1000),
+                dcc.Interval(id="keepalive_interval1", interval=1000),
                 dcc.Store(id="traces_store", data=None, storage_type="memory"),
                 dcc.Store(id="trace_add_store", data=None, storage_type="memory"),
                 html.Div(id="keepalive_div"),
-                dcc.Location("url", refresh=True),
+                dcc.Location("url", refresh=False),
                 nav_bar,
                 notification_provider,
                 dmc.Container([page_container], fluid=True, className="pt-2"),
@@ -120,6 +123,7 @@ def sync_collection(ts, data, data_add_ts, data_add):
     Output("username_nav", "children"),
     Output("fullname_nav", "children"),
     Output("avatar_nav", "children"),
+    Output("keepalive_interval1", "n_intervals"),
     Input("url", "href"),
     prevent_initial_call=True,
 )
@@ -127,7 +131,7 @@ def update_hello_message(href):
     cookies = flask.request.cookies
     user = get_user_from_cookies(cookies)
     if user.username:
-        return user.username, user.full_name, user.initials
+        return user.username, user.full_name, user.initials, 1
     raise PreventUpdate
 
 
@@ -141,6 +145,82 @@ def update_mt_theme(value):
         return {"colorScheme": "light"}
     else:
         return {"colorScheme": "dark"}
+
+
+app.clientside_callback(
+    """
+    function(n_intervals){
+    var currentLocation = window.location;
+    //var selectedStyle = "3px solid #3B5BDB";
+    var selectedStyle = "3px solid rgb(59, 91, 219)";
+    var inactiveStyle = "3px solid rgba(0,0,0,0)";
+
+    var el = document.getElementById("nav_header_select");
+    if (currentLocation.pathname.startsWith("/app/select")){
+        if (el.style.borderBottom != selectedStyle){
+            el.style.borderBottom = selectedStyle;
+        }
+    }
+    else{
+        if (el.style.borderBottom != inactiveStyle){
+            el.style.borderBottom = inactiveStyle;
+        }
+    }
+
+    var el = document.getElementById("nav_header_collection");
+    if (currentLocation.pathname.startsWith("/app/collection")){
+        if (el.style.borderBottom != selectedStyle){
+            el.style.borderBottom = selectedStyle;
+        }
+    }
+    else{
+        if (el.style.borderBottom != inactiveStyle){
+            el.style.borderBottom = inactiveStyle;
+        }
+    }
+
+    var el = document.getElementById("nav_header_viz");
+    if (currentLocation.pathname.startsWith("/app/viz")){
+        if (el.style.borderBottom != selectedStyle){
+            el.style.borderBottom = selectedStyle;
+        }
+    }
+    else{
+        if (el.style.borderBottom != inactiveStyle){
+            el.style.borderBottom = inactiveStyle;
+        }
+    }
+
+    var el = document.getElementById("nav_header_annotations");
+    if (currentLocation.pathname.startsWith("/app/annotations")){
+        if (el.style.borderBottom != selectedStyle){
+            el.style.borderBottom = selectedStyle;
+        }
+    }
+    else{
+        if (el.style.borderBottom != inactiveStyle){
+            el.style.borderBottom = inactiveStyle;
+        }
+    }
+
+    var el = document.getElementById("nav_header_docs");
+    if (currentLocation.pathname.startsWith("/app/docs")){
+        if (el.style.borderBottom != selectedStyle){
+            el.style.borderBottom = selectedStyle;
+        }
+    }
+    else{
+        if (el.style.borderBottom != inactiveStyle){
+            el.style.borderBottom = inactiveStyle;
+        }
+    }
+
+
+    return window.dash_clientside.no_update;
+    }""",
+    Output("keepalive_div", "style"),
+    Input("keepalive_interval1", "n_intervals"),
+)
 
 
 @app.callback(
@@ -185,3 +265,54 @@ def clear_collection(nc):
     if nc > 0:
         return [], False
     raise PreventUpdate
+
+
+"""
+@app.callback(
+    output=dict(
+        home=Output({"role": "navbar_target", "index": "home"}, "style"),
+        select=Output({"role": "navbar_target", "index": "select"}, "style"),
+        collection=Output({"role": "navbar_target", "index": "collection"}, "style"),
+        viz=Output({"role": "navbar_target", "index": "viz"}, "style"),
+        annotations=Output({"role": "navbar_target", "index": "annotations"}, "style"),
+        docs=Output({"role": "navbar_target", "index": "docs"}, "style"),
+    ),
+    inputs=dict(
+        href=Input("url", "href"),
+        pn=Input("url", "pathname"),
+        search=Input("url", "search"),
+    ),
+)
+def update_nav_header_highlight(href, pn, search):
+    if pn is not None:
+        styles = dict(
+            home=nav_style_inactive,
+            select=nav_style_inactive,
+            collection=nav_style_inactive,
+            viz=nav_style_inactive,
+            annotations=nav_style_inactive,
+            docs=nav_style_inactive,
+        )
+        if pn == PATH_PREFIX:
+            styles["home"] = nav_style_active
+            return styles
+        elif pn.startswith(PATH_PREFIX + "select"):
+            styles["select"] = nav_style_active
+            return styles
+        elif pn.startswith(PATH_PREFIX + "collection"):
+            styles["collection"] = nav_style_active
+            return styles
+        elif pn.startswith(PATH_PREFIX + "viz"):
+            styles["viz"] = nav_style_active
+            return styles
+        elif pn.startswith(PATH_PREFIX + "annotations"):
+            styles["annotations"] = nav_style_active
+            return styles
+        elif pn.startswith(PATH_PREFIX + "docs"):
+            styles["docs"] = nav_style_active
+            return styles
+        else:
+            return styles
+
+    raise PreventUpdate
+"""
