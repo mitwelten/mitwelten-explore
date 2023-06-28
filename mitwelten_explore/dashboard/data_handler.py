@@ -604,7 +604,7 @@ def get_data_sources(args: UrlSearchArgs):
             if len(meteoswiss_datasets) == 0:
                 meteoswiss_datasets.append(
                     dict(
-                        name="Meteoschweiz",
+                        name="MeteoSchweiz",
                         reference="https://www.meteoschweiz.admin.ch/",
                     )
                 )
@@ -617,7 +617,7 @@ def get_data_sources(args: UrlSearchArgs):
     if len(mitwelten_datasets) > 0:
         datasource_dict["SNF Mitwelten"] = mitwelten_datasets
     if len(meteoswiss_datasets) > 0:
-        datasource_dict["Meteoschweiz"] = meteoswiss_datasets
+        datasource_dict["MeteoSchweiz"] = meteoswiss_datasets
     if len(gbif_datasets) > 0:
         datasource_dict["GBIF Datasets"] = gbif_datasets
     return datasource_dict

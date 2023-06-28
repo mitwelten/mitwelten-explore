@@ -48,7 +48,6 @@ def tooltip(
             children=children,
             label=text,
             position=position,
-            withArrow=arrow,
             color=color,
         )
     else:
@@ -66,7 +65,7 @@ def datasource_indicator(datasources: dict):
     children = []
     titles = []
     for key in datasources.keys():
-        titles.append(dmc.Text(key, size="xs"))
+        titles.append(key)
         for ds in datasources[key]:
             children.append(
                 dmc.Anchor(
@@ -82,27 +81,37 @@ def datasource_indicator(datasources: dict):
     return dmc.HoverCard(
         withArrow=False,
         shadow="md",
+        position="top-start",
         children=[
             dmc.HoverCardTarget(
                 dmc.Group(
                     [
                         dmc.Group(
                             [
-                                get_icon(icons.copyright),
-                                dmc.Text("data:", size="sm", weight=300),
+                                # get_icon(icons.copyright),
+                                get_icon(icons.database),
                             ],
-                            spacing=3,
+                            spacing=1,
                         ),
                     ]
-                    + titles,
-                    spacing="sm",
+                    + [dmc.Text(" | ".join(titles), size="xs", color="dimmed")],
+                    spacing=4,
+                    style={"cursor": "pointer"},
                 )
             ),
             dmc.HoverCardDropdown(
                 [
                     dmc.Text("Data Sources", weight=500),
-                    dmc.Stack(children, spacing=3),
-                ]
+                    dmc.Stack(
+                        children,
+                        spacing=3,
+                        style={
+                            "maxHeight": "60vh",
+                            "maxWidth": "50vw",
+                            "overflowY": "auto",
+                        },
+                    ),
+                ],
             ),
         ],
     )
