@@ -8,7 +8,7 @@ if os.path.exists("../.env"):
 DATA_API_URL = "https://data.mitwelten.org/api/v3/"
 
 PATH_PREFIX = "/app/"
-MITWELTEN_LOGO = "https://raw.githubusercontent.com/mitwelten/mitwelten.github.io/master/favicons/android-36x36.png"
+MITWELTEN_LOGO = "/app/assets/mitwelten_logo.png"
 HLJS_STYLESHEET = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs2015.min.css"
 REFRESH_KEY_TIME_LEFT_S = 10 * 60
 
