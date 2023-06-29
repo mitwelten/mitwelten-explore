@@ -11,16 +11,15 @@ theme_switch = ThemeSwitchAIO(
     switch_props={"persistence": True, "persistence_type": "local"},
 )
 
+NAV_TARGET_PADDING_X = 12
+
 
 nav_logo_target = dmc.Anchor(
     dmc.Group(
         [
             html.Img(src=MITWELTEN_LOGO, height="36px"),
             dmc.MediaQuery(
-                dmc.Text(
-                    "Mitwelten Explore",
-                    weight=700,
-                ),
+                dmc.Text("MITWELTEN EXPLORE", weight=700, lts=0),
                 smallerThan="lg",
                 styles={"display": "none"},
             ),
@@ -58,7 +57,7 @@ nav_dataset_target = dmc.Menu(
                 style=nav_style_inactive,
                 # id={"role":"navbar_target", "index":"select"},
                 id="nav_header_select",
-                className=None,
+                px=NAV_TARGET_PADDING_X,
             ),
         ),
         dmc.MenuDropdown(
@@ -133,6 +132,7 @@ nav_collection_target = dmc.Anchor(
         spacing=4,
         id="nav_header_collection",
         style=nav_style_inactive,
+        px=NAV_TARGET_PADDING_X,
         noWrap=True,
     ),
     href=PATH_PREFIX + "collection",
@@ -163,6 +163,7 @@ nav_viz_target = dmc.Menu(
                 ],
                 spacing=4,
                 style=nav_style_inactive,
+                px=NAV_TARGET_PADDING_X,
                 id="nav_header_viz",
             ),
         ),
@@ -207,6 +208,7 @@ nav_annotations_target = dmc.Anchor(
         ],
         spacing="xs",
         id="nav_header_annotations",
+        px=NAV_TARGET_PADDING_X,
         style=nav_style_inactive,
     ),
     href=PATH_PREFIX + "annotations",
@@ -230,6 +232,7 @@ nav_docs_target = dmc.Anchor(
         spacing="xs",
         style=nav_style_inactive,
         id="nav_header_docs",
+        px=NAV_TARGET_PADDING_X,
     ),
     href=PATH_PREFIX + "docs",
     variant="text",
@@ -243,6 +246,7 @@ nav_settings_target = dmc.Menu(
                 [
                     get_icon(icons.theme, width=22),
                 ],
+                px=NAV_TARGET_PADDING_X,
                 style={"cursor": "pointer"},
             ),
         ),
@@ -348,7 +352,7 @@ nav_bar = dmc.Group(
                 nav_docs_target,
                 nav_settings_target,
             ],
-            spacing="xl",
+            spacing=0,
             noWrap=True,
             mt=1,
         ),

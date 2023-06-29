@@ -21,7 +21,7 @@ All annotations are listed in the [Annotations page](annotations).
 - Optionally, click on the preview tab to see how the annotation will look like.
 - Click on the publish button to save the annotation.
 
-<img src="assets/images/annots.gif" style="maxWidth:75%;" />
+<img src="assets/images/annots.gif" style="maxWidth:100%;" />
 
 
 *A title is required to publish an annotation*
@@ -39,6 +39,6 @@ To delete an annotation, go to [**My Annotations**](annotations?my_annotations=t
 
 To remove the annotation, click on the red button **Delete Annotation** in the right section of the page (see image below) and confirm your action.
 
-<img src="assets/images/sample_annotation.png" style="maxWidth:75%;" />
+<img src="assets/images/sample_annotation.png" style="maxWidth:100%;" />
 
 

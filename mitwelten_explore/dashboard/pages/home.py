@@ -241,8 +241,8 @@ annots_card = dmc.Anchor(
 def layout(**kwargs):
     return dmc.Container(
         [
-            dcc.Location("url", refresh=False),
-            dmc.Title("Mitwelten Explore"),
+            dcc.Location("annots_url", refresh=False),
+            dmc.Title("Mitwelten Explore", align="center"),
             dmc.Space(h=40),
             dmc.Grid(
                 [
@@ -395,7 +395,7 @@ def layout(**kwargs):
     )
 
 
-@callback(Output("annots_card_stack", "children"), Input("url", "href"))
+@callback(Output("annots_card_stack", "children"), Input("annots_url", "href"))
 def update_latest_annots(href):
     annots = get_annotations(auth_cookie=flask.request.cookies.get("auth"))
     annot_cards = []
