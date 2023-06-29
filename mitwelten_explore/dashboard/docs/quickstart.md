@@ -3,6 +3,11 @@
 *Follow the steps to get to know this tool*
 
 
+<img src="assets/images/quickstart.png" style="maxWidth:80%;" />
+
+
+
+
 ## 1. Find an interesting dataset
 
 
@@ -18,7 +23,7 @@ Hover over the text **Datasets** in the header of this page and click on a datas
 
 
 <div style="padding:15px 30px 15px 15px">
-<img src="assets/images/taxon_modal.png" style="maxWidth:60%;" />
+<img src="assets/images/taxon_modal.png" style="maxWidth:80%;" />
 </div>
 
 
@@ -35,7 +40,7 @@ Hover over the text **Datasets** in the header of this page and click on a datas
 The whole process of adding Mitwelten Detections and GBIF Observations of the hover fly to the collection is shown in the animated image below.
 
 <div style="padding:15px 30px 15px 15px">
-<img src="assets/images/taxon_select.gif" style="maxWidth:75%;border:1px solid gray;" />
+<img src="assets/images/taxon_select.gif" style="maxWidth:100%;border:1px solid gray;" />
 </div>
 
 
@@ -90,7 +95,7 @@ The Dashboard contains following components:
 
 
 <div style="padding:15px 30px 15px 15px; ">
-<img src="assets/images/aves_ts_dashboard.png" style="maxWidth:75%;border:1px solid gray;" />
+<img src="assets/images/aves_ts_dashboard.png" style="maxWidth:100%;border:1px solid gray;" />
 </div>
 
 
@@ -104,7 +109,7 @@ Hover over the text **Visualize** in the page header and click on **Compare Data
 * A Popup with a list of all datasets in your collection will appear:
 
 <div style="padding:15px 30px 15px 15px">
-<img src="assets/images/compare_select.png" style="maxWidth:60%;" />
+<img src="assets/images/compare_select.png" style="maxWidth:80%;" />
 </div>
 
 * Check the checkboxes to the left of the dataset title to add the dataset to the dashboard.
@@ -128,7 +133,7 @@ A Dashboard that compares Mitwelten detections of the class Insecta, Air tempera
 
 
 <div style="padding:15px 30px 15px 15px">
-<img src="assets/images/comp_dashboard.png" style="maxWidth:75%;border:1px solid gray;" />
+<img src="assets/images/comp_dashboard.png" style="maxWidth:100%;border:1px solid gray;" />
 </div>
 
 ---
@@ -162,7 +167,7 @@ The Dashboard contains following components:
 A Taxon Dashboard for the order Apodiformes is shown in the image below.
 
 <div style="padding:15px 15px 15px 15px">
-<img src="assets/images/taxon_dashboard.png" style="maxWidth:75%;border:1px solid gray;" />
+<img src="assets/images/taxon_dashboard.png" style="maxWidth:100%;border:1px solid gray;" />
 </div>
 
 ---

@@ -28,9 +28,10 @@ doc_pages = [
 
 def layout(**kwargs):
     return dmc.Container(
-        fluid=True,
-        p=0,
-        pt=12,
+        #fluid=True,
+        #p=0,
+        pt=8,
+        className="container-xl",
         style={
             "display": "flex",
             "height": "calc(100vh - 53px)",
