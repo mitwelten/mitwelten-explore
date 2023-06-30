@@ -71,8 +71,16 @@ class LocationData:
 def agg_fcn_mapper(fcn):
     if fcn == "mean":
         return np.mean
-    else:
+    elif fcn == "sum":
         return np.sum
+    elif fcn == "min":
+        return np.min
+    elif fcn == "max":
+        return np.max
+    elif fcn == "median":
+        return np.median
+    else:
+        return np.mean
 
 
 def get_continuous_color(colorscale, intermed):
@@ -485,9 +493,9 @@ def generate_multi_h3hexbin_map(
 ):
     ds0_visible = ds0.visible
     ds1_visible = ds1.visible
-    if len(ds0.values)==0:
+    if len(ds0.values) == 0:
         ds0_visible = False
-    if len(ds1.values)==0:
+    if len(ds1.values) == 0:
         ds1_visible = False
     if ds1_visible is False and ds0_visible is False:
         return generate_empty_map()
@@ -718,9 +726,9 @@ def generate_multi_bubble_map(
 ):
     ds0_visible = ds0.visible
     ds1_visible = ds1.visible
-    if len(ds0.values)==0:
+    if len(ds0.values) == 0:
         ds0_visible = False
-    if len(ds1.values)==0:
+    if len(ds1.values) == 0:
         ds1_visible = False
     if ds1_visible is False and ds0_visible is False:
         return generate_empty_map()

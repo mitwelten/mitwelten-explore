@@ -84,9 +84,9 @@ nav_dataset_target = dmc.Menu(
                     href=PATH_PREFIX + "select/pax",
                 ),
                 dmc.MenuItem(
-                    "Mitwelten ENV",
-                    icon=get_icon(icons.env_sensors, 24),
-                    href=PATH_PREFIX + "select/env",
+                    "Mitwelten Bird Diversity",
+                    icon=get_icon(icons.bird, 24),
+                    href=PATH_PREFIX + "select/bird",
                 ),
                 dmc.MenuDivider(),
                 dmc.MenuItem(

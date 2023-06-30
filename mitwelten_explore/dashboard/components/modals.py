@@ -116,6 +116,8 @@ def generate_viz_timeseries_select_modal_children(store_data):
             location_name = dmc.Text(
                 f"Mitwelten Deployment {data.get('deployment_id')}", size="sm"
             )
+        else:
+            continue
 
         single_viz_url = (
             f"{PATH_PREFIX}viz/timeseries?{urlencode_dict(dict(trace=data))}"
@@ -151,7 +153,9 @@ def generate_viz_timeseries_select_modal_children(store_data):
     return list_entries
 
 
-def viz_compare_select_modal(id, title="Select two or more datasets from your collection"):
+def viz_compare_select_modal(
+    id, title="Select two or more datasets from your collection"
+):
     return dmc.Modal(
         title=dmc.Text(title, weight=500),
         id=id,
@@ -181,6 +185,47 @@ def generate_viz_map_select_modal_children(store_data, id_role):
             unit = dmc.Badge(ds.rank.value, color="teal")
             description = dmc.Group(description_components, spacing="xs")
             location_name = dmc.Text("Mitwelten Deployments", size="sm")
+            list_entries.append(
+                dmc.Grid(
+                    [
+                        dmc.Col(
+                            dmc.Group(
+                                [
+                                    dmc.Checkbox(
+                                        color="teal",
+                                        id={
+                                            "role": id_role,
+                                            "index": str(store_data[i]),
+                                        },
+                                        checked=False,
+                                    ),
+                                    icon,
+                                    trace_id,
+                                ]
+                            ),
+                            span=2,
+                        ),
+                        dmc.Col(dmc.Group([description, unit]), span=7),
+                        dmc.Col(
+                            dmc.Group(
+                                [
+                                    get_icon(icon=icons.location_marker),
+                                    location_name,
+                                ],
+                                spacing=4,
+                            ),
+                            span=3,
+                        ),
+                    ]
+                )
+            )
+        elif ds.type == DatasetType.distinct_species:
+            trace_id = dmc.Code(ds.get_id())
+            icon = get_icon(ds.get_icon(), width=32)
+
+            unit = dmc.Badge(ds.get_unit(), color="teal")
+            location_name = dmc.Text(ds.get_location(), size="sm")
+            description = dmc.Text(ds.get_title())
             list_entries.append(
                 dmc.Grid(
                     [
@@ -370,6 +415,9 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
             unit = dmc.Badge(ds.get_unit(), color="teal")
 
             location_name = dmc.Text(ds.get_location(), size="sm")
+
+        else:
+            continue
 
         if i > 0:
             list_entries.append(dmc.Divider())

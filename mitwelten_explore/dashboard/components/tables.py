@@ -116,9 +116,10 @@ def taxon_species_detections_table(
 
 
 def deployments_table(deployment_ids):
-    deployments = []
-    for d in deployment_ids:
-        deployments.append(get_deployments(deployment_id=d)[0])
+    all_deployments = get_deployments()
+    deployments = [
+        d for d in all_deployments if d.get("deployment_id") in deployment_ids
+    ]
 
     header = [
         html.Thead(

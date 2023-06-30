@@ -7,7 +7,8 @@ from dashboard.models import (
     EnvTempDataset,
     EnvMoistDataset,
     PollinatorDataset,
-    to_typed_dataset
+    BirdDataset,
+    to_typed_dataset,
 )
 from dash import html
 import json
@@ -34,7 +35,6 @@ def dataset_title(dataset: dict):
         ],
         style={"rowGap": "2px"},
     )
-
 
 
 def taxon_list_card(taxon: Taxon, id_role):
@@ -349,6 +349,60 @@ def pollinator_dataset_card(id_role, deployment_ids=None, pollinator_class=None)
                 href=f"{PATH_PREFIX}viz/timeseries?{urlencode_dict(dict(trace=ds.to_dataset()))}",
                 target="_blank",
             ),
+            dmc.Button(
+                # "Collect",
+                get_icon(
+                    icon=icons.bookmark,
+                    width=20,
+                ),
+                color="indigo.6",
+                variant="subtle",
+                px=4,
+                # compact=True,
+                id={
+                    "role": id_role,
+                    "index": json.dumps(ds.to_dataset()),
+                },
+            ),
+        ],
+        position="right",
+    )
+
+    if deployment_ids is None or len(deployment_ids) == 0:
+        location = "All Deployments"
+        location_group = dmc.Group(
+            [get_icon(icon=icons.location_marker), dmc.Text(location)]
+        )
+    else:
+        location_group = deployments_table(deployment_ids)
+
+    return dmc.Card(
+        [
+            title_group,
+            dmc.Spoiler(
+                showLabel="Show All",
+                hideLabel="Hide",
+                maxHeight=150,
+                children=[
+                    location_group,
+                ],
+            ),
+            btn_group,
+        ],
+        withBorder=True,
+    )
+
+
+def bird_dataset_card(id_role, deployment_ids=None):
+    ds = BirdDataset(deployment_id=deployment_ids)
+    title = "Distinct Species"
+    title_group = dmc.Group([get_icon(icon=icons.bird), dmc.Text(title, weight=500)])
+    btn_group = dmc.Group(
+        [
+            # dmc.Anchor(
+            # href=f"{PATH_PREFIX}viz/timeseries?{urlencode_dict(dict(trace=ds.to_dataset()))}",
+            # target="_blank",
+            # ),
             dmc.Button(
                 # "Collect",
                 get_icon(

@@ -85,7 +85,7 @@ class PageIds(object):
 ids = PageIds()
 
 
-def resp_to_locationdata(resp, name=None):
+def resp_to_locationdata(resp, name=None, agg_fcn="sum"):
     lat = []
     lon = []
     values = []
@@ -104,7 +104,9 @@ def resp_to_locationdata(resp, name=None):
                 ids.append(r.get("deployment_id"))
             except:
                 ids.append(str(uuid4()))
-    return LocationData(lat=lat, lon=lon, ids=ids, values=values, name=name)
+    return LocationData(
+        lat=lat, lon=lon, ids=ids, values=values, name=name, agg_fcn=agg_fcn
+    )
 
 
 def add_datapoints_to_locationdata(data: LocationData, resp):
@@ -538,7 +540,19 @@ def update_map_store(search, pn):
                 locationdata.append(
                     resp_to_locationdata(gbif_locations, ds.get_title())
                 )
-
+        if ds.type == DatasetType.distinct_species:
+            locations = get_detection_locations(
+                taxon_id=212,
+                confidence=args.cfg[i].confidence,
+                time_from=args.view_config.time_from,
+                time_to=args.view_config.time_to,
+                distinctspecies=True,
+                deployment_ids=ds.deployment_id,
+            )
+            ds_location = resp_to_locationdata(
+                locations, name=ds.get_title(), agg_fcn=args.cfg[i].agg
+            )
+            locationdata.append(ds_location)
         else:
             locationdata.append(LocationData())
     return [l.to_dict() for l in locationdata]

@@ -69,6 +69,7 @@ class DatasetType(str, Enum):
     env_temp = "env_temp"
     env_humi = "env_humi"
     env_moist = "env_moist"
+    distinct_species = "birds_by_depl"
 
 
 rank_hierarchy_list = [
@@ -288,14 +289,14 @@ class PaxDataset:
     def get_id(self):
         return self.node_label
 
+
 class MultiPaxDataset:
-    def __init__(self, deployment_id = None, **kwargs):
+    def __init__(self, deployment_id=None, **kwargs):
         self.deployment_id = deployment_id
         self.type = DatasetType.multi_pax
         self.param_desc = "PAX Counter"
         self.unit = "PAX"
-        
-        
+
     def get_location(self):
         if isinstance(self.deployment_id, list):
             if len(self.deployment_id) == 0:
@@ -307,11 +308,13 @@ class MultiPaxDataset:
                 return f"{len(self.deployment_id)} Mitwelten Deployments"
         else:
             return "Mitwelten Deployments"
+
     def to_dataset(self):
         return dict(
             type=self.type.value,
             deployment_id=self.deployment_id,
         )
+
     def get_unit(self):
         return self.unit
 
@@ -323,6 +326,7 @@ class MultiPaxDataset:
 
     def get_id(self):
         return "pax"
+
 
 class PollinatorClass(str, Enum):
     fliege = "fliege"
@@ -377,6 +381,42 @@ class PollinatorDataset:
 
     def get_id(self):
         return "polli"
+
+
+class BirdDataset:
+    def __init__(self, deployment_id=None, **kwargs):
+        self.deployment_id = deployment_id
+
+        self.type = DatasetType.distinct_species
+        self.param_desc = "Distinct Species"
+        self.unit = "Species"
+
+    def to_dataset(self):
+        return dict(type=self.type.value, deployment_id=self.deployment_id)
+
+    def get_unit(self):
+        return self.unit
+
+    def get_title(self):
+        return "Distinct Species"
+
+    def get_location(self):
+        if isinstance(self.deployment_id, list):
+            if len(self.deployment_id) == 0:
+                return "Mitwelten Deployments"
+
+            if len(self.deployment_id) == 1:
+                return f"Mitwelten Deployment {self.deployment_id[0]}"
+            else:
+                return f"{len(self.deployment_id)} Mitwelten Deployments"
+        else:
+            return "All Mitwelten Deployments"
+
+    def get_icon(self):
+        return icons.bird
+
+    def get_id(self):
+        return "birds"
 
 
 class EnvHumiDataset:
@@ -606,6 +646,8 @@ def to_typed_dataset(dataset: dict):
         return GBIFTaxon(**dataset)
     elif dataset_type == DatasetType.multi_pax:
         return MultiPaxDataset(**dataset)
+    elif dataset_type == DatasetType.distinct_species:
+        return BirdDataset(**dataset)
     else:
         return None
 
@@ -627,6 +669,7 @@ def default_view_config(dataset: dict):
         return dict(agg=DEFAULT_AGGREGATION, normalize=False)
     elif dataset_type == DatasetType.pax:
         return dict(normalize=False)
-
+    elif dataset_type == DatasetType.distinct_species:
+        return dict(normalize=False, confidence=DEFAULT_CONFIDENCE, agg="mean")
     else:
         return {}

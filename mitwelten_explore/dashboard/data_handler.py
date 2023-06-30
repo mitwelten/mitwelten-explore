@@ -12,6 +12,7 @@ from dashboard.models import (
     to_typed_dataset,
     PollinatorDataset,
     GBIFTaxon,
+    BirdDataset,
 )
 from dashboard.utils.communication import CachedRequest, construct_url
 from dashboard.utils.ts import merge_detections_dicts
@@ -468,6 +469,27 @@ def load_map_data(dataset, cfg, vc: ViewConfiguration, auth_cookie=None):
                     loc_dict["longitude"].append(longitude)
                     loc_dict["name"].append(f'deplpoyment {l.get("deployment_id")}')
                     loc_dict["id"].append(l.get("deployment_id"))
+        return loc_dict
+
+    elif ds.type == DatasetType.distinct_species:
+        loc_dict = {"latitude": [], "longitude": [], "name": [], "id": []}
+        locations = get_detection_locations(
+            212,
+            confidence=cfg.confidence,
+            time_from=vc.time_from,
+            time_to=vc.time_to,
+            distinctspecies=True,
+        )
+        if locations is not None:
+            for l in locations:
+                latitude = l.get("location").get("lat")
+                longitude = l.get("location").get("lon")
+                if validate_coordinates(latitude, longitude):
+                    loc_dict["latitude"].append(latitude)
+                    loc_dict["longitude"].append(longitude)
+                    loc_dict["name"].append(f'deplpoyment {l.get("deployment_id")}')
+                    loc_dict["id"].append(l.get("deployment_id"))
+
         return loc_dict
     elif ds.type == DatasetType.gbif_observations:
         locations = get_gbif_detection_locations(
