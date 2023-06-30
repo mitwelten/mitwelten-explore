@@ -33,7 +33,7 @@ import uuid
 # TODO: move icons to styles.icons
 
 
-def viz_timeseries_select_modal(opened, id="select_ts_modal"):
+def viz_single_dataset_select_modal(opened, id="select_ts_modal"):
     return dmc.Modal(
         title=dmc.Text("Select a dataset from your collection", weight=500),
         opened=opened,
@@ -751,3 +751,50 @@ def confirm_dialog(id, submit_id, text=None, title="Are you sure you want to con
         title=dmc.Text(title, weight=500),
         opened=True,
     )
+
+
+def generate_viz_deployment_select_modal_children(store_data):
+    if store_data is None:
+        return []
+
+    list_entries = []
+    for i in range(len(store_data)):
+        ds = to_typed_dataset(store_data[i])
+        if ds.type == DatasetType.distinct_species:
+            trace_id = dmc.Code(ds.get_id())
+            icon = get_icon(icon=ds.get_icon(), width=32)
+            description = dmc.Text(ds.get_title(), size="md")
+            unit = dmc.Badge(ds.get_unit(), color="teal")
+
+            location_name = dmc.Text(ds.get_location(), size="sm")
+
+            deployment_viz_url = f"{PATH_PREFIX}viz/deployment?{urlencode_dict(dict(dataset=ds.to_dataset()))}"
+            if i > 0:
+                list_entries.append(dmc.Divider())
+            list_entries.append(
+                dmc.Anchor(
+                    [
+                        dmc.Grid(
+                            [
+                                dmc.Col(dmc.Group([icon, trace_id]), span=2),
+                                dmc.Col(dmc.Group([description, unit]), span=7),
+                                dmc.Col(
+                                    dmc.Group(
+                                        [
+                                            get_icon(icon=icons.location_marker),
+                                            location_name,
+                                        ],
+                                        spacing=4,
+                                    ),
+                                    span=3,
+                                ),
+                            ]
+                        )
+                    ],
+                    href=deployment_viz_url,
+                    variant="text",
+                )
+            )
+        else:
+            continue
+    return list_entries

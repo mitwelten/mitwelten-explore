@@ -5,7 +5,6 @@ import dash_mantine_components as dmc
 from uuid import uuid4
 import json
 from dashboard.styles import icons, get_icon
-from dashboard.aio_components.aio_list_component import PagedListSearchableAIO
 from dashboard.components.dataset_presentation import bird_dataset_card
 from dashboard.api_clients.deployments_client import get_deployments
 from dashboard.charts.map_charts import generate_scatter_map_plot

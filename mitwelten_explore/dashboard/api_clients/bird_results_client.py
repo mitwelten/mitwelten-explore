@@ -94,3 +94,21 @@ def get_species_detection_count_by_parent(taxon_id, confidence, limit=20):
         data = res.json()
         return data
     return None
+
+
+def get_detection_list_by_deployment(
+    confidence=0.6, deployment_ids=None, time_from=None, time_to=None, limit=1000
+):
+    url = construct_url(
+        f"birds/detectionlist",
+        {"conf": confidence, "limit": limit, "from": time_from, "to": time_to},
+    )
+    if isinstance(deployment_ids, list) and len(deployment_ids) > 0:
+        for d in deployment_ids:
+            url += f"&deployment_ids={d}"
+    res = cr.get(url)
+    if res.status_code == 200:
+
+        data = res.json()
+        return data
+    return None

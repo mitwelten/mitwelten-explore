@@ -16,7 +16,7 @@ from dashboard.utils.communication import (
 )
 import dash_mantine_components as dmc
 from dashboard.components.modals import (
-    viz_timeseries_select_modal,
+    viz_single_dataset_select_modal,
     generate_viz_timeseries_select_modal_children,
     share_modal,
 )
@@ -103,7 +103,7 @@ def layout(**qargs):
     args = UrlSearchArgs(**query_args)
     if args.dataset is None:
         return dmc.Container(
-            viz_timeseries_select_modal(True, id=ids.select_dataset_modal)
+            viz_single_dataset_select_modal(True, id=ids.select_dataset_modal)
         )
     vc = args.view_config
     ds = to_typed_dataset(args.dataset)
@@ -130,7 +130,7 @@ def layout(**qargs):
         )
     else:
         return dmc.Container(
-            viz_timeseries_select_modal(True, id=ids.select_dataset_modal)
+            viz_single_dataset_select_modal(True, id=ids.select_dataset_modal)
         )
     return dmc.Container(
         [

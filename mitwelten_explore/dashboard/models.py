@@ -389,7 +389,7 @@ class BirdDataset:
 
         self.type = DatasetType.distinct_species
         self.param_desc = "Distinct Species"
-        self.unit = "Species"
+        self.unit = "Distinct Species"
 
     def to_dataset(self):
         return dict(type=self.type.value, deployment_id=self.deployment_id)
@@ -398,7 +398,7 @@ class BirdDataset:
         return self.unit
 
     def get_title(self):
-        return "Distinct Species"
+        return "Distinct species by deployment"
 
     def get_location(self):
         if isinstance(self.deployment_id, list):

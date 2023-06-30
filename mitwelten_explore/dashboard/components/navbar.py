@@ -74,6 +74,11 @@ nav_dataset_target = dmc.Menu(
                     href=PATH_PREFIX + "select/pollinator",
                 ),
                 dmc.MenuItem(
+                    "Mitwelten Bird Deployments",
+                    icon=get_icon(icons.bird, 24),
+                    href=PATH_PREFIX + "select/bird",
+                ),
+                dmc.MenuItem(
                     "Meteodata",
                     icon=get_icon(icons.meteoswiss, 24),
                     href=PATH_PREFIX + "select/meteo",
@@ -82,11 +87,6 @@ nav_dataset_target = dmc.Menu(
                     "Mitwelten PAX",
                     icon=get_icon(icons.pax_counter, 24),
                     href=PATH_PREFIX + "select/pax",
-                ),
-                dmc.MenuItem(
-                    "Mitwelten Bird Diversity",
-                    icon=get_icon(icons.bird, 24),
-                    href=PATH_PREFIX + "select/bird",
                 ),
                 dmc.MenuDivider(),
                 dmc.MenuItem(
@@ -176,7 +176,7 @@ nav_viz_target = dmc.Menu(
                     href=PATH_PREFIX + "viz/timeseries",
                 ),
                 dmc.MenuItem(
-                    "Compare Traces",
+                    "Compare Datasets",
                     icon=get_icon(icons.multi_chart, 16),
                     href=PATH_PREFIX + "viz/compare",
                 ),
@@ -184,6 +184,11 @@ nav_viz_target = dmc.Menu(
                     "Map",
                     icon=get_icon(icons.map_chart, 16),
                     href=PATH_PREFIX + "viz/map",
+                ),
+                dmc.MenuItem(
+                    "Deployment",
+                    icon=get_icon(icons.location_poi, 16),
+                    href=PATH_PREFIX + "viz/deployment",
                 ),
             ]
         ),

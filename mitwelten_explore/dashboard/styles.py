@@ -56,6 +56,7 @@ class Icons(object):
     license_cc = "cib:creative-commons"
     license_cc_pd = "cib:creative-commons-pd"
     license_cc0 = "cib:creative-commons-zero"
+    location_poi = "gis:location-poi"
 
 
 class IconUrls(object):

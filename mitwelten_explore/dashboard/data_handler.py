@@ -479,6 +479,7 @@ def load_map_data(dataset, cfg, vc: ViewConfiguration, auth_cookie=None):
             time_from=vc.time_from,
             time_to=vc.time_to,
             distinctspecies=True,
+            deployment_ids=ds.deployment_id,
         )
         if locations is not None:
             for l in locations:
