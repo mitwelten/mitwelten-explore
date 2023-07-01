@@ -26,6 +26,8 @@ class Icons(object):
     arrow_subdir = "ic:baseline-subdirectory-arrow-right"
     pax_counter = "mdi:wireless"
     meteoswiss = "arcticons:meteoswiss"
+    media_image = "ph:image"
+    multimedia = "mdi:multimedia"
     env_sensors = "carbon:soil-temperature-field"
     help = "material-symbols:help-outline"
     info = "mdi:about-variant"

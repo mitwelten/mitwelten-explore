@@ -693,20 +693,19 @@ def update_datasource(search, pn):
         raise PreventUpdate
     taxon_id = pn.split("/")[-1]
     if taxon_id is not None:
+        selected_taxon = get_taxon(taxon_key=taxon_id)
         query_args = parse_nested_qargs(qargs_to_dict(search))
         url_args = UrlSearchArgs(**query_args)
         url_args.datasets = []
         if url_args.gbif_data == True:
             url_args.datasets.append(
-                GBIFTaxon(datum_id=taxon_id, rank=RankEnum.species).to_dataset()
+                GBIFTaxon(**selected_taxon.to_dataset()).to_dataset()
             )
         if url_args.mw_data == True:
-            url_args.datasets.append(
-                Taxon(datum_id=taxon_id, rank=RankEnum.species).to_dataset()
-            )
+            url_args.datasets.append(selected_taxon.to_dataset())
 
         datasources = get_data_sources(url_args)
-        return datasource_indicator(datasources)
+        return datasource_indicator(datasources, url_args=url_args)
     raise PreventUpdate
 
 

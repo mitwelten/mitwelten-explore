@@ -117,8 +117,6 @@ plaio = PagedListSearchableAIO(
 
 
 def generate_list_items(species):
-
-    # normalized_counts = np.sqrt(counts)
     if len(species) == 0:
         return []
     max_count_norm = max([np.sqrt(s.count) for s in species])

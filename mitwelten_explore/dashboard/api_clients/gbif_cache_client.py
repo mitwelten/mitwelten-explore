@@ -59,3 +59,18 @@ def get_gbif_datasets(taxon_id, time_from=None, time_to=None):
         data = res.json()
         return data
     return None
+
+
+def get_gbif_occurence_list(
+    taxon_id, time_from=None, time_to=None, limit=100, offset=0
+):
+    url = construct_url(
+        f"gbif/{taxon_id}/occurences",
+        {"from": time_from, "to": time_to, "limit": limit, "offset": offset},
+    )
+    res = cr.get(url)
+    if res.status_code == 200:
+
+        data = res.json()
+        return data
+    return None

@@ -1,5 +1,8 @@
 import dash_mantine_components as dmc
 from dashboard.styles import icons, get_icon
+from dashboard.models import to_typed_dataset, DatasetType, UrlSearchArgs
+from configuration import PATH_PREFIX
+from dashboard.utils.communication import urlencode_dict
 
 
 def chart_loading_overlay(children, position="left"):
@@ -61,9 +64,10 @@ def tooltip(
         )
 
 
-def datasource_indicator(datasources: dict):
+def datasource_indicator(datasources: dict, url_args: UrlSearchArgs = None):
     children = []
     titles = []
+
     for key in datasources.keys():
         titles.append(key)
         for ds in datasources[key]:
@@ -77,6 +81,37 @@ def datasource_indicator(datasources: dict):
                     target="_blank",
                 )
             )
+    original_records = None
+    if url_args is not None:
+        datasets = url_args.datasets
+        if isinstance(datasets, list):
+            for dataset_item in datasets:
+                ds = to_typed_dataset(dataset_item)
+                if ds.type == DatasetType.gbif_observations:
+                    original_records = dmc.Anchor(
+                        dmc.Text(
+                            ["List of observations ", get_icon(icons.open_in_new_tab)],
+                            weight=500,
+                        ),
+                        href=f"{PATH_PREFIX}reference/gbif?{urlencode_dict(dict(dataset=ds.to_dataset(), time_from=url_args.view_config.time_from,time_to=url_args.view_config.time_to))}",
+                        target="_blank",
+                    )
+
+        elif isinstance(datasets, dict):
+            ds = to_typed_dataset(datasets)
+            if ds.type == DatasetType.gbif_observations:
+                original_records = dmc.Anchor(
+                    dmc.Text(
+                        ["List of observations ", get_icon(icons.open_in_new_tab)],
+                        weight=500,
+                    ),
+                    href=f"{PATH_PREFIX}reference/gbif?{urlencode_dict(dict(dataset=ds.to_dataset()))}",
+                    target="_blank",
+                )
+        else:
+            original_records = None
+    else:
+        original_records = None
 
     return dmc.HoverCard(
         withArrow=False,
@@ -101,7 +136,10 @@ def datasource_indicator(datasources: dict):
             ),
             dmc.HoverCardDropdown(
                 [
-                    dmc.Text("Data Sources", weight=500),
+                    dmc.Group(
+                        [dmc.Text("Data Sources", weight=500), original_records],
+                        position="apart",
+                    ),
                     dmc.Stack(
                         children,
                         spacing=3,
