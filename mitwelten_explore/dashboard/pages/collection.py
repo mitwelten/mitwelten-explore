@@ -4,7 +4,10 @@ import flask
 from dash.exceptions import PreventUpdate
 import dash_mantine_components as dmc
 import json
-from dashboard.aio_components.aio_list_component import PagedListAIO, PagedListSearchableAIO
+from dashboard.aio_components.aio_list_component import (
+    PagedListAIO,
+    PagedListSearchableAIO,
+)
 from dashboard.components.lists import generate_selected_data_list
 from dashboard.components.notifications import generate_notification
 
@@ -47,11 +50,14 @@ def remove_trace(buttons, data):
     trg = ctx.triggered_id
     index_to_remove = trg.get("index")
     if index_to_remove is not None:
-        del data[index_to_remove]
-    
-    return data, generate_notification(
-        title="Item removed from collection",
-        message="the dataset was removed from your collection",
-        color="indigo",
-        icon="mdi:trash-can-outline"
-    )
+        ds_to_remove = json.loads(index_to_remove)
+        if ds_to_remove in data:
+            data.remove(ds_to_remove)
+
+            return data, generate_notification(
+                title="Item removed from collection",
+                message="the dataset was removed from your collection",
+                color="indigo",
+                icon="mdi:trash-can-outline",
+            )
+    raise PreventUpdate

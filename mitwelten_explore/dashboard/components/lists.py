@@ -9,6 +9,7 @@ from dashboard.models import (
     default_view_config,
 )
 from dashboard.components.overlays import tooltip
+import json
 
 
 def generate_selected_data_list(store_data):
@@ -141,7 +142,9 @@ def generate_selected_data_list(store_data):
                                                 px=4,
                                                 id={
                                                     "role": "remove_from_collection_btn",
-                                                    "index": i,
+                                                    "index": json.dumps(
+                                                        ds.to_dataset()
+                                                    ),
                                                 },
                                             ),
                                             "Remove this dataset from your collection",
