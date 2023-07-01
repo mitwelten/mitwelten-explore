@@ -399,10 +399,16 @@ def bird_dataset_card(id_role, deployment_ids=None):
     title_group = dmc.Group([get_icon(icon=icons.bird), dmc.Text(title, weight=500)])
     btn_group = dmc.Group(
         [
-            # dmc.Anchor(
-            # href=f"{PATH_PREFIX}viz/timeseries?{urlencode_dict(dict(trace=ds.to_dataset()))}",
-            # target="_blank",
-            # ),
+            dmc.Anchor(
+                dmc.Button(
+                    "Explore detected Species",
+                    leftIcon=get_icon(icon=icons.bird, width=20),
+                    color="indigo.6",
+                    variant="outline",
+                ),
+                href=f"{PATH_PREFIX}viz/deployment?{urlencode_dict(dict(dataset=ds.to_dataset()))}",
+                target="_blank",
+            ),
             dmc.Button(
                 # "Collect",
                 get_icon(

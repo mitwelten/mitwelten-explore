@@ -119,6 +119,8 @@ plaio = PagedListSearchableAIO(
 def generate_list_items(species):
 
     # normalized_counts = np.sqrt(counts)
+    if len(species) == 0:
+        return []
     max_count_norm = max([np.sqrt(s.count) for s in species])
 
     items = []
@@ -448,7 +450,6 @@ def update_map_plot(search_args):
         if query_args.get("dataset") is None:
             raise PreventUpdate
         location_info = get_locations_from_qargs(query_args)
-        print(location_info)
         return generate_scatter_map_plot(
             location_info.get("latitude"),
             location_info.get("longitude"),

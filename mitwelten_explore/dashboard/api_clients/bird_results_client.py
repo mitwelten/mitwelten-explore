@@ -40,9 +40,12 @@ def get_detection_locations(
             "distinctspecies": distinctspecies,
         },
     )
-    if isinstance(deployment_ids, list) and len(deployment_ids) > 0:
-        for d in deployment_ids:
-            url += f"&deployment_ids={d}"
+    if deployment_ids is not None:
+        if isinstance(deployment_ids, list) and len(deployment_ids) > 0:
+            for d in deployment_ids:
+                url += f"&deployment_ids={d}"
+        else:
+            url += f"&deployment_ids={deployment_ids}"
     res = cr.get(url)
     if res.status_code == 200:
 

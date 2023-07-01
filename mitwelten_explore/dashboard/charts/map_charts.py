@@ -5,6 +5,7 @@ from dashboard.utils.geo_utils import (
     calculate_zoom_from_points,
     zoom_to_cell_resolution,
     generate_clusters,
+    validate_coordinates,
 )
 import numpy as np
 from configuration import DEFAULT_LAT, DEFAULT_LON, DEFAULT_ZOOM
@@ -146,14 +147,26 @@ def generate_empty_map(zoom=DEFAULT_ZOOM, clat=DEFAULT_LAT, clon=DEFAULT_LON):
 # single points, highlight
 def generate_scatter_map_plot(lats, lons, names, ids, selected=None):
 
-    if len(lats) == 0:
+    valid_lats = []
+    valid_lons = []
+    for i in range(len(lats)):
+        if validate_coordinates(lats[i], lons[i]):
+            valid_lats.append(lats[i])
+            valid_lons.append(lons[i])
+    if len(valid_lats) == 0:
         mean_lat = DEFAULT_LAT
         mean_lon = DEFAULT_LON
+        zoom = 10
+    elif len(valid_lats) == 1:
+        mean_lat = valid_lats[0]
+        mean_lon = valid_lons[0]
+        zoom = 18
     else:
-        not_0_lats = [lat for lat in lats if lat != 0.0]
-        not_0_lons = [lon for lon in lons if lon != 0.0]
-        mean_lat = np.mean(not_0_lats)
-        mean_lon = np.mean(not_0_lons)
+        mean_lat = np.mean(valid_lats)
+        mean_lon = np.mean(valid_lons)
+        zoom = calculate_zoom_from_points(
+            min(valid_lats), max(valid_lats), min(valid_lons), max(valid_lons)
+        )
     fig = go.Figure()
     if selected is not None:
         if isinstance(selected, list):
@@ -199,7 +212,7 @@ def generate_scatter_map_plot(lats, lons, names, ids, selected=None):
         mapbox={
             "style": "open-street-map",
             "center": {"lon": mean_lon, "lat": mean_lat},
-            "zoom": 10,
+            "zoom": zoom,
         },
         showlegend=False,
         margin=dict(l=0, r=0, t=0, b=0),

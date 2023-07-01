@@ -1,12 +1,14 @@
 from h3 import h3
 import numpy as np
 
+
 def validate_coordinates(lat, lon):
     if lon < 5.5 or lon > 9:
         return False
-    if lat < 46.5  or lat > 49:
+    if lat < 46.5 or lat > 49:
         return False
     return True
+
 
 def zoom_to_cell_resolution(zoom):
     # if zoom > 17.5:
@@ -26,20 +28,20 @@ def zoom_to_cell_resolution(zoom):
         return 8
     else:
         return 7
-    
-def calculate_zoom_from_points(latmin,latmax,lonmin,lonmax):
+
+
+def calculate_zoom_from_points(latmin, latmax, lonmin, lonmax):
     try:
-        max_bound = max(abs(lonmax-lonmin), abs(latmax-latmin)) * 111
+        max_bound = max(abs(lonmax - lonmin), abs(latmax - latmin)) * 111
         if max_bound == 0:
             return 18
-        return 13.7 - np.log(max_bound)
+        return 13 - np.log(max_bound)
     except:
         return 18
 
 
-    
-def generate_clusters(resolution, lat, lon,values, fun, *args):
-    assert(len(lat)==len(values)==len(lon))
+def generate_clusters(resolution, lat, lon, values, fun, *args):
+    assert len(lat) == len(values) == len(lon)
     values_dict = {}
     for i in range(len(lat)):
         parent_cluster_id = h3.geo_to_h3(lat[i], lon[i], resolution)
@@ -51,8 +53,9 @@ def generate_clusters(resolution, lat, lon,values, fun, *args):
         values_dict[h3_parent_id] = fun(values_dict[h3_parent_id], *args)
     return values_dict
 
-def get_points_in_cluster(cluster_id, lat,lon,point_ids):
-    assert(len(lat)==len(point_ids)==len(lon))
+
+def get_points_in_cluster(cluster_id, lat, lon, point_ids):
+    assert len(lat) == len(point_ids) == len(lon)
     resolution = h3.h3_get_resolution(cluster_id)
     points_in_cell = []
     for i in range(len(lat)):
