@@ -774,7 +774,7 @@ def generate_viz_deployment_select_modal_children(store_data):
     list_entries = []
     for i in range(len(store_data)):
         ds = to_typed_dataset(store_data[i])
-        if ds.type == DatasetType.distinct_species:
+        if ds.type in [DatasetType.distinct_species, DatasetType.pollinators]:
             trace_id = dmc.Code(ds.get_id())
             icon = get_icon(icon=ds.get_icon(), width=32)
             description = dmc.Text(ds.get_title(), size="md")

@@ -3,7 +3,7 @@ from dash import dcc, callback, Input, Output, State, ctx, html, no_update, ALL
 from dash.exceptions import PreventUpdate
 import flask
 import dash_mantine_components as dmc
-from dashboard.models import UrlSearchArgs, to_typed_dataset, Annotation
+from dashboard.models import UrlSearchArgs, to_typed_dataset, Annotation, DatasetType
 from dashboard.styles import icons, get_icon
 from dashboard.components.navbar import ThemeSwitchAIO
 from uuid import uuid4
@@ -12,6 +12,9 @@ from dashboard.aio_components.aio_list_component import PagedListSearchableAIO
 from dashboard.aio_components.aio_texteditor_component import TextEditorAIO
 from dashboard.components.overlays import chart_loading_overlay, datasource_indicator
 from dashboard.api_clients.bird_results_client import get_detection_list_by_deployment
+from dashboard.api_clients.pollinator_results_client import (
+    get_polli_detection_list_by_deployment,
+)
 from dashboard.api_clients.userdata_client import post_annotation
 from dashboard.components.selects import confidence_threshold_select
 from dashboard.components.labels import badge_de, badge_en
@@ -46,12 +49,16 @@ class SpeciesListItem:
         count=None,
         label_de=None,
         label_en=None,
+        **kwargs,
     ):
         self.datum_id = datum_id
         self.label_sci = label_sci
         self.count = count
         self.label_de = label_de
         self.label_en = label_en
+        if "class" in kwargs:
+            self.label_de = kwargs.get("class")
+            self.label_sci = kwargs.get("class")
 
 
 class PageIds(object):
@@ -422,13 +429,24 @@ def update_list(href, search, theme):
     ):
         raise PreventUpdate
     ds = to_typed_dataset(query_args.dataset)
-    data = get_detection_list_by_deployment(
-        confidence=query_args.view_config.confidence,
-        deployment_ids=ds.deployment_id,
-        time_from=query_args.view_config.time_from,
-        time_to=query_args.view_config.time_to,
-    )
-    species = [SpeciesListItem(**d) for d in data]
+    if ds.type == DatasetType.distinct_species:
+        data = get_detection_list_by_deployment(
+            confidence=query_args.view_config.confidence,
+            deployment_ids=ds.deployment_id,
+            time_from=query_args.view_config.time_from,
+            time_to=query_args.view_config.time_to,
+        )
+        species = [SpeciesListItem(**d) for d in data]
+    elif ds.type == DatasetType.pollinators:
+        data = get_polli_detection_list_by_deployment(
+            confidence=query_args.view_config.confidence,
+            deployment_ids=ds.deployment_id,
+            time_from=query_args.view_config.time_from,
+            time_to=query_args.view_config.time_to,
+        )
+        species = [SpeciesListItem(**d) for d in data]
+    else:
+        species = []
     return (
         generate_list_items(species),
         pie_chart([s.label_sci for s in species], [s.count for s in species], theme),

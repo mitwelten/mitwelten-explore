@@ -214,3 +214,24 @@ def get_polli_detection_count_by_id(taxon_id, confidence, time_from=None, time_t
             if isinstance(detections, list):
                 return sum(detections)
     return 0
+
+
+def get_polli_detection_list_by_deployment(
+    confidence=0.6, deployment_ids=None, time_from=None, time_to=None, limit=1000
+):
+    url = construct_url(
+        f"pollinators/detectionlist",
+        {"conf": confidence, "limit": limit, "from": time_from, "to": time_to},
+    )
+    if deployment_ids is not None:
+        if isinstance(deployment_ids, list) and len(deployment_ids) > 0:
+            for d in deployment_ids:
+                url += f"&deployment_ids={d}"
+        else:
+            url += f"&deployment_ids={deployment_ids}"
+    res = cr.get(url)
+    if res.status_code == 200:
+
+        data = res.json()
+        return data
+    return None
