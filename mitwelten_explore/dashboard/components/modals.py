@@ -77,6 +77,13 @@ def generate_viz_timeseries_select_modal_children(store_data):
             unit = dmc.Badge(data.get("rank"), color="teal")
 
             location_name = dmc.Text("Mitwelten Deployments", size="sm")
+        elif trace_type == DatasetType.distinct_species:
+            trace_id = dmc.Code(ds.get_id())
+            icon = get_icon(ds.get_icon(), width=32)
+            description = dmc.Text(ds.get_title(), size="md")
+            unit = dmc.Badge(ds.get_unit(), color="teal")
+
+            location_name = dmc.Text(ds.get_location(), size="sm")
 
         elif ds.type == DatasetType.gbif_observations:
             trace_id = dmc.Code(ds.get_id())
@@ -375,6 +382,13 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
             unit = dmc.Badge(data.get("rank"), color="teal")
 
             location_name = dmc.Text("Mitwelten Deployments", size="sm")
+        elif ds.type == DatasetType.distinct_species:
+            trace_id = dmc.Code(ds.get_id())
+            icon = get_icon(ds.get_icon(), width=32)
+            description = dmc.Text(ds.get_title(), size="md")
+            unit = dmc.Badge(ds.get_unit(), color="teal")
+
+            location_name = dmc.Text(ds.get_location(), size="sm")
 
         elif ds.type == DatasetType.gbif_observations:
             trace_id = dmc.Code(ds.get_id())

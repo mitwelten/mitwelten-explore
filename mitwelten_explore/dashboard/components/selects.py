@@ -11,7 +11,11 @@ def confidence_threshold_select(id, value=None, visible=True, **kwargs):
             placeholder="Confidence",
             id=id,
             value=value,
-            data=[{"value": i / 20, "label": f"{i*5} %"} for i in range(1, 20)],
+            data=[{"value": i / 20, "label": f"{i*5} %"} for i in range(1, 20)]
+            + [
+                {"value": i, "label": f"{int(i*100)} %"}
+                for i in [0.96, 0.97, 0.98, 0.99]
+            ],
             style={"minWidth": 120} if visible else {"display": "none"},
             icon=get_icon(icon="fluent:math-formula-20-filled"),
             **kwargs,

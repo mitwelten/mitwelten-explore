@@ -39,6 +39,7 @@ from dashboard.api_clients.bird_results_client import (
     get_detection_locations,
     get_detection_count,
     get_detection_time_of_day,
+    get_detection_list_by_deployment,
 )
 from dashboard.api_clients.gbif_cache_client import (
     get_gbif_detection_dates,
@@ -133,6 +134,25 @@ def load_ts_data(dataset, cfg, vc: ViewConfiguration, auth_cookie=None):
                 time_to=vc.time_to,
             )
             res = merge_detections_dicts(res, res_polli)
+        if res is not None:
+            dates = res.get("bucket")
+            values = res.get("detections")
+            if cfg.normalize:
+                values = [
+                    (v - min(values)) / (max(values) - min(values)) for v in values
+                ]
+            return dates, values
+
+    elif ds.type == DatasetType.distinct_species:
+        res = get_detection_dates(
+            212,
+            confidence=cfg.confidence,
+            bucket_width=vc.bucket,
+            time_from=vc.time_from,
+            time_to=vc.time_to,
+            deployment_ids=ds.deployment_id,
+            distinctspecies=True,
+        )
         if res is not None:
             dates = res.get("bucket")
             values = res.get("detections")
@@ -299,6 +319,23 @@ def load_tod_data(
             values = [(v - min(values)) / (max(values) - min(values)) for v in values]
         return minutes_of_day, values
 
+    elif ds.type == DatasetType.distinct_species:
+        res = get_detection_time_of_day(
+            taxon_id=212,
+            confidence=cfg.confidence,
+            time_from=vc.time_from,
+            time_to=vc.time_to,
+            distinctspecies=True,
+            deployment_ids=ds.deployment_id,
+        )
+        if res is not None:
+            minutes_of_day = res.get("minuteOfDay")
+            values = res.get("detections")
+            if cfg.normalize:
+                values = [
+                    (v - min(values)) / (max(values) - min(values)) for v in values
+                ]
+            return minutes_of_day, values
     elif ds.type == DatasetType.gbif_observations:
         res = get_gbif_detection_time_of_day(
             taxon_id=ds.datum_id,
@@ -394,6 +431,8 @@ def load_tod_data(
         if cfg.normalize:
             values = [(v - min(values)) / (max(values) - min(values)) for v in values]
         return minutes_of_day, values
+    else:
+        return [], []
 
 
 def load_map_data(dataset, cfg, vc: ViewConfiguration, auth_cookie=None):
@@ -562,6 +601,24 @@ def load_statsagg_data(dataset, cfg, vc: ViewConfiguration = None, auth_cookie=N
             )
 
         return {"total_detections": total_detections}
+
+    elif ds.type == DatasetType.distinct_species:
+        detected_species = get_detection_list_by_deployment(
+            deployment_ids=ds.deployment_id,
+            confidence=cfg.confidence,
+            time_from=vc.time_from,
+            time_to=vc.time_to,
+            limit=1000,
+        )
+        if isinstance(detected_species, list) and len(detected_species) > 0:
+            stats = {"distinct species": len(detected_species)}
+            stats.update(
+                {d.get("label_sci"): d.get("count") for d in detected_species[:10]}
+            )
+            return stats
+
+        return {}
+
     elif ds.type == DatasetType.gbif_observations:
         return {
             "total_detections": get_gbif_detection_count(

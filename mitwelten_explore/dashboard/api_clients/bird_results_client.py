@@ -4,7 +4,13 @@ cr = CachedRequest("bird_cache", 2 * 60 * 60)
 
 
 def get_detection_dates(
-    taxon_id, confidence, bucket_width, time_from=None, time_to=None
+    taxon_id,
+    confidence,
+    bucket_width,
+    time_from=None,
+    time_to=None,
+    distinctspecies=False,
+    deployment_ids=None,
 ):
     url = construct_url(
         f"birds/{taxon_id}/date",
@@ -13,8 +19,15 @@ def get_detection_dates(
             "conf": confidence,
             "from": time_from,
             "to": time_to,
+            "distinctspecies": distinctspecies,
         },
     )
+    if deployment_ids is not None:
+        if isinstance(deployment_ids, list) and len(deployment_ids) > 0:
+            for d in deployment_ids:
+                url += f"&deployment_ids={d}"
+        else:
+            url += f"&deployment_ids={deployment_ids}"
     res = cr.get(url)
     if res.status_code == 200:
 
@@ -55,7 +68,13 @@ def get_detection_locations(
 
 
 def get_detection_time_of_day(
-    taxon_id, confidence, bucket_width_m=20, time_from=None, time_to=None
+    taxon_id,
+    confidence,
+    bucket_width_m=20,
+    time_from=None,
+    time_to=None,
+    distinctspecies=False,
+    deployment_ids=None,
 ):
     url = construct_url(
         f"birds/{taxon_id}/time_of_day",
@@ -64,8 +83,15 @@ def get_detection_time_of_day(
             "bucket_width_m": bucket_width_m,
             "from": time_from,
             "to": time_to,
+            "distinctspecies": distinctspecies,
         },
     )
+    if deployment_ids is not None:
+        if isinstance(deployment_ids, list) and len(deployment_ids) > 0:
+            for d in deployment_ids:
+                url += f"&deployment_ids={d}"
+        else:
+            url += f"&deployment_ids={deployment_ids}"
     res = cr.get(url)
     if res.status_code == 200:
 

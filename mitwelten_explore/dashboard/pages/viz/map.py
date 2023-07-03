@@ -410,7 +410,9 @@ def generate_link(checkboxes, nc, search):
                 index_dict = json.loads(index_str)
 
                 traces.append(index_dict)
-                initial_dataset_configs.append(default_view_config(index_dict))
+                initial_dataset_configs.append(
+                    default_view_config(index_dict, map_dashboard=True)
+                )
             try:
                 query_args = parse_nested_qargs(qargs_to_dict(search))
             except:

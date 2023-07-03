@@ -652,7 +652,7 @@ def to_typed_dataset(dataset: dict):
         return None
 
 
-def default_view_config(dataset: dict):
+def default_view_config(dataset: dict, map_dashboard=False):
     dataset_type = dataset.get("type")
     if dataset_type in [
         DatasetType.birds,
@@ -670,6 +670,9 @@ def default_view_config(dataset: dict):
     elif dataset_type == DatasetType.pax:
         return dict(normalize=False)
     elif dataset_type == DatasetType.distinct_species:
-        return dict(normalize=False, confidence=DEFAULT_CONFIDENCE, agg="mean")
+        if map_dashboard:
+            return dict(normalize=False, confidence=DEFAULT_CONFIDENCE, agg="mean")
+        else:
+            return dict(normalize=False, confidence=DEFAULT_CONFIDENCE)
     else:
         return {}
