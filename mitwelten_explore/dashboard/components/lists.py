@@ -71,6 +71,7 @@ def generate_selected_data_list(store_data):
             DatasetType.pollinators,
             DatasetType.pax,
             DatasetType.gbif_observations,
+            DatasetType.distinct_species,
         ]:
             dashboard_buttons.append(
                 dmc.Anchor(
@@ -84,6 +85,28 @@ def generate_selected_data_list(store_data):
                     target="_blank",
                 )
             )
+        location_information = dmc.Group(
+            [
+                get_icon(icon=icons.location_marker),
+                dmc.Text(ds.get_location(), size="md"),
+            ],
+            spacing=2,
+        )
+        if ds.type in [
+            DatasetType.distinct_species,
+            DatasetType.pollinators,
+            DatasetType.pax,
+            DatasetType.multi_pax,
+            DatasetType.env_humi,
+            DatasetType.env_moist,
+            DatasetType.env_temp,
+        ]:
+            if ds.deployment_id is not None:
+                location_information = dmc.Anchor(
+                    location_information,
+                    target="_blank",
+                    href=f"{PATH_PREFIX}reference/deployment?{urlencode_dict(dict(ids=ds.deployment_id))}",
+                )
 
         list_entries.append(
             dmc.Card(
@@ -117,13 +140,7 @@ def generate_selected_data_list(store_data):
                                                 ),
                                             ]
                                         ),
-                                        dmc.Group(
-                                            [
-                                                get_icon(icon=icons.location_marker),
-                                                dmc.Text(ds.get_location(), size="md"),
-                                            ],
-                                            spacing=2,
-                                        ),
+                                        location_information,
                                     ],
                                     spacing=4,
                                 ),

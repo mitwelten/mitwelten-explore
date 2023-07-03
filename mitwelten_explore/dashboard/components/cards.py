@@ -10,6 +10,8 @@ from dashboard.api_clients.third_party_clients import (
 )
 from dashboard.models import UrlSearchArgs, to_typed_dataset
 from configuration import PATH_PREFIX
+from dashboard.utils.text_utils import format_datetime
+from dashboard.charts.map_charts import generate_scatter_map_plot
 
 
 def taxon_stat_card(total_det_id, n_deployments_id):
@@ -363,3 +365,94 @@ def dataset_info_cards(args: UrlSearchArgs, config_btn_role):
         )
 
     return cards
+
+
+def deployment_info_card(deployment_info: dict, show_map=False):
+    id = deployment_info.get("deployment_id")
+    desc = deployment_info.get("description")
+    node_label = deployment_info.get("node").get("node_label")
+    node_type = deployment_info.get("node").get("type")
+    period = deployment_info.get("period")
+    period_start = format_datetime(period.get("start"))
+    period_end = (
+        format_datetime(period.get("end"))
+        if period.get("end") is not None
+        else "Active"
+    )
+
+    tags = (
+        [t.get("name") for t in deployment_info.get("tags")]
+        if deployment_info.get("tags") is not None
+        else []
+    )
+    location = deployment_info.get("location")
+    lat = location.get("lat")
+    lon = location.get("lon")
+
+    edit_link = dmc.Anchor(
+        dmc.Button(
+            "Edit",
+            leftIcon=get_icon(icons.edit_pen),
+            rightIcon=get_icon(icon=icons.open_in_new_tab),
+            variant="subtle",
+        ),
+        href=f"https://deploy.mitwelten.org/deployments/edit/{id}",
+        target="_blank",
+    )
+    map = (
+        dmc.CardSection(
+            dcc.Graph(
+                figure=generate_scatter_map_plot(
+                    lats=[lat], lons=[lon], ids=[id], names=[f"Deployment {id}"]
+                ),
+                config=dict(
+                    displayModeBar=False,
+                ),
+                style=dict(height="20vh"),
+            )
+        )
+        if show_map
+        else dmc.Text()
+    )
+    return dmc.Card(
+        [
+            dmc.Stack(
+                [
+                    dmc.Group(
+                        [
+                            dmc.Text(f"Deployment {id}", weight=500),
+                            dmc.Code(node_label),
+                            edit_link,
+                        ],
+                        position="apart",
+                    ),
+                    dmc.Divider(),
+                    dmc.Stack(
+                        [
+                            dmc.Group(
+                                [dmc.Text("Type:", weight=300), dmc.Text(node_type)],
+                            ),
+                            dmc.Group(
+                                [dmc.Text("Description:", weight=300), dmc.Text(desc)],
+                                style={"rowGap": 2},
+                            ),
+                            dmc.Group(
+                                [
+                                    dmc.Text("Period:", weight=300),
+                                    dmc.Text(f"{period_start} - {period_end}"),
+                                ],
+                            ),
+                            dmc.Group(
+                                [dmc.Text("Tags:", weight=300)]
+                                + [dmc.Badge(t) for t in tags]
+                            ),
+                        ],
+                        spacing=4,
+                    ),
+                    dmc.Space(h=12),
+                ]
+            ),
+            map,
+        ],
+        withBorder=True,
+    )
