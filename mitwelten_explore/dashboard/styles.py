@@ -37,6 +37,7 @@ class Icons(object):
     location_poi = "gis:location-poi"
     logout = "material-symbols:logout"
     map_chart = "material-symbols:map-outline-rounded"
+    map_pin = "uil:map-pin"
     media_image = "ph:image"
     meteoswiss = "arcticons:meteoswiss"
     more_3_dots = "material-symbols:more-horiz"

@@ -10,13 +10,98 @@ from dashboard.aio_components.aio_list_component import (
 )
 from dashboard.components.lists import generate_selected_data_list
 from dashboard.components.notifications import generate_notification
-
+from dashboard.styles import get_icon, icons
 
 dash.register_page(
     __name__,
 )
-
-plaio = PagedListSearchableAIO(items=[])
+list_legend = dmc.Card(
+    [
+        dmc.Grid(
+            [
+                dmc.Col(dmc.Text("Type", size="sm", weight=500), span=1),
+                dmc.Col(
+                    dmc.Text("Name  Unit  Location", size="sm", weight=500), span=5
+                ),
+                dmc.Col(
+                    dmc.Group(
+                        [
+                            dmc.Group(
+                                [
+                                    get_icon(
+                                        icon=icons.location_poi,
+                                        width=20,
+                                        color=dmc.theme.DEFAULT_COLORS["grape"][6],
+                                    ),
+                                    dmc.Text(
+                                        "Deployment Dashboard",
+                                        color="grape.6",
+                                        size="sm",
+                                        weight=500,
+                                    ),
+                                ],
+                                spacing=3,
+                            ),
+                            dmc.Group(
+                                [
+                                    get_icon(
+                                        icon=icons.map_chart,
+                                        width=20,
+                                        color=dmc.theme.DEFAULT_COLORS["cyan"][6],
+                                    ),
+                                    dmc.Text(
+                                        "Map Dashboard",
+                                        color="cyan.6",
+                                        size="sm",
+                                        weight=500,
+                                    ),
+                                ],
+                                spacing=3,
+                            ),
+                            dmc.Group(
+                                [
+                                    get_icon(
+                                        icon=icons.dashboard,
+                                        width=20,
+                                        color=dmc.theme.DEFAULT_COLORS["teal"][6],
+                                    ),
+                                    dmc.Text(
+                                        "Taxon Dashboard",
+                                        color="teal.6",
+                                        size="sm",
+                                        weight=500,
+                                    ),
+                                ],
+                                spacing=3,
+                            ),
+                            dmc.Group(
+                                [
+                                    get_icon(
+                                        icon=icons.line_chart,
+                                        width=20,
+                                        color=dmc.theme.DEFAULT_COLORS["indigo"][6],
+                                    ),
+                                    dmc.Text(
+                                        "Time Series Dashboard",
+                                        color="indigo.6",
+                                        size="sm",
+                                        weight=500,
+                                    ),
+                                ],
+                                spacing=3,
+                            ),
+                        ],
+                        position="right",
+                    ),
+                    span=6,
+                ),
+            ]
+        )
+    ],
+    px=0,
+    py=4,
+)
+plaio = PagedListSearchableAIO(items=[], legend=list_legend)
 
 
 def layout(**qargs):

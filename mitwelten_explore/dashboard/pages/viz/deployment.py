@@ -16,6 +16,10 @@ from dashboard.api_clients.pollinator_results_client import (
     get_polli_detection_list_by_deployment,
 )
 from dashboard.api_clients.userdata_client import post_annotation
+from dashboard.api_clients.environment_entries_client import (
+    get_environment_entries_nearby,
+    get_legend,
+)
 from dashboard.components.selects import confidence_threshold_select
 from dashboard.components.labels import badge_de, badge_en
 from dashboard.components.dataset_presentation import dataset_title
@@ -26,11 +30,12 @@ from dashboard.components.modals import (
 )
 from dashboard.components.affix import affix_menu, affix_button, datasource_affix
 from configuration import PATH_PREFIX, DEFAULT_CONFIDENCE, DEFAULT_TR_START
-from dashboard.charts.basic_charts import pie_chart, no_data_figure
-from dashboard.charts.map_charts import generate_empty_map, generate_scatter_map_plot
-
+from dashboard.charts.basic_charts import pie_chart, no_data_figure, spider_chart
+from dashboard.charts.map_charts import (
+    generate_empty_map,
+    deployment_location_map,
+)
 from dashboard.data_handler import get_locations_from_qargs, get_data_sources
-
 from dashboard.utils.communication import (
     parse_nested_qargs,
     qargs_to_dict,
@@ -73,6 +78,7 @@ class PageIds(object):
     affix_annotate = str(uuid4())
     datasource_indicator = str(uuid4())
     share_modal_div = str(uuid4())
+    spider_chart = str(uuid4())
 
 
 ids = PageIds()
@@ -133,12 +139,12 @@ def generate_list_items(species):
         normalized_count = np.sqrt(s.count)
         count_percent = (normalized_count / max_count_norm) * 100
         label_de = (
-            dmc.Group([badge_de, dmc.Text(s.label_de)], spacing=3)
+            dmc.Group([badge_de, dmc.Text(s.label_de, size="sm")], spacing=3)
             if s.label_de
             else None
         )
         label_en = (
-            dmc.Group([badge_en, dmc.Text(s.label_en)], spacing=3)
+            dmc.Group([badge_en, dmc.Text(s.label_en, size="sm")], spacing=3)
             if s.label_en
             else None
         )
@@ -287,35 +293,61 @@ def layout(**qargs):
                                                     figure=no_data_figure(
                                                         annotation=""
                                                     ),
-                                                    style={"maxHeight": "70vh"},
+                                                    config=dict(
+                                                        displayModeBar=False,
+                                                    ),
+                                                    # style={"maxHeight": "70vh"},
                                                 ),
                                             ),
                                         ],
                                         withBorder=True,
-                                        className="flex-grow-1",
+                                        # className="flex-grow-1",
                                     ),
-                                    dmc.Card(
-                                        dcc.Graph(
-                                            id=ids.map,
-                                            figure=generate_empty_map(),
-                                            style={
-                                                "height": "100%",
-                                                "minHeight": "30vh",
-                                            },
-                                        ),
-                                        withBorder=True,
-                                        p=0,
+                                    dmc.Tabs(
+                                        [
+                                            dmc.TabsList(
+                                                [
+                                                    dmc.Tab("Map", value="map"),
+                                                    dmc.Tab("Environment", value="env"),
+                                                ]
+                                            ),
+                                            dmc.TabsPanel(
+                                                dcc.Graph(
+                                                    id=ids.map,
+                                                    figure=generate_empty_map(),
+                                                    style={
+                                                        "height": "100%",
+                                                        "minHeight": "30vh",
+                                                    },
+                                                    config=dict(
+                                                        displayModeBar=False,
+                                                    ),
+                                                ),
+                                                value="map",
+                                            ),
+                                            dmc.TabsPanel(
+                                                dmc.Card(
+                                                    dmc.CardSection(
+                                                        dcc.Graph(id=ids.spider_chart),
+                                                    ),
+                                                    withBorder=True,
+                                                ),
+                                                value="env",
+                                            ),
+                                        ],
+                                        color="teal",
+                                        value="map",
                                         className="flex-grow-1",
                                     ),
                                 ],
                                 style={"height": "100%"},
                             ),
                         ],
-                        className="col-lg-4",
+                        className="col-lg-5",
                     ),
                     dmc.Col(
                         dmc.Card(plaio, withBorder=True, style={"height": "100%"}),
-                        className="col-lg-8",
+                        className="col-lg-7",
                     ),
                 ]
             ),
@@ -458,20 +490,57 @@ def update_list(href, search, theme):
 # update map plot
 @callback(
     Output(ids.map, "figure"),
+    Output(ids.spider_chart, "figure"),
     Input(ids.url, "search"),
+    Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
 )
-def update_map_plot(search_args):
+def update_map_plot(search_args, theme):
     if search_args is not None:
         query_args = parse_nested_qargs(qargs_to_dict(search_args))
         if query_args.get("dataset") is None:
             raise PreventUpdate
         location_info = get_locations_from_qargs(query_args)
-        return generate_scatter_map_plot(
-            location_info.get("latitude"),
-            location_info.get("longitude"),
-            location_info.get("name"),
-            location_info.get("id"),
-        )
+        lats = location_info.get("latitude")
+        lons = location_info.get("longitude")
+        names = location_info.get("name")
+        deployment_ids = location_info.get("id")
+
+        if isinstance(lats, list):
+            if len(lats) == 0:
+                raise PreventUpdate
+            elif len(lats) == 1:
+                mean_lats = lats[0]
+                mean_lons = lons[0]
+            else:
+
+                mean_lats = np.mean(lats)
+                mean_lons = np.mean(lons)
+            legend = get_legend()
+            entries = get_environment_entries_nearby(
+                lat=mean_lats, lon=mean_lons, limit=3
+            )
+            if entries is not None:
+                labels = [l.get("label") for l in legend.values()]
+                keys = list(legend.keys())
+                spider = spider_chart(labels, keys, entries, theme)
+                elats = [e.get("location").get("lat") for e in entries]
+                elons = [e.get("location").get("lon") for e in entries]
+                eids = [e.get("environment_id") for e in entries]
+                map = deployment_location_map(
+                    lats, lons, deployment_ids, elats=elats, elons=elons, enames=eids
+                )
+            else:
+                spider = no_data_figure(
+                    annotation="No measurements nearby", light_mode=theme
+                )
+
+        else:
+            spider = no_data_figure(
+                annotation="No measurements nearby", light_mode=theme
+            )
+            map = deployment_location_map(lats, lons, deployment_ids)
+
+        return map, spider
 
 
 # update datasource indicator

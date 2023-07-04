@@ -18,7 +18,7 @@ def layout(**qargs):
         ids = [ids]
     if not isinstance(ids, list):
         return dmc.Container(dmc.Alert(title="ID not found."))
-    show_map = len(ids) <= 10
+    show_map = len(ids) <= 12
     return dmc.Container(
         dmc.Grid(
             [

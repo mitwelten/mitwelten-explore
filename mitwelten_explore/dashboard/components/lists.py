@@ -27,39 +27,72 @@ def generate_selected_data_list(store_data):
         ]:
 
             dashboard_buttons.append(
-                dmc.Anchor(
-                    dmc.Button(
-                        "Map",
-                        color="cyan.6",
-                        variant="outline",
-                        leftIcon=get_icon(icon=icons.map_chart, width=24),
+                tooltip(
+                    dmc.Anchor(
+                        dmc.Button(
+                            get_icon(icon=icons.map_chart, width=24),
+                            # "Map",
+                            color="cyan.6",
+                            variant="outline",
+                            # leftIcon=get_icon(icon=icons.map_chart, width=24),
+                        ),
+                        href=f"{PATH_PREFIX}viz/map?{urlencode_dict(dict(datasets=[ds.to_dataset()],cfg=[default_view_config(ds.to_dataset())]))}",
                     ),
-                    href=f"{PATH_PREFIX}viz/map?{urlencode_dict(dict(datasets=[ds.to_dataset()],cfg=[default_view_config(ds.to_dataset())]))}",
-                ),
+                    "Map Dashboard",
+                    color="cyan.6",
+                )
             )
+        if ds.type in [DatasetType.distinct_species, DatasetType.pollinators]:
+            dashboard_buttons.append(
+                tooltip(
+                    dmc.Anchor(
+                        dmc.Button(
+                            get_icon(icon=icons.location_poi, width=24),
+                            # "Deployment",
+                            color="grape.6",
+                            variant="outline",
+                            # leftIcon=get_icon(icon=icons.location_poi, width=24),
+                        ),
+                        href=f"{PATH_PREFIX}viz/deployment?{urlencode_dict(dict(dataset=ds.to_dataset()))}",
+                    ),
+                    "Deployment Dashboard",
+                    color="grape.6",
+                )
+            )
+
         if ds.type == DatasetType.birds:
             dashboard_buttons.append(
-                dmc.Anchor(
-                    dmc.Button(
-                        "Taxon Dashboard",
-                        color="teal.6",
-                        variant="outline",
-                        leftIcon=get_icon(icon=icons.dashboard, width=24),
+                tooltip(
+                    dmc.Anchor(
+                        dmc.Button(
+                            get_icon(icon=icons.dashboard, width=24),
+                            # "Taxon Dashboard",
+                            color="teal.6",
+                            variant="outline",
+                            # leftIcon=get_icon(icon=icons.dashboard, width=24),
+                        ),
+                        href=f"{PATH_PREFIX}viz/taxon/{ds.datum_id}?mw_data=true",
                     ),
-                    href=f"{PATH_PREFIX}viz/taxon/{ds.datum_id}?mw_data=true",
+                    "Taxon Dashboard",
+                    color="teal.6",
                 )
             )
 
         if ds.type == DatasetType.gbif_observations:
             dashboard_buttons.append(
-                dmc.Anchor(
-                    dmc.Button(
-                        "Taxon Dashboard",
-                        color="teal.6",
-                        variant="outline",
-                        leftIcon=get_icon(icon=icons.dashboard, width=24),
+                tooltip(
+                    dmc.Anchor(
+                        dmc.Button(
+                            get_icon(icon=icons.dashboard, width=24),
+                            # "Taxon Dashboard",
+                            color="teal.6",
+                            variant="outline",
+                            # leftIcon=get_icon(icon=icons.dashboard, width=24),
+                        ),
+                        href=f"{PATH_PREFIX}viz/taxon/{ds.datum_id}?gbif_data=true",
                     ),
-                    href=f"{PATH_PREFIX}viz/taxon/{ds.datum_id}?gbif_data=true",
+                    "Taxon Dashboard",
+                    color="teal.6",
                 )
             )
         if ds.type in [
@@ -74,15 +107,20 @@ def generate_selected_data_list(store_data):
             DatasetType.distinct_species,
         ]:
             dashboard_buttons.append(
-                dmc.Anchor(
-                    dmc.Button(
-                        "Time Series Dashboard",
-                        color="indigo.6",
-                        variant="outline",
-                        leftIcon=get_icon(icon=icons.line_chart, width=24),
+                tooltip(
+                    dmc.Anchor(
+                        dmc.Button(
+                            get_icon(icon=icons.line_chart, width=24),
+                            # "Time Series Dashboard",
+                            color="indigo.6",
+                            variant="outline",
+                            # leftIcon=get_icon(icon=icons.line_chart, width=24),
+                        ),
+                        href=f"{PATH_PREFIX}viz/timeseries?{urlencode_dict(dict(trace=ds.to_dataset()))}",
+                        target="_blank",
                     ),
-                    href=f"{PATH_PREFIX}viz/timeseries?{urlencode_dict(dict(trace=ds.to_dataset()))}",
-                    target="_blank",
+                    "Time Series Dashboard",
+                    color="indigo.6",
                 )
             )
         location_information = dmc.Group(

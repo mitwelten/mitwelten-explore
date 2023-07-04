@@ -220,6 +220,128 @@ def generate_scatter_map_plot(lats, lons, names, ids, selected=None):
     return fig
 
 
+def deployment_location_map(
+    lats,
+    lons,
+    deployment_ids,
+    elats=None,
+    elons=None,
+    enames=None,
+    eclat=None,
+    eclon=None,
+):
+    fig = go.Figure()
+    valid_lats = []
+    valid_lons = []
+    if elats is not None and elons is not None and enames is not None:
+        fig.add_traces(
+            generate_environment_entries_traces(elats, elons, enames, eclat, eclon)
+        )
+    for i in range(len(lats)):
+        if validate_coordinates(lats[i], lons[i]):
+            valid_lats.append(lats[i])
+            valid_lons.append(lons[i])
+    if len(valid_lats) == 0:
+        mean_lat = DEFAULT_LAT
+        mean_lon = DEFAULT_LON
+        zoom = 10
+    elif len(valid_lats) == 1:
+        mean_lat = valid_lats[0]
+        mean_lon = valid_lons[0]
+        zoom = 18
+    else:
+        mean_lat = np.mean(valid_lats)
+        mean_lon = np.mean(valid_lons)
+        zoom = calculate_zoom_from_points(
+            min(valid_lats), max(valid_lats), min(valid_lons), max(valid_lons)
+        )
+    fig.add_trace(
+        go.Scattermapbox(
+            lon=lons,
+            lat=lats,
+            text=deployment_ids,
+            name="deployments",
+            marker={"size": 16, "color": "#339AF0", "opacity": 0.5},
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
+    fig.add_trace(
+        go.Scattermapbox(
+            lon=lons,
+            lat=lats,
+            text=deployment_ids,
+            name="deployments",
+            marker={"size": 12, "color": "#1971C2", "opacity": 1},
+            hovertemplate="%{text}<extra></extra>",
+        )
+    )
+
+    fig.update_layout(
+        plot_bgcolor="rgba(0,0,0,0)",
+        hoverlabel_bgcolor="rgba(245, 245, 245,0.8)",
+        mapbox={
+            "style": "open-street-map",
+            "center": {"lon": mean_lon, "lat": mean_lat},
+            "zoom": zoom,
+        },
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            x=0.01,
+            y=0.01,
+            xanchor="left",
+            yanchor="bottom",
+            bgcolor="rgba(245, 245, 245,0.8)",
+        ),
+        margin=dict(l=0, r=0, t=0, b=0),
+    )
+    return fig
+
+
+def generate_environment_entries_traces(lats, lons, names, clat=None, clon=None):
+    colors = ["#A61E4D", "#D6336C", "#F06595", "#FAA2C1"]
+    traces = []
+    lat_values = []
+    lon_values = []
+    text_vals = []
+    sizes = []
+    color_values = []
+    for i in range(len(lats)):
+        lat_values.append(lats[i])
+        lat_values.append(lats[i])
+        lon_values.append(lons[i])
+        lon_values.append(lons[i])
+        text_vals.append(names[i])
+        text_vals.append(names[i])
+        sizes.append(15)
+        sizes.append(12)
+        color_values.append(colors[-1])
+        color_values.append(colors[i])
+    traces.append(
+        go.Scattermapbox(
+            lon=lon_values,
+            lat=lat_values,
+            text=text_vals,
+            name="env",
+            marker={"size": sizes, "color": color_values, "opacity": 0.9},
+            hovertemplate="%{text}<extra></extra>",
+        )
+    )
+    if clat is not None and clon is not None:
+        traces.append(
+            go.Scattermapbox(
+                lon=[clon],
+                lat=[clat],
+                name="center point",
+                text=["center point"],
+                marker={"size": 10, "color": "#FCC419", "opacity": 0.9},
+                hovertemplate="%{text}<extra></extra>",
+            )
+        )
+    return traces
+
+
 def generate_multi_scatter_map_plot(data: list):
     if data is None or len(data) == 0:
         return generate_empty_map()

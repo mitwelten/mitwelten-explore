@@ -551,6 +551,47 @@ class EnvMoistDataset:
         return self.node_label
 
 
+class LocationEnvironmentDataset:
+    def __init__(
+        self,
+        attribute=None,
+        label=None,
+        descriprion_max=None,
+        descriprion_min=None,
+        **kwargs,
+    ):
+        self.attribute = attribute
+        self.label = label
+        self.descriprion_max = descriprion_max
+        self.descriprion_min = descriprion_min
+        self.type = DatasetType.location
+        self.unit = "0-10"
+
+    def to_dataset(self):
+        return dict(
+            type=self.type.value,
+            attribute=self.attribute,
+            label=self.label,
+            descriprion_max=self.descriprion_max,
+            descriprion_min=self.descriprion_min,
+        )
+
+    def get_unit(self):
+        return self.unit
+
+    def get_title(self):
+        return self.label
+
+    def get_location(self):
+        return f"Basel Area"
+
+    def get_icon(self):
+        return icons.map_pin
+
+    def get_id(self):
+        return self.attribute
+
+
 class ViewConfiguration:
     def __init__(
         self,
@@ -648,6 +689,8 @@ def to_typed_dataset(dataset: dict):
         return MultiPaxDataset(**dataset)
     elif dataset_type == DatasetType.distinct_species:
         return BirdDataset(**dataset)
+    elif dataset_type == DatasetType.location:
+        return LocationEnvironmentDataset(**dataset)
     else:
         return None
 
@@ -665,6 +708,7 @@ def default_view_config(dataset: dict, map_dashboard=False):
         DatasetType.env_humi,
         DatasetType.env_moist,
         DatasetType.env_temp,
+        DatasetType.location,
     ]:
         return dict(agg=DEFAULT_AGGREGATION, normalize=False)
     elif dataset_type == DatasetType.pax:
