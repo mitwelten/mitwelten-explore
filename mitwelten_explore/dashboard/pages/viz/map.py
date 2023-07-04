@@ -36,6 +36,7 @@ from dashboard.utils.communication import (
 from dashboard.utils.geo_utils import validate_coordinates
 from dashboard.api_clients.bird_results_client import get_detection_locations
 from dashboard.api_clients.sensordata_client import get_pax_locations
+from dashboard.api_clients.environment_entries_client import get_environment_attribute
 from dashboard.api_clients.pollinator_results_client import (
     POLLINATOR_IDS,
     get_polli_detection_locations_by_id,
@@ -100,9 +101,13 @@ def resp_to_locationdata(resp, name=None, agg_fcn="sum"):
                 values.append(r.get("detections"))
             elif "pax" in r:
                 values.append(r.get("pax"))
-            try:
+            elif "value" in r:
+                values.append(r.get("value"))
+            if "deployment_id" in r:
                 ids.append(r.get("deployment_id"))
-            except:
+            elif "environment_id" in r:
+                ids.append(r.get("environment_id"))
+            else:
                 ids.append(str(uuid4()))
     return LocationData(
         lat=lat, lon=lon, ids=ids, values=values, name=name, agg_fcn=agg_fcn
@@ -119,6 +124,8 @@ def add_datapoints_to_locationdata(data: LocationData, resp):
                 value = r.get("detections")
             elif "pax" in r:
                 value = r.get("pax")
+            elif "value" in r:
+                value = r.get("value")
             try:
                 id = r.get("deployment_id")
             except:
@@ -531,6 +538,15 @@ def update_map_store(search, pn):
             if pax_locations is not None:
 
                 locationdata.append(resp_to_locationdata(pax_locations, ds.get_title()))
+        elif ds.type == DatasetType.location:
+            env_locations = get_environment_attribute(attribute_id=ds.attribute)
+            env_locations = [e for e in env_locations if e.get("value") > 0]
+            if env_locations is not None:
+                locationdata.append(
+                    resp_to_locationdata(
+                        env_locations, ds.get_title(), agg_fcn=args.cfg[i].agg
+                    )
+                )
         elif ds.type == DatasetType.gbif_observations:
             gbif_locations = get_gbif_detection_locations(
                 taxon_id=ds.datum_id,
@@ -542,7 +558,7 @@ def update_map_store(search, pn):
                 locationdata.append(
                     resp_to_locationdata(gbif_locations, ds.get_title())
                 )
-        if ds.type == DatasetType.distinct_species:
+        elif ds.type == DatasetType.distinct_species:
             locations = get_detection_locations(
                 taxon_id=212,
                 confidence=args.cfg[i].confidence,
@@ -571,7 +587,6 @@ def update_dataset_cards(search, pn):
         raise PreventUpdate
     args = UrlSearchArgs(**parse_nested_qargs(qargs_to_dict(search)))
     if args.datasets is not None:
-
         ds_cards = [
             dataset_info_card(
                 args=args,

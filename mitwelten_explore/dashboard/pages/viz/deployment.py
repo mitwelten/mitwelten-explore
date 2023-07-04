@@ -296,7 +296,6 @@ def layout(**qargs):
                                                     config=dict(
                                                         displayModeBar=False,
                                                     ),
-                                                    # style={"maxHeight": "70vh"},
                                                 ),
                                             ),
                                         ],
@@ -317,7 +316,7 @@ def layout(**qargs):
                                                     figure=generate_empty_map(),
                                                     style={
                                                         "height": "100%",
-                                                        "minHeight": "30vh",
+                                                        # "minHeight": "30vh",
                                                     },
                                                     config=dict(
                                                         displayModeBar=False,
@@ -328,7 +327,12 @@ def layout(**qargs):
                                             dmc.TabsPanel(
                                                 dmc.Card(
                                                     dmc.CardSection(
-                                                        dcc.Graph(id=ids.spider_chart),
+                                                        dcc.Graph(
+                                                            id=ids.spider_chart,
+                                                            config=dict(
+                                                                displayModeBar=False,
+                                                            ),
+                                                        ),
                                                     ),
                                                     withBorder=True,
                                                 ),
@@ -349,7 +353,7 @@ def layout(**qargs):
                         dmc.Card(plaio, withBorder=True, style={"height": "100%"}),
                         className="col-lg-7",
                     ),
-                ]
+                ],
             ),
         ],
         fluid=True,

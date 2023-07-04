@@ -48,16 +48,18 @@ def spider_chart(labels, keys, entries, light_mode=True, maxdist=1000):
         distance_m = int(entries[i].get("distance"))
         id = entries[i].get("environment_id")
         values = [entries[i][k] for k in keys]
+        values = [v if v >= 0 else None for v in values]
         fig.add_trace(
             go.Scatterpolar(
                 r=values + [values[0]],
                 theta=labels + [labels[0]],
                 fill="toself" if i == 0 else None,
-                name=f"{id} ({distance_m} m)",
+                name=f"ID {id} ({distance_m} m)",
                 mode="lines+markers",
                 line_width=3 if i == 0 else 2,
                 line_color=colors[i],
                 opacity=opacities[i],
+                hovertemplate="%{theta}: <b>%{r}</b> / 10",
             )
         )
     fig.update_layout(
@@ -73,11 +75,8 @@ def spider_chart(labels, keys, entries, light_mode=True, maxdist=1000):
             gridshape="linear",
             bgcolor="rgba(0,0,0,0)",
         ),
-        # margin=dict(l=10, r=10, t=50, b=10),
-        font=dict(
-            # family="Roboto",
-            # size=19,
-        ),
+        margin_pad=90,
+        font_size=11,
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         legend=dict(orientation="h"),

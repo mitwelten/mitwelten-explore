@@ -556,14 +556,16 @@ class LocationEnvironmentDataset:
         self,
         attribute=None,
         label=None,
-        descriprion_max=None,
-        descriprion_min=None,
+        description_max=None,
+        description_min=None,
+        description_mid=None,
         **kwargs,
     ):
         self.attribute = attribute
         self.label = label
-        self.descriprion_max = descriprion_max
-        self.descriprion_min = descriprion_min
+        self.description_max = description_max
+        self.description_min = description_min
+        self.description_mid = description_mid
         self.type = DatasetType.location
         self.unit = "0-10"
 
@@ -572,8 +574,9 @@ class LocationEnvironmentDataset:
             type=self.type.value,
             attribute=self.attribute,
             label=self.label,
-            descriprion_max=self.descriprion_max,
-            descriprion_min=self.descriprion_min,
+            description_max=self.description_max,
+            description_min=self.description_min,
+            description_mid=self.description_mid,
         )
 
     def get_unit(self):

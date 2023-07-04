@@ -11,6 +11,7 @@ from dashboard.api_clients.pollinator_results_client import (
     get_polli_detection_count_by_id,
 )
 from dashboard.api_clients.gbif_cache_client import get_gbif_detection_count
+from dashboard.api_clients.environment_entries_client import get_legend
 from dashboard.components.labels import badge_de, badge_en
 from dashboard.components.selects import agg_fcn_select, confidence_threshold_select
 
@@ -23,6 +24,7 @@ from dashboard.models import (
     PollinatorDataset,
     to_typed_dataset,
     MultiPaxDataset,
+    LocationEnvironmentDataset,
 )
 from dashboard.styles import icons, get_icon
 from dash import dcc
@@ -307,47 +309,62 @@ def generate_viz_map_select_modal_children(store_data, id_role):
                     ]
                 )
             )
-    all_pax_ds = MultiPaxDataset()
-    trace_id = dmc.Code(all_pax_ds.get_id())
-    icon = get_icon(all_pax_ds.get_icon(), width=32)
-    description = dmc.Text(all_pax_ds.get_title(), size="md")
-    unit = dmc.Badge(all_pax_ds.get_unit(), color="teal")
-    location_name = dmc.Text(all_pax_ds.get_location(), size="sm")
-    list_entries.append(dmc.Text("Default Datasets", weight=500, align="center"))
-    list_entries.append(
-        dmc.Grid(
-            [
-                dmc.Col(
-                    dmc.Group(
-                        [
-                            dmc.Checkbox(
-                                color="teal",
-                                id={
-                                    "role": id_role,
-                                    "index": str(all_pax_ds.to_dataset()),
-                                },
-                                checked=False,
-                            ),
-                            icon,
-                            trace_id,
-                        ]
-                    ),
-                    span=2,
-                ),
-                dmc.Col(dmc.Group([description, unit]), span=7),
-                dmc.Col(
-                    dmc.Group(
-                        [
-                            get_icon(icon=icons.location_marker),
-                            location_name,
-                        ],
-                        spacing=4,
-                    ),
-                    span=3,
-                ),
-            ]
+    environment_legend = get_legend()
+    default_datasets = [MultiPaxDataset()]
+    for key in environment_legend.keys():
+        default_datasets.append(
+            LocationEnvironmentDataset(
+                attribute=key,
+                label=environment_legend[key].get("label"),
+                description_min=environment_legend[key].get("description")[0],
+                description_max=environment_legend[key].get("description")[-1],
+            )
         )
-    )
+
+    list_entries.append(dmc.Text("Default Datasets", weight=500, align="center"))
+    for ds in default_datasets:
+        list_entries.append(
+            dmc.Grid(
+                [
+                    dmc.Col(
+                        dmc.Group(
+                            [
+                                dmc.Checkbox(
+                                    color="teal",
+                                    id={
+                                        "role": id_role,
+                                        "index": str(ds.to_dataset()),
+                                    },
+                                    checked=False,
+                                ),
+                                get_icon(ds.get_icon(), width=32),
+                                dmc.Code(ds.get_id()),
+                            ]
+                        ),
+                        span=2,
+                    ),
+                    dmc.Col(
+                        dmc.Group(
+                            [
+                                dmc.Text(ds.get_title(), size="md"),
+                                dmc.Badge(ds.get_unit(), color="teal"),
+                            ]
+                        ),
+                        span=7,
+                    ),
+                    dmc.Col(
+                        dmc.Group(
+                            [
+                                get_icon(icon=icons.location_marker),
+                                dmc.Text(ds.get_location(), size="sm"),
+                            ],
+                            spacing=4,
+                        ),
+                        span=3,
+                    ),
+                ]
+            )
+        )
     return list_entries
 
 
