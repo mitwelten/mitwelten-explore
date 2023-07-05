@@ -1,0 +1,37 @@
+{
+    "SWISSTOPO_IMAGE": {
+        "name": "Swisstopo Image",
+        "description": "Bildaufnahmen von Swisstopo",
+        "img": null,
+        "reference": "Swisstopo",
+        "url": "https://www.swisstopo.admin.ch/de/home.html"
+    },
+    "SWISSTOPO_BASE": {
+        "name": "Swisstopo Base",
+        "description": "Basiskarten von Swisstopo",
+        "img": null,
+        "reference": "Swisstopo",
+        "url": "https://www.swisstopo.admin.ch/de/home.html"
+    },
+    "LEBENSRAUMKARTE": {
+        "name": "Lebensraumkarte",
+        "description": "Der Datensatz enthält die Schweizer Lebensräume gemäss der TypoCH-Klassifikation ('Lebensräume der Schweiz', Delarze et al. 2015) flächendeckend, mindestens bis zur zweiten Detailstufe der Klassifikation (Lebensraumgruppe); wenn möglich bis zur dritten Detailstufe (Lebensraumtyp). Er stützt sich auf die bestehende gesamtschweizerische Bodenbedeckungskartierung des Topografischen Landschaftsmodells (TLM) von Swisstopo für die Erfassung der groben Lebensraumklassen auf Stufe 1 der TypoCH-Klassifikation und für Lebensraumklassen auf der zweiten Stufe, die mit diesen Informationen gut identifiziert werden können (zum Beispiel Klasse 1. Gewässer, 3. Gletscher, Fels, Schutt und Geröll, 9. Gebäude). Die Lebensraumtypen wurden dann auf einer feineren Detailebene (TypoCH 3. Ebene, wo möglich) mit einer Kombination verschiedener Methoden erfasst, wie Verbreitungsmodelle, die auf maschinellem Lernen beruhen und komplexen Regelsätzen, die sich stark auf Erdbeobachtungsdaten stützen. Insgesamt wurden 84 Lebensraumtypen oder -gruppen kartiert.",
+        "img": "https://api3.geo.admin.ch/static/images/legends/ch.bafu.lebensraumkarte-schweiz_de.png",
+        "reference": "Bundesamt für Umwelt",
+        "url": "https://www.bafu.admin.ch/bafu/de/home.html"
+    },
+    "VEGETATIONSHOEHE": {
+        "name": "Vegetationshöhenmodell LFI",
+        "description": "Informationen zu Vegetationshöhen werden mit Methoden der Fernerkundung mit aktiven und passiven Sensoren ermittelt. Ein aktiver Sensor ist LiDAR. Ein passiver Sensor ist ein optischer Sensor, zum Beispiel eine Luftbildkamera. LiDAR wird in der Schweiz auf regionaler, kantonaler und nationaler Ebene aufgenommen. Ein regelmässiges Nachführungskonzept besteht allerdings nicht. Stereo – Lufbilder werden auf nationaler Ebene regelmässig in einem 3-Jahres Turnus aufgezeichnet. Aus diesen planbaren Grundlagendaten der swisstopo werden regelmässig 3D Datensätze, digitale Oberlächenmodelle (DOM), mit hoher Auflösung im Rahmen des Landesforstinventars (LFI) erstellt. Aus der Differenz des DOM und dem digitalen Terrainmodell der swisstopo (swissAlti3D) wird ein normalisiertes digitales Oberflächenmodell (nDOM) berechnet. Gebäude werden mit einer Kombination aus den Grundflächen des Topographischen Landschaftsmodells (TLM) der swisstopo und den spektralen Informationen der Stereo – Luftbilder eliminiert. Das Endresutat ist ein Modell der Vegetationshöhe (Vegetationshöhenmodell VHM) über die Schweiz.",
+        "img": "https://api3.geo.admin.ch/static/images/legends/ch.bafu.landesforstinventar-vegetationshoehenmodell_de.png",
+        "reference": "Bundesamt für Umwelt",
+        "url": "https://www.bafu.admin.ch/bafu/de/home.html"
+    },
+    "OBERFLAECHENMODELL": {
+        "name": "Oberflächenmodell LFI",
+        "description": "Informationen zu Vegetationshöhen werden mit Methoden der Fernerkundung mit aktiven und passiven Sensoren ermittelt. Ein aktiver Sensor ist LiDAR. Ein passiver Sensor ist ein optischer Sensor, zum Beispiel eine Luftbildkamera. LiDAR wird in der Schweiz auf regionaler, kantonaler und nationaler Ebene aufgenommen. Ein regelmässiges Nachführungskonzept besteht allerdings nicht. Stereo – Lufbilder werden auf nationaler Ebene regelmässig in einem 3-Jahres Turnus aufgezeichnet. Aus diesen planbaren Grundlagendaten der swisstopo werden regelmässig 3D Datensätze, digitale Oberlächenmodelle (DOM), mit hoher Auflösung im Rahmen des Landesforstinventars (LFI) erstellt. Aus der Differenz des DOM und dem digitalen Terrainmodell der swisstopo (swissAlti3D) wird ein normalisiertes digitales Oberflächenmodell (nDOM) berechnet. Gebäude werden mit einer Kombination aus den Grundflächen des Topographischen Landschaftsmodells (TLM) der swisstopo und den spektralen Informationen der Stereo – Luftbilder eliminiert. Das Endresutat ist ein Modell der Vegetationshöhe (Vegetationshöhenmodell VHM) über die Schweiz.",
+        "reference": "Bundesamt für Umwelt",
+        "url": "https://www.bafu.admin.ch/bafu/de/home.html",
+        "img": null
+    }
+}

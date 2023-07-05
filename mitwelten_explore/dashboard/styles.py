@@ -1,6 +1,28 @@
 from dash_iconify import DashIconify
 import dash_mantine_components as dmc
 import plotly.colors
+import json
+
+with open("dashboard/data/mapbox_layers.json", "r", encoding="utf-8") as f:
+    MAPBOX_LAYERS = json.loads(f.read())
+
+with open("dashboard/data/mapbox_layers_description.json", "r", encoding="utf-8") as f:
+    MAP_LAYER_DESCRIPTIONS = json.loads(f.read())
+
+MAP_LAYERS_WITH_LEGEND = [
+    k
+    for k in MAP_LAYER_DESCRIPTIONS.keys()
+    if MAP_LAYER_DESCRIPTIONS[k].get("img") is not None
+]
+
+DEFAULT_MAP_LAYER = {
+    "below": "traces",
+    "sourcetype": "raster",
+    "sourceattribution": '<a href="https://www.swisstopo.admin.ch/de/home.html" target="_blank">SwissTopo</a>',
+    "source": [
+        "https://wmts10.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/current/3857/{z}/{x}/{y}.jpeg"
+    ],
+}
 
 
 class Icons(object):
@@ -27,12 +49,14 @@ class Icons(object):
     hexagon_outline = "ic:outline-hexagon"
     hierarchy = "system-uicons:hierarchy"
     info = "mdi:about-variant"
+    info_filled = "mdi:information"
     layout_rect = "icon-park-outline:rectangle-one"
     layout_row = "icon-park-outline:layout-two"
     license_cc = "cib:creative-commons"
     license_cc_pd = "cib:creative-commons-pd"
     license_cc0 = "cib:creative-commons-zero"
     line_chart = "mdi:chart-line"
+    list_legend = "la:list-ul"
     location_marker = "material-symbols:location-on-outline"
     location_poi = "gis:location-poi"
     logout = "material-symbols:logout"
@@ -128,16 +152,3 @@ TRANSPARENT_COLORSCALE = [
     [0.0, "rgba(0,0,0,0)"],
     [1.0, "rgba(0,0,0,0)"],
 ]
-
-
-nav_style_active = {
-    "cursor": "pointer",
-    "height": "39px",
-    "borderBottom": "3px solid #4C6EF5",
-    "borderTop": "3px solid rgba(0,0,0,0)",
-}
-nav_style_inactive = {
-    "cursor": "pointer",
-    "height": "39px",
-    "borderTop": "3px solid rgba(0,0,0,0)",
-}

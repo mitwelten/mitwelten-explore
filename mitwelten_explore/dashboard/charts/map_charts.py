@@ -13,6 +13,8 @@ from dashboard.styles import (
     MULTI_VIZ_COLORSCALE,
     SEQUENTIAL_COLORSCALES,
     TRANSPARENT_COLORSCALE,
+    MAPBOX_LAYERS,
+    DEFAULT_MAP_LAYER,
 )
 
 
@@ -21,16 +23,18 @@ colors2, _ = plotly.colors.convert_colors_to_same_type(SEQUENTIAL_COLORSCALES[1]
 colorscale1 = plotly.colors.make_colorscale(colors1)
 colorscale2 = plotly.colors.make_colorscale(colors2)
 
-SWISSTOPO_LAYER = [
-    {
-        "below": "traces",
-        "sourcetype": "raster",
-        "sourceattribution": '<a href="https://www.swisstopo.admin.ch/de/home.html" target="_blank">SwissTopo</a>',
-        "source": [
-            "https://wmts10.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/current/3857/{z}/{x}/{y}.jpeg"
-        ],
-    },
-]
+
+def get_mapbox_layers(base, overlay=None):
+    if base is None:
+        return [DEFAULT_MAP_LAYER]
+    layers = [MAPBOX_LAYERS.get(base, DEFAULT_MAP_LAYER)]
+    if overlay:
+        overlay_layer_orig = MAPBOX_LAYERS.get(overlay)
+        overlay_layer = overlay_layer_orig.copy()
+        if overlay_layer is not None:
+            overlay_layer["opacity"] = 0.5
+            layers.append(overlay_layer)
+    return layers
 
 
 class LocationData:
@@ -137,7 +141,7 @@ def generate_empty_map(zoom=DEFAULT_ZOOM, clat=DEFAULT_LAT, clon=DEFAULT_LON):
             "style": "white-bg",
             "zoom": zoom,
             "center": {"lat": clat, "lon": clon},
-            "layers": SWISSTOPO_LAYER,
+            "layers": [DEFAULT_MAP_LAYER],
         },
         showlegend=False,
     )
@@ -381,7 +385,7 @@ def generate_multi_scatter_map_plot(data: list):
             "style": "white-bg",
             "zoom": zoom,
             "center": {"lat": center_lat, "lon": center_lon},
-            "layers": SWISSTOPO_LAYER,
+            "layers": [DEFAULT_MAP_LAYER],
         },
         showlegend=False,
         margin=dict(l=0, r=0, t=0, b=0),
@@ -501,7 +505,7 @@ def generate_h3hexbin_map(
             "style": "white-bg",
             "zoom": zoom,
             "center": {"lat": clat, "lon": clon},
-            "layers": SWISSTOPO_LAYER,
+            "layers": [DEFAULT_MAP_LAYER],
         },
         showlegend=False,
     )
@@ -625,6 +629,8 @@ def generate_multi_h3hexbin_map(
     scatter=False,
     range0=None,
     range1=None,
+    base_layer=None,
+    overlay_layer=None,
 ):
     ds0_visible = ds0.visible
     ds1_visible = ds1.visible
@@ -776,6 +782,8 @@ def generate_multi_h3hexbin_map(
 
     hexbin_map.update_xaxes(visible=False)
     hexbin_map.update_yaxes(visible=False)
+    layers = get_mapbox_layers(base_layer, overlay_layer)
+
     hexbin_map.update_layout(
         clickmode="event",
         margin=dict(l=0, r=0, t=0, b=0),
@@ -786,7 +794,7 @@ def generate_multi_h3hexbin_map(
             "style": "white-bg",
             "zoom": zoom,
             "center": {"lat": clat, "lon": clon},
-            "layers": SWISSTOPO_LAYER,
+            "layers": layers,
         },
         showlegend=True,
         legend=dict(
@@ -858,6 +866,8 @@ def generate_multi_bubble_map(
     zoom=None,
     clat=None,
     clon=None,
+    base_layer=None,
+    overlay_layer=None,
 ):
     ds0_visible = ds0.visible
     ds1_visible = ds1.visible
@@ -936,7 +946,7 @@ def generate_multi_bubble_map(
                 color=MULTI_VIZ_COLORSCALE[1],
             )
         )
-
+    layers = get_mapbox_layers(base_layer, overlay_layer)
     bubble_map.update_layout(
         margin=dict(l=0, r=0, t=0, b=0),
         plot_bgcolor="rgba(0,0,0,0)",
@@ -946,7 +956,7 @@ def generate_multi_bubble_map(
             "style": "white-bg",
             "zoom": zoom,
             "center": {"lat": clat, "lon": clon},
-            "layers": SWISSTOPO_LAYER,
+            "layers": layers,
         },
         showlegend=False,
     )

@@ -1,0 +1,48 @@
+{
+    "SWISSTOPO_IMAGE": {
+        "name": "Swisstopo Image",
+        "below": "traces",
+        "sourcetype": "raster",
+        "sourceattribution": "<a href='https://www.swisstopo.admin.ch/de/home.html' target='_blank'>SwissTopo</a>",
+        "source": [
+            "https://wmts10.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/current/3857/{z}/{x}/{y}.jpeg"
+        ]
+    },
+    "SWISSTOPO_BASE": {
+        "name": "Swisstopo Base",
+        "below": "traces",
+        "sourcetype": "raster",
+        "sourceattribution": "<a href='https://www.swisstopo.admin.ch/de/home.html' target='_blank'>SwissTopo</a>",
+        "source": [
+            "https://wmts10.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg"
+        ]
+    },
+    "LEBENSRAUMKARTE": {
+        "name": "Lebensraumkarte",
+        "below": "traces",
+        "sourcetype": "raster",
+        "sourceattribution": "<a href='https://www.bafu.admin.ch/bafu/de/home.html' target='_blank'>BAFU</a>",
+        "source": [
+            "https://wmts9.geo.admin.ch/1.0.0/ch.bafu.lebensraumkarte-schweiz/default/current/3857/{z}/{x}/{y}.png"
+        ]
+    },
+    "VEGETATIONSHOEHE":{
+        "name":"Vegetationshöhenmodell LFI",
+        "below": "traces",
+        "sourcetype": "raster",
+        "sourceattribution": "<a href='https://www.bafu.admin.ch/bafu/de/home.html' target='_blank'>BAFU</a>",
+        "source": [
+            "https://wmts9.geo.admin.ch/1.0.0/ch.bafu.landesforstinventar-vegetationshoehenmodell/default/current/3857/{z}/{x}/{y}.png"
+        ]
+        
+    },
+    "OBERFLAECHENMODELL":{
+        "name":"Oberflächenmodell LFI",
+        "below": "traces",
+        "sourcetype": "raster",
+        "sourceattribution": "<a href='https://www.bafu.admin.ch/bafu/de/home.html' target='_blank'>BAFU</a>",
+        "source": [
+            "https://wmts9.geo.admin.ch/1.0.0/ch.bafu.landesforstinventar-vegetationshoehenmodell_relief/default/current/3857/{z}/{x}/{y}.png"
+        ]
+    }
+}

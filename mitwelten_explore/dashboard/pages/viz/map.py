@@ -49,6 +49,9 @@ from dashboard.styles import (
     SEQUENTIAL_COLORSCALES,
     MULTI_VIZ_COLORSCALE,
     MULTI_VIZ_COLORSCALE_MT,
+    MAPBOX_LAYERS,
+    MAP_LAYER_DESCRIPTIONS,
+    MAP_LAYERS_WITH_LEGEND,
 )
 from uuid import uuid4
 import json
@@ -73,6 +76,7 @@ class PageIds(object):
     agg_select = str(uuid4())
     switch_datasets = str(uuid4())
     share_modal_div = str(uuid4())
+    map_layer_info_div = str(uuid4())
     play_switch = str(uuid4())
     show_scatter = str(uuid4())
     affix_share = str(uuid4())
@@ -81,6 +85,9 @@ class PageIds(object):
     map_config_stack = str(uuid4())
     map_type_control = str(uuid4())
     datasource_indicator = str(uuid4())
+    map_base_layer_select = str(uuid4())
+    map_overlay_layer_select = str(uuid4())
+    open_layer_info_btn = str(uuid4())
 
 
 ids = PageIds()
@@ -169,6 +176,28 @@ def map_type_control(value="hexbin"):
     )
 
 
+map_layer_base_select = dmc.Select(
+    data=[
+        {"label": MAPBOX_LAYERS[k].get("name"), "value": k}
+        for k in MAPBOX_LAYERS.keys()
+    ],
+    value=list(MAPBOX_LAYERS.keys())[0],
+    label="Base Layer",
+    id=ids.map_base_layer_select,
+)
+
+map_layer_overlay_select = dmc.Select(
+    data=[
+        {"label": MAPBOX_LAYERS[k].get("name"), "value": k}
+        for k in MAPBOX_LAYERS.keys()
+    ],
+    value=None,
+    clearable=True,
+    label="Overlay",
+    id=ids.map_overlay_layer_select,
+)
+
+
 def layout(**qargs):
     query_args = parse_nested_qargs(qargs)
     if len(query_args) == 0:
@@ -194,10 +223,10 @@ def layout(**qargs):
             dcc.Location(ids.url, refresh=False),
             html.Div(id=ids.config_modal_div),
             html.Div(id=ids.share_modal_div),
+            html.Div(id=ids.map_layer_info_div),
             datasource_affix(ids.datasource_indicator),
             affix,
             annot_editor,
-            # dcc.Interval(id=ids.interval,interval=5000, n_intervals=0),
             dmc.Group(
                 [
                     dmc.Text("Spatial exploration", size="lg", weight=600),
@@ -218,9 +247,7 @@ def layout(**qargs):
                                     [
                                         dmc.Loader(
                                             size="sm",
-                                            # variant="dots",
                                             color="teal.5",
-                                            # color="gray.0",
                                         ),
                                         dmc.Text(
                                             "Loading",
@@ -232,9 +259,7 @@ def layout(**qargs):
                                 ),
                                 style={
                                     "position": "absolute",
-                                    # "top": 10,
                                     "bottom": 10,
-                                    # "left": "50%",
                                     "left": 10,
                                     "backgroundColor": "rgba(245, 245, 245,0.8)",
                                 },
@@ -267,11 +292,35 @@ def layout(**qargs):
                             dmc.Stack(
                                 [
                                     dmc.Divider(),
+                                    dmc.Group(
+                                        [
+                                            dmc.Text("Map Layers", weight=500),
+                                            dmc.ActionIcon(
+                                                children=get_icon(
+                                                    icons.info_filled, width=20
+                                                ),
+                                                id=ids.open_layer_info_btn,
+                                                disabled=True,
+                                                variant="subtle",
+                                                color="indigo",
+                                            ),
+                                        ],
+                                        position="apart",
+                                    ),
+                                    map_layer_base_select,
+                                    map_layer_overlay_select,
+                                ],
+                                spacing="xs",
+                            ),
+                            dmc.Space(h=8),
+                            dmc.Stack(
+                                [
                                     dmc.Text("Map Type", weight=500),
                                     map_type_ctl,
-                                ]
+                                ],
+                                spacing="xs",
                             ),
-                            dmc.Space(h=12),
+                            dmc.Space(h=8),
                             dmc.Stack(
                                 id=ids.map_config_stack,
                                 style={"display": "none"} if bubble_map else None,
@@ -337,6 +386,7 @@ def layout(**qargs):
                                         else None,
                                     ),
                                 ],
+                                spacing="xs",
                             ),
                         ],
                         className="col-md-2",
@@ -480,8 +530,10 @@ def update_url_location(dr_trg, dr, search_args, map_type):
     Input(ids.colorscale_slider_1, "value"),
     Input(ids.colorscale_slider_2, "value"),
     Input(ids.map_type_control, "value"),
+    Input(ids.map_base_layer_select, "value"),
+    Input(ids.map_overlay_layer_select, "value"),
 )
-def set_scatter_config(checked, range0, range1, type):
+def set_scatter_config(checked, range0, range1, type, base_layer, overlay_layer):
     if type is not None:
         bubble = type == "bubble"
         return {
@@ -489,6 +541,8 @@ def set_scatter_config(checked, range0, range1, type):
             "range0": range0,
             "range1": range1,
             "bubble": bubble,
+            "base_layer": base_layer,
+            "overlay_layer": overlay_layer,
         }
 
 
@@ -730,6 +784,61 @@ def update_switch_datasets_href(search, pn):
     query_args["datasets"] = datasets
     query_args["cfg"] = cfg
     return f"{pn}?{urlencode_dict(query_args)}"
+
+
+@callback(
+    Output(ids.open_layer_info_btn, "disabled"),
+    Input(ids.map_base_layer_select, "value"),
+    Input(ids.map_overlay_layer_select, "value"),
+)
+def enable_legend_button(base, overlay):
+    if base in MAP_LAYERS_WITH_LEGEND or overlay in MAP_LAYERS_WITH_LEGEND:
+        return False
+    return True
+
+
+# open map layer info
+@callback(
+    Output(ids.map_layer_info_div, "children"),
+    Input(ids.open_layer_info_btn, "n_clicks"),
+    Input(ids.map_base_layer_select, "value"),
+    Input(ids.map_overlay_layer_select, "value"),
+)
+def open_info_box(nc, base_layer, overlay_layer):
+    if base_layer in MAP_LAYERS_WITH_LEGEND:
+        img_url = MAP_LAYER_DESCRIPTIONS[base_layer].get("img")
+        name = MAP_LAYER_DESCRIPTIONS[base_layer].get("name")
+    elif overlay_layer in MAP_LAYER_DESCRIPTIONS:
+        img_url = MAP_LAYER_DESCRIPTIONS[overlay_layer].get("img")
+        name = MAP_LAYER_DESCRIPTIONS[overlay_layer].get("name")
+    else:
+        return []
+    if None in [img_url, name]:
+        return []
+    return dmc.Affix(
+        dmc.Alert(
+            title=name,
+            children=dmc.ScrollArea(
+                [
+                    dmc.Card(
+                        html.Img(
+                            src=img_url,
+                        ),
+                        p=0,
+                        bg="gray.0",
+                    ),
+                ],
+                h="25vh",
+            ),
+            withCloseButton=True,
+            variant="outline",
+            color="gray",
+            maw="40vw",
+            mah="30vh",
+            styles={"root": {"padding": "8px"}},
+        ),
+        position={"bottom": 30, "left": 30},
+    )
 
 
 # share modal

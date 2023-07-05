@@ -224,6 +224,10 @@ class H3HexBinMapMultiAIO(html.Div):
         range1 = config.get("range1", None) if config is not None else None
         bubblemap = config.get("bubble", False) if config is not None else False
         single_map = len(data) == 1
+        base_layer = config.get("base_layer", None) if config is not None else None
+        overlay_layer = (
+            config.get("overlay_layer", None) if config is not None else None
+        )
         dataset0 = LocationData(**data[0])
         dataset1 = LocationData(**data[1]) if not single_map else LocationData()
 
@@ -232,6 +236,8 @@ class H3HexBinMapMultiAIO(html.Div):
                 return generate_multi_bubble_map(
                     ds0=dataset0,
                     ds1=dataset1,
+                    base_layer=base_layer,
+                    overlay_layer=overlay_layer,
                 )
             return generate_multi_h3hexbin_map(
                 ds0=dataset0,
@@ -239,6 +245,8 @@ class H3HexBinMapMultiAIO(html.Div):
                 scatter=show_scatter,
                 range0=range0,
                 range1=range1,
+                base_layer=base_layer,
+                overlay_layer=overlay_layer,
             )
 
         elif "graph" in trg_subcomponents:
@@ -247,6 +255,8 @@ class H3HexBinMapMultiAIO(html.Div):
                     return generate_multi_bubble_map(
                         ds0=dataset0,
                         ds1=dataset1,
+                        base_layer=base_layer,
+                        overlay_layer=overlay_layer,
                     )
                 else:
                     return generate_multi_h3hexbin_map(
@@ -255,6 +265,8 @@ class H3HexBinMapMultiAIO(html.Div):
                         scatter=show_scatter,
                         range0=range0,
                         range1=range1,
+                        base_layer=base_layer,
+                        overlay_layer=overlay_layer,
                     )
             if bubblemap:
                 raise PreventUpdate
@@ -272,6 +284,8 @@ class H3HexBinMapMultiAIO(html.Div):
                 scatter=show_scatter,
                 range0=range0,
                 range1=range1,
+                base_layer=base_layer,
+                overlay_layer=overlay_layer,
             )
 
         raise PreventUpdate
