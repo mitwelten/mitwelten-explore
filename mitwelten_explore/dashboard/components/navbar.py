@@ -3,7 +3,7 @@ import dash_mantine_components as dmc
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import ThemeSwitchAIO
 from configuration import *
-from dashboard.styles import icons, get_icon, nav_style_inactive
+from dashboard.styles import icons, get_icon
 
 theme_switch = ThemeSwitchAIO(
     aio_id="theme",
@@ -12,6 +12,11 @@ theme_switch = ThemeSwitchAIO(
 )
 
 NAV_TARGET_PADDING_X = 12
+nav_style_inactive = {
+    "cursor": "pointer",
+    "height": "39px",
+    "borderTop": "3px solid rgba(0,0,0,0)",
+}
 
 
 nav_logo_target = dmc.Anchor(
