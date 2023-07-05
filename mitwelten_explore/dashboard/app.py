@@ -21,7 +21,6 @@ from dashboard.components.notifications import generate_notification
 from dashboard.utils.communication import get_user_from_cookies
 from dashboard.api_clients.userdata_client import update_collection, get_collection
 from dashboard.models import to_typed_dataset
-from dashboard.styles import nav_style_active, nav_style_inactive
 
 app = Dash(
     __name__,
