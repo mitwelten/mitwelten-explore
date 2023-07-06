@@ -7,7 +7,7 @@ dash.register_page(__name__, path="/docs")
 
 def get_doc_page(section):
     try:
-        with open(f"dashboard/docs/{section}.md", "r") as f:
+        with open(f"dashboard/docs/{section}.md", "r", encoding="utf-8") as f:
             content = f.read()
     except:
         content = "### This Page does not exist."
@@ -20,6 +20,7 @@ doc_pages = [
     "collection",
     "dashboards",
     "charts",
+    "maps",
     "annotations",
     "api",
     "about",
