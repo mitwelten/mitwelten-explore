@@ -1,7 +1,7 @@
 from dashboard.utils.communication import CachedRequest, construct_url
 from configuration import DATA_API_URL
 
-cr = CachedRequest("deployments_cache", 2 * 60 * 60)
+cr = CachedRequest("deployments_cache", 60 * 60)
 
 
 def get_deployments(type_query=None, deployment_id=None):
@@ -38,6 +38,86 @@ def get_deployment_location(deployment_id):
 
 def get_deployment_info(deployment_id):
     url = f"{DATA_API_URL}deployment/{deployment_id}"
+    res = cr.get(url)
+    if res.status_code == 200:
+        return res.json()
+    return None
+
+
+def get_total_image_count(deployment_ids=None, time_from=None, time_to=None):
+    url = construct_url(
+        "statistics/image/count",
+        {
+            "from": time_from,
+            "to": time_to,
+        },
+    )
+    if deployment_ids is not None:
+        if isinstance(deployment_ids, list) and len(deployment_ids) > 0:
+            for d in deployment_ids:
+                url += f"&deployment_ids={d}"
+        else:
+            url += f"&deployment_ids={deployment_ids}"
+    res = cr.get(url)
+    if res.status_code == 200:
+        return res.json()
+    return None
+
+
+def get_total_audio_duration(deployment_ids=None, time_from=None, time_to=None):
+    url = construct_url(
+        "statistics/audio/total_duration",
+        {
+            "from": time_from,
+            "to": time_to,
+        },
+    )
+    if deployment_ids is not None:
+        if isinstance(deployment_ids, list) and len(deployment_ids) > 0:
+            for d in deployment_ids:
+                url += f"&deployment_ids={d}"
+        else:
+            url += f"&deployment_ids={deployment_ids}"
+    res = cr.get(url)
+    if res.status_code == 200:
+        return res.json()
+    return None
+
+
+def get_daily_audio_duration(deployment_ids=None, time_from=None, time_to=None):
+    url = construct_url(
+        "statistics/audio/daily_recordings",
+        {
+            "from": time_from,
+            "to": time_to,
+        },
+    )
+    if deployment_ids is not None:
+        if isinstance(deployment_ids, list) and len(deployment_ids) > 0:
+            for d in deployment_ids:
+                url += f"&deployment_ids={d}"
+        else:
+            url += f"&deployment_ids={deployment_ids}"
+    res = cr.get(url)
+    if res.status_code == 200:
+        return res.json()
+    return None
+
+
+def get_daily_image_captures(deployment_ids=None, time_from=None, time_to=None):
+    url = construct_url(
+        "statistics/image/daily_image_count",
+        {
+            "from": time_from,
+            "to": time_to,
+        },
+    )
+    if deployment_ids is not None:
+        if isinstance(deployment_ids, list) and len(deployment_ids) > 0:
+            for d in deployment_ids:
+                url += f"&deployment_ids={d}"
+        else:
+            url += f"&deployment_ids={deployment_ids}"
     res = cr.get(url)
     if res.status_code == 200:
         return res.json()

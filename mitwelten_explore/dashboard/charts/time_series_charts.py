@@ -26,6 +26,46 @@ def empty_figure():
     return fig
 
 
+def data_collection_bar_chart(
+    times, values, title, unit, marker_color="#15AABF", light_mode=True
+):
+    fig = go.Figure()
+    fig.add_trace(
+        go.Bar(
+            x=times,
+            y=values,
+            marker_color=marker_color,
+            marker_line_color=marker_color,
+            marker_line_width=1.5,
+            hovertemplate="<b>%{y:.2f}</b>" + f" {unit}<extra></extra>",
+        )
+    )
+    fig.update_layout(
+        title=f"{title} [{unit}]",
+        margin=dict(
+            l=20,
+            r=20,
+            t=50,
+            b=20,
+        ),
+        template="plotly_white" if light_mode else "plotly_dark",
+        hovermode="x unified",
+        showlegend=False,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        hoverlabel_bgcolor="rgba(245, 245, 245,0.8)",
+        hoverlabel_font_color="black",
+    )
+    fig.update_xaxes(
+        showspikes=True,
+        spikedash="solid",
+        spikemode="across",
+        spikecolor="#0B7285",
+        spikethickness=-2,
+    )
+    return fig
+
+
 def generate_ts_figure(
     times,
     values,

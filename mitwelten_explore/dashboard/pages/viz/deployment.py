@@ -16,6 +16,10 @@ from dashboard.api_clients.pollinator_results_client import (
     get_polli_detection_list_by_deployment,
 )
 from dashboard.api_clients.userdata_client import post_annotation
+from dashboard.api_clients.deployments_client import (
+    get_daily_image_captures,
+    get_daily_audio_duration,
+)
 from dashboard.api_clients.environment_entries_client import (
     get_environment_entries_nearby,
     get_legend,
@@ -35,6 +39,7 @@ from dashboard.charts.map_charts import (
     generate_empty_map,
     deployment_location_map,
 )
+from dashboard.charts.time_series_charts import data_collection_bar_chart
 from dashboard.data_handler import get_locations_from_qargs, get_data_sources
 from dashboard.utils.communication import (
     parse_nested_qargs,
@@ -72,13 +77,14 @@ class PageIds(object):
     pie_chart = str(uuid4())
     map = str(uuid4())
     select_modal = str(uuid4())
-    distinct_species = str(uuid4())
-    total_detections = str(uuid4())
+    detection_stats_group = str(uuid4())
+    data_stats_indicator = str(uuid4())
     affix_share = str(uuid4())
     affix_annotate = str(uuid4())
     datasource_indicator = str(uuid4())
     share_modal_div = str(uuid4())
     spider_chart = str(uuid4())
+    data_bar_chart = str(uuid4())
 
 
 ids = PageIds()
@@ -118,6 +124,25 @@ plaio_legend = dmc.Grid(
         ),
     ],
 )
+
+
+def value_indicator_group(value, text):
+    return dmc.Group(
+        [
+            dmc.Text(
+                value,
+                size="1.5rem",
+                color="teal.5",
+                weight=600,
+            ),
+            dmc.Text(
+                text,
+                size="md",
+            ),
+        ],
+        spacing="xs",
+        p=0,
+    )
 
 
 plaio = PagedListSearchableAIO(
@@ -252,105 +277,127 @@ def layout(**qargs):
                 [
                     dmc.Col(
                         [
-                            dmc.Stack(
-                                className="d-flex w-100",
-                                children=[
-                                    dmc.Card(
+                            dmc.AccordionMultiple(
+                                [
+                                    dmc.AccordionItem(
                                         [
-                                            dmc.Group(
+                                            dmc.AccordionControl(
+                                                dmc.Text(
+                                                    "Detections", weight=500, size="sm"
+                                                ),
+                                                py=8,
+                                            ),
+                                            dmc.AccordionPanel(
                                                 [
                                                     dmc.Group(
-                                                        [
-                                                            dmc.Text(
-                                                                id=ids.distinct_species,
-                                                                size=30,
-                                                                color="teal.5",
-                                                                weight=600,
-                                                            ),
-                                                            dmc.Text(
-                                                                "Species", size="md"
-                                                            ),
-                                                        ]
+                                                        id=ids.detection_stats_group,
+                                                        position="center",
+                                                        p=0,
                                                     ),
-                                                    dmc.Group(
-                                                        [
-                                                            dmc.Text(
-                                                                id=ids.total_detections,
-                                                                size=30,
-                                                                color="teal.5",
-                                                                weight=600,
-                                                            ),
-                                                            dmc.Text(
-                                                                "Detections", size="md"
-                                                            ),
-                                                        ]
-                                                    ),
-                                                ],
-                                            ),
-                                            dmc.CardSection(
-                                                dcc.Graph(
-                                                    id=ids.pie_chart,
-                                                    figure=no_data_figure(
-                                                        annotation=""
-                                                    ),
-                                                    config=dict(
-                                                        displayModeBar=False,
-                                                    ),
-                                                ),
-                                            ),
-                                        ],
-                                        withBorder=True,
-                                        # className="flex-grow-1",
-                                    ),
-                                    dmc.Tabs(
-                                        [
-                                            dmc.TabsList(
-                                                [
-                                                    dmc.Tab("Map", value="map"),
-                                                    dmc.Tab("Environment", value="env"),
-                                                ]
-                                            ),
-                                            dmc.TabsPanel(
-                                                dcc.Graph(
-                                                    id=ids.map,
-                                                    figure=generate_empty_map(),
-                                                    style={
-                                                        "height": "100%",
-                                                        # "minHeight": "30vh",
-                                                    },
-                                                    config=dict(
-                                                        displayModeBar=False,
-                                                    ),
-                                                ),
-                                                value="map",
-                                            ),
-                                            dmc.TabsPanel(
-                                                dmc.Card(
-                                                    dmc.CardSection(
+                                                    dmc.LoadingOverlay(
                                                         dcc.Graph(
-                                                            id=ids.spider_chart,
+                                                            id=ids.pie_chart,
+                                                            figure=no_data_figure(
+                                                                annotation=""
+                                                            ),
                                                             config=dict(
                                                                 displayModeBar=False,
                                                             ),
                                                         ),
+                                                        transitionDuration=400,
                                                     ),
-                                                    withBorder=True,
-                                                ),
-                                                value="env",
+                                                ]
                                             ),
                                         ],
-                                        color="teal",
+                                        value="detections",
+                                        className="bg-transparent",
+                                    ),
+                                    dmc.AccordionItem(
+                                        [
+                                            dmc.AccordionControl(
+                                                dmc.Text("Map", weight=500, size="sm"),
+                                                py=8,
+                                            ),
+                                            dmc.AccordionPanel(
+                                                dcc.Graph(
+                                                    id=ids.map,
+                                                    figure=generate_empty_map(),
+                                                    config=dict(
+                                                        displayModeBar=False,
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
                                         value="map",
-                                        className="flex-grow-1",
+                                        className="bg-transparent",
+                                    ),
+                                    dmc.AccordionItem(
+                                        [
+                                            dmc.AccordionControl(
+                                                dmc.Text(
+                                                    "Collected data",
+                                                    weight=500,
+                                                    size="sm",
+                                                ),
+                                                py=8,
+                                            ),
+                                            dmc.AccordionPanel(
+                                                [
+                                                    dmc.Group(
+                                                        id=ids.data_stats_indicator,
+                                                        position="center",
+                                                    ),
+                                                    dmc.LoadingOverlay(
+                                                        dcc.Graph(
+                                                            id=ids.data_bar_chart,
+                                                            figure=no_data_figure(
+                                                                annotation=""
+                                                            ),
+                                                            config=dict(
+                                                                displayModeBar=False,
+                                                            ),
+                                                        ),
+                                                        transitionDuration=400,
+                                                    ),
+                                                ]
+                                            ),
+                                        ],
+                                        value="statistics",
+                                        className="bg-transparent",
+                                    ),
+                                    dmc.AccordionItem(
+                                        [
+                                            dmc.AccordionControl(
+                                                dmc.Text(
+                                                    "Environment",
+                                                    weight=500,
+                                                    size="sm",
+                                                ),
+                                                py=8,
+                                            ),
+                                            dmc.AccordionPanel(
+                                                dcc.Graph(
+                                                    id=ids.spider_chart,
+                                                    config=dict(
+                                                        displayModeBar=False,
+                                                    ),
+                                                )
+                                            ),
+                                        ],
+                                        value="environment",
+                                        className="bg-transparent",
                                     ),
                                 ],
-                                style={"height": "100%"},
+                                variant="contained",
+                                value=["detections"],
+                                # value="detections",
+                                styles={"content": {"padding": 0}},
                             ),
                         ],
                         className="col-lg-5",
                     ),
                     dmc.Col(
-                        dmc.Card(plaio, withBorder=True, style={"height": "100%"}),
+                        dmc.LoadingOverlay(plaio, transitionDuration=400),
                         className="col-lg-7",
                     ),
                 ],
@@ -446,11 +493,11 @@ def update_select_modal(is_open, data):
     return no_update
 
 
+# update result list
 @callback(
     Output(plaio.ids.store(plaio.aio_id), "data"),
     Output(ids.pie_chart, "figure"),
-    Output(ids.distinct_species, "children"),
-    Output(ids.total_detections, "children"),
+    Output(ids.detection_stats_group, "children"),
     Input(ids.url, "href"),
     Input(ids.url, "search"),
     Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
@@ -486,8 +533,12 @@ def update_list(href, search, theme):
     return (
         generate_list_items(species),
         pie_chart([s.label_sci for s in species], [s.count for s in species], theme),
-        f"{len(data)}",
-        f"{sum([s.count for s in species])}",
+        [
+            value_indicator_group(f"{len(data)}", "Species"),
+            value_indicator_group(
+                f"{sum([s.count for s in species]):,}".replace(",", "'"), "Detections"
+            ),
+        ],
     )
 
 
@@ -495,7 +546,7 @@ def update_list(href, search, theme):
 @callback(
     Output(ids.map, "figure"),
     Output(ids.spider_chart, "figure"),
-    Input(ids.url, "search"),
+    State(ids.url, "search"),
     Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
 )
 def update_map_plot(search_args, theme):
@@ -545,6 +596,66 @@ def update_map_plot(search_args, theme):
             map = deployment_location_map(lats, lons, deployment_ids)
 
         return map, spider
+
+
+# update data acquisition chart
+@callback(
+    Output(ids.data_bar_chart, "figure"),
+    Output(ids.data_stats_indicator, "children"),
+    Input(ids.url, "search"),
+    Input(ids.url, "href"),
+    Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
+)
+def update_bar_chart(search, href, theme):
+    if search is not None:
+        query_args = UrlSearchArgs(**parse_nested_qargs(qargs_to_dict(search)))
+        if query_args.dataset is None:
+            raise PreventUpdate
+        ds = to_typed_dataset(query_args.dataset)
+        if ds.type == DatasetType.distinct_species:
+            durations = get_daily_audio_duration(
+                ds.deployment_id,
+                time_from=query_args.view_config.time_from,
+                time_to=query_args.view_config.time_to,
+            )
+            if isinstance(durations, list):
+                times = [d.get("bucket") for d in durations]
+                values_s = [d.get("recording_seconds") for d in durations]
+                total_duration = sum(values_s)
+                td = (
+                    datetime.timedelta(seconds=total_duration)
+                    if total_duration is not None
+                    else 0
+                )
+                values = [d / 3600 for d in values_s]
+                return data_collection_bar_chart(
+                    times,
+                    values,
+                    title="Recording duration per day",
+                    unit="h",
+                    light_mode=theme,
+                ), value_indicator_group(f"{td}", "Total recording time")
+
+        elif ds.type == DatasetType.pollinators:
+            images = get_daily_image_captures(
+                ds.deployment_id,
+                time_from=query_args.view_config.time_from,
+                time_to=query_args.view_config.time_to,
+            )
+            if isinstance(images, list):
+                times = [i.get("bucket") for i in images]
+                values = [i.get("image_count") for i in images]
+                total_images = sum(values) if values is not None else 0
+                return data_collection_bar_chart(
+                    times,
+                    values,
+                    title="Images per day",
+                    unit="captures",
+                    light_mode=theme,
+                ), value_indicator_group(
+                    f"{total_images:,}".replace(",", "'"), "Captured images"
+                )
+    raise PreventUpdate
 
 
 # update datasource indicator
