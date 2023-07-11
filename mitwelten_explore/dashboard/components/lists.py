@@ -10,6 +10,7 @@ from dashboard.models import (
     Deployment,
 )
 from dashboard.components.overlays import tooltip
+from dashboard.components.dataset_presentation import deployment_info_spoiler
 from dashboard.api_clients.deployments_client import get_deployments
 import json
 
@@ -142,49 +143,8 @@ def generate_selected_data_list(store_data):
             DatasetType.env_temp,
         ]:
             if ds.deployment_id is not None:
-                deployments = get_deployments(
-                    deployment_id=ds.deployment_id, typed=True
-                )
-                deployment_list = []
-                for d in deployments:
-                    deployment_list.append(
-                        dmc.Group(
-                            [
-                                dmc.Anchor(
-                                    dmc.Text(
-                                        [
-                                            get_icon(icon=icons.location_poi),
-                                            f"{d.deployment_id}",
-                                        ]
-                                    ),
-                                    target="_blank",
-                                    href=f"{PATH_PREFIX}reference/deployment?{urlencode_dict(dict(ids=[d.deployment_id]))}",
-                                ),
-                                dmc.Code(d.node_label),
-                                dmc.Badge(
-                                    f"{d.period_start.split(' ')[0]} - {d.period_end.split(' ')[0]}",
-                                    size="sm",
-                                    variant="outline",
-                                ),
-                                dmc.Text(
-                                    d.description,
-                                    color="dimmed",
-                                    size="sm",
-                                    truncate=True,
-                                ),
-                                dmc.Group(
-                                    [dmc.Badge(t, size="xs") for t in d.tags], spacing=4
-                                ),
-                            ],
-                            style={"rowGap": 3},
-                        )
-                    )
-                deployment_list = [location_information] + deployment_list
-                location_information = dmc.Spoiler(
-                    showLabel="Show All",
-                    hideLabel="Hide",
-                    maxHeight=60,
-                    children=dmc.Stack(deployment_list, spacing=4),
+                location_information = deployment_info_spoiler(
+                    ds.deployment_id, location_information
                 )
 
         list_entries.append(

@@ -9,6 +9,7 @@ from dashboard.models import (
     PollinatorDataset,
     BirdDataset,
     to_typed_dataset,
+    DatasetType,
 )
 from dash import html
 import json
@@ -16,6 +17,7 @@ from configuration import PATH_PREFIX
 from dashboard.utils.communication import urlencode_dict
 from dashboard.components.tables import deployments_table
 from dashboard.components.labels import badge_de, badge_en
+from dashboard.api_clients.deployments_client import get_deployments
 
 
 def dataset_title(dataset: dict):
@@ -451,3 +453,48 @@ def bird_dataset_card(id_role, deployment_ids=None):
         ],
         withBorder=True,
     )
+
+
+def deployment_info_spoiler(deployment_ids, location_information=None):
+    if deployment_ids is not None:
+        deployments = get_deployments(deployment_id=deployment_ids, typed=True)
+        deployment_list = []
+        for d in deployments:
+            deployment_list.append(
+                dmc.Group(
+                    [
+                        dmc.Anchor(
+                            dmc.Text(
+                                [
+                                    get_icon(icon=icons.location_poi),
+                                    f"{d.deployment_id}",
+                                ]
+                            ),
+                            target="_blank",
+                            href=f"{PATH_PREFIX}reference/deployment?{urlencode_dict(dict(ids=[d.deployment_id]))}",
+                        ),
+                        dmc.Code(d.node_label),
+                        dmc.Badge(
+                            f"{d.period_start.split(' ')[0]} - {d.period_end.split(' ')[0]}",
+                            size="sm",
+                            variant="outline",
+                        ),
+                        dmc.Text(
+                            d.description,
+                            color="dimmed",
+                            size="sm",
+                            truncate=True,
+                        ),
+                        dmc.Group([dmc.Badge(t, size="xs") for t in d.tags], spacing=4),
+                    ],
+                    style={"rowGap": 3},
+                )
+            )
+        deployment_list = [location_information] + deployment_list
+        return dmc.Spoiler(
+            showLabel="Show All",
+            hideLabel="Hide",
+            maxHeight=60,
+            children=dmc.Stack(deployment_list, spacing=4),
+        )
+    return None
