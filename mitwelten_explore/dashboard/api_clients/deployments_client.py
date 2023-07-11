@@ -1,17 +1,20 @@
 from dashboard.utils.communication import CachedRequest, construct_url
+from dashboard.models import Deployment
 from configuration import DATA_API_URL
 
 cr = CachedRequest("deployments_cache", 60 * 60)
 
 
-def get_deployments(type_query=None, deployment_id=None):
+def get_deployments(type_query=None, deployment_id=None, typed=False):
     url = f"{DATA_API_URL}deployments"
     res = cr.get(url)
     if res.status_code == 200:
         deployments = res.json()
         if deployment_id:
+            if not isinstance(deployment_id, list):
+                deployment_id = [deployment_id]
             deployments = [
-                d for d in deployments if d.get("deployment_id") == deployment_id
+                d for d in deployments if d.get("deployment_id") in deployment_id
             ]
         if type_query:
             filtered_deployments = [
@@ -19,8 +22,12 @@ def get_deployments(type_query=None, deployment_id=None):
                 for d in deployments
                 if type_query in d.get("node").get("type").lower()
             ]
-            return filtered_deployments
-        return deployments
+            return (
+                filtered_deployments
+                if not typed
+                else [Deployment(d) for d in filtered_deployments]
+            )
+        return deployments if not typed else [Deployment(d) for d in deployments]
     return []
 
 

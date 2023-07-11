@@ -2,6 +2,7 @@ import datetime
 from enum import Enum
 from configuration import DEFAULT_AGGREGATION, DEFAULT_CONFIDENCE
 from dashboard.styles import icons, icon_urls
+from dashboard.utils.text_utils import format_datetime
 
 
 class AppUser:
@@ -102,6 +103,31 @@ class RankEnum(str, Enum):
         return rank_hierarchy_list.index(self.value) < rank_hierarchy_list.index(
             other.value
         )
+
+
+class Deployment:
+    def __init__(self, deployment_response: dict):
+        self.deployment_id = deployment_response.get("deployment_id")
+        description = deployment_response.get("description")
+        self.description = description if description else "-"
+        self.node_label = deployment_response.get("node").get("node_label")
+        self.node_type = deployment_response.get("node").get("type")
+        period = deployment_response.get("period")
+        self.period_start = format_datetime(period.get("start"))
+        self.period_end = (
+            format_datetime(period.get("end"))
+            if period.get("end") is not None
+            else "Active"
+        )
+
+        self.tags = (
+            [t.get("name") for t in deployment_response.get("tags")]
+            if deployment_response.get("tags") is not None
+            else []
+        )
+        location = deployment_response.get("location")
+        self.lat = location.get("lat")
+        self.lon = location.get("lon")
 
 
 class Taxon:
