@@ -15,7 +15,6 @@ from dashboard.api_clients.bird_results_client import get_detection_list_by_depl
 from dashboard.api_clients.pollinator_results_client import (
     get_polli_detection_list_by_deployment,
 )
-from dashboard.api_clients.userdata_client import post_annotation
 from dashboard.api_clients.deployments_client import (
     get_daily_image_captures,
     get_daily_audio_duration,
@@ -30,8 +29,9 @@ from dashboard.components.dataset_presentation import dataset_title
 from dashboard.components.modals import (
     viz_single_dataset_select_modal,
     generate_viz_deployment_select_modal_children,
-    share_modal,
 )
+from dashboard.common_callbacks import share_modal_callback, publish_annotation_callback
+
 from dashboard.components.affix import affix_menu, affix_button, datasource_affix
 from configuration import PATH_PREFIX, DEFAULT_CONFIDENCE, DEFAULT_TR_START
 from dashboard.charts.basic_charts import pie_chart, no_data_figure, spider_chart
@@ -679,12 +679,8 @@ def update_datasource(search, pn):
     State(ids.url, "search"),
     State(ids.url, "href"),
 )
-def show_modal(nc, search, href):
-    if nc is not None:
-        base_path = href.split("?")[0]
-        path_to_share = base_path + search
-        return share_modal(path_to_share)
-    return no_update
+def share_modal(nc, search, href):
+    return share_modal_callback(nc, search, href)
 
 
 # post annotation
@@ -704,57 +700,5 @@ def show_modal(nc, search, href):
 def publish_annotation(nc, search, pathname, data):
     if nc is not None:
         cookies = flask.request.cookies
-
-        user = get_user_from_cookies(cookies)
-
-        annot = Annotation(
-            user=user, url=pathname.split(PATH_PREFIX)[1] + search, **data
-        )
-        title_row = dmc.Group(
-            [
-                dmc.Text(annot.title, weight=600, size="xl"),
-                dmc.Group(
-                    [
-                        dmc.Text(annot.time_str, weight=300),
-                        dmc.Text(f"by {user.username}"),
-                    ]
-                ),
-            ],
-            position="apart",
-        )
-        if post_annotation(annotation=annot, auth_cookie=cookies.get("auth")):
-
-            return (
-                dmc.Modal(
-                    children=dmc.Card(
-                        [
-                            title_row,
-                            dmc.Space(h=12),
-                            dmc.Divider(pb=12),
-                            dcc.Markdown(data.get("md_content")),
-                        ],
-                        withBorder=True,
-                        style={"border": "1px solid green"},
-                    ),
-                    opened=True,
-                    title="Annotation published!",
-                    size="60%",
-                    zIndex=1000,
-                ),
-                1,
-            )
-        else:
-            return (
-                dmc.Modal(
-                    children=dmc.Alert(
-                        children="Something went wrong. Try again.", color="red"
-                    ),
-                    opened=True,
-                    title="Annotation published!",
-                    size="60%",
-                    zIndex=1000,
-                ),
-                no_update,
-            )
-
+        return publish_annotation_callback(cookies, nc, search, pathname, data)
     raise PreventUpdate

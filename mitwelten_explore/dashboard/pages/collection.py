@@ -99,7 +99,8 @@ list_legend = dmc.Card(
         )
     ],
     px=0,
-    py=4,
+    pt=4,
+    pb=12,
 )
 plaio = PagedListSearchableAIO(items=[], legend=list_legend)
 
