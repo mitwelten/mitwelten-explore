@@ -73,6 +73,19 @@ def post_annotation(annotation: Annotation, auth_cookie):
     return True
 
 
+def update_annotation(annot_id: int, annot_content: str, auth_cookie):
+    url = f"{DATA_API_URL}explore/annotations/{annot_id}"
+    res = requests.put(
+        url=url,
+        json=dict(content=annot_content),
+        headers={"Authorization": f"Bearer {auth_cookie}"},
+    )
+    if res.status_code == 200:
+        return True
+    else:
+        return False
+
+
 def delete_annotation(annot_id: int, auth_cookie):
     url = f"{DATA_API_URL}explore/annotations/{annot_id}"
     res = requests.delete(url=url, headers={"Authorization": f"Bearer {auth_cookie}"})

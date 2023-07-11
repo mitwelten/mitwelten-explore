@@ -10,6 +10,7 @@ from dashboard.api_clients.userdata_client import (
     get_annotation,
     get_annotation_by_user,
     delete_annotation,
+    update_annotation,
 )
 from dashboard.api_clients.taxonomy_client import get_taxon
 from dashboard.models import UrlSearchArgs, to_typed_dataset, Annotation, DatasetType
@@ -19,9 +20,26 @@ from dashboard.utils.communication import (
     qargs_to_dict,
     get_user_from_cookies,
 )
-from dashboard.utils.text_utils import beautify_timedelta, markdown_to_plain_text
+from dashboard.utils.text_utils import (
+    beautify_timedelta,
+    markdown_to_plain_text,
+    to_html,
+    to_markdown,
+)
 import datetime
 from uuid import uuid4
+
+
+import dash_quill
+
+DEFAULT_TOOLBAR_MODS = [
+    [{"header": "1"}, {"header": "2"}, "bold", "italic"],
+    [
+        {"list": "ordered"},
+        {"list": "bullet"},
+    ],
+    ["link"],
+]
 
 dash.register_page(__name__, path="/annotations")
 
@@ -32,6 +50,8 @@ class PageIds(object):
     delete_annot_role = str(uuid4())
     modal_div = str(uuid4())
     confirm_delete_role = str(uuid4())
+    texteditor = str(uuid4())
+    save_btn = str(uuid4())
 
 
 ids = PageIds()
@@ -48,12 +68,9 @@ def get_dataset_types(annot: Annotation):
                     ds_types.append(to_typed_dataset(ds).type)
             elif args.dataset is not None:
                 ds_types.append(to_typed_dataset(args.dataset).type)
-        if len(ds_types)==0:
+        if len(ds_types) == 0:
             if annot.url.startswith("viz/taxon/"):
                 ds_types.append(DatasetType.birds)
-                #taxon_id = annot.url.split("viz/taxon/")[1].split("?")[0]
-                #taxon = get_taxon(int(taxon_id))
-                #ds_types.append(taxon.get_title())
     return ds_types
 
 
@@ -216,7 +233,9 @@ def get_annotation_list(annotations):
     return items
 
 
-def annot_container(annot: Annotation, current_user_sub=None):
+def annot_container(
+    annot: Annotation, current_user_sub=None, href=None, edit_mode=False
+):
     ds_types = get_dataset_types(annot)
     time_range = get_dataset_time_range(annot)
     dashboard_time_range = (
@@ -226,168 +245,220 @@ def annot_container(annot: Annotation, current_user_sub=None):
     )
 
     delete_btn = None
+    edit_btn = None
+    cancel_btn = None
+    save_btn = None
     if current_user_sub == annot.user_sub:
         delete_btn = dmc.Button(
             color="red",
             children="Delete Annotation",
             id={"role": ids.delete_annot_role, "index": annot.id},
+            style={"display": "none"} if edit_mode else None,
         )
+        edit_btn = dmc.Anchor(
+            dmc.Button(
+                children="Edit",
+                leftIcon=get_icon(icons.edit_pen),
+                color="indigo",
+                disabled=edit_mode,
+            ),
+            href=f"{href}&edit=true" if not edit_mode else None,
+            style={"display": "none"} if edit_mode else None,
+        )
+        cancel_btn = dmc.Anchor(
+            dmc.Button(
+                children="Cancel",
+                color="gray",
+                disabled=edit_mode == False,
+            ),
+            href=f"{href.split('&edit')[0]}" if edit_mode else None,
+            style={"display": "none"} if edit_mode == False else None,
+        )
+        save_btn = dmc.Button(
+            children="Save",
+            id=ids.save_btn,
+            color="green",
+            style={"display": "none"} if edit_mode == False else None,
+        )
+
+    header = dmc.Anchor(
+        dmc.Group(
+            [
+                get_icon(icon=icons.arrow_back),
+                dmc.Text("Annotations", weight=500),
+            ]
+        ),
+        href=f"{PATH_PREFIX}annotations",
+    )
+    side_element = dmc.Card(
+        [
+            dmc.Stack(
+                [
+                    dmc.Stack(
+                        [
+                            dmc.Text(
+                                "Author",
+                                color="dimmed",
+                                size="sm",
+                            ),
+                            dmc.Anchor(
+                                [
+                                    dmc.Group(
+                                        [
+                                            dmc.Avatar(
+                                                annot.user.initials,
+                                                radius="xl",
+                                                color="blue",
+                                            ),
+                                            dmc.Stack(
+                                                [
+                                                    dmc.Text(
+                                                        annot.user.username,
+                                                        size="sm",
+                                                        weight=500,
+                                                    ),
+                                                    dmc.Text(
+                                                        annot.user.full_name,
+                                                        size="sm",
+                                                    ),
+                                                ],
+                                                spacing=0,
+                                            ),
+                                        ],
+                                        spacing="xs",
+                                    ),
+                                ],
+                                href=f"{PATH_PREFIX}annotations?q={annot.user.username}",
+                                variant="text",
+                            ),
+                        ],
+                        spacing=4,
+                    ),
+                    dmc.Stack(
+                        [
+                            dmc.Text(
+                                "Created at",
+                                color="dimmed",
+                                size="sm",
+                            ),
+                            dmc.Text(
+                                annot.time_str,
+                                size="sm",
+                            ),
+                        ],
+                        spacing=4,
+                    ),
+                    dmc.Stack(
+                        [
+                            dmc.Text(
+                                "Dashboard Reference",
+                                color="dimmed",
+                                size="sm",
+                            ),
+                            dmc.Anchor(
+                                dmc.Button(
+                                    "Open Dashboard",
+                                    color="teal",
+                                    variant="outline",
+                                    rightIcon=get_icon(icon=icons.open_in_new_tab),
+                                ),
+                                target="_blank",
+                                href=f"{PATH_PREFIX}{annot.url}",
+                                variant="text",
+                            ),
+                        ],
+                        spacing=4,
+                    ),
+                    dmc.Stack(
+                        [
+                            dmc.Text(
+                                "Datasets",
+                                color="dimmed",
+                                size="sm",
+                            ),
+                            dmc.Group(
+                                [
+                                    dmc.Badge(
+                                        t.value,
+                                        variant="outline",
+                                    )
+                                    for t in ds_types
+                                ],
+                                spacing=8,
+                                style={"rowGap": 8},
+                            ),
+                        ],
+                        spacing=4,
+                    ),
+                    dmc.Stack(
+                        [
+                            dmc.Text(
+                                "Dashboard Time Range",
+                                color="dimmed",
+                                size="sm",
+                            ),
+                            dashboard_time_range,
+                        ],
+                        spacing=4,
+                    ),
+                    dmc.Group([edit_btn, cancel_btn, save_btn, delete_btn]),
+                ]
+            )
+        ],
+        withBorder=False,
+        bg="transparent",
+    )
+    annot_content_card = dmc.Card(
+        [
+            dmc.Text(annot.title, weight=700, size="2rem"),
+            dmc.Space(h=2),
+            dmc.Divider(),
+            dmc.Space(h=6),
+            dmc.Group(
+                [
+                    dcc.Markdown(annot.md_content),
+                ],
+                noWrap=True,
+            ),
+        ],
+        withBorder=True,
+        style={"display": "none"} if edit_mode == True else None,
+    )
+    text_editor = dmc.Card(
+        [
+            dmc.Text(annot.title, weight=700, size="2rem"),
+            dmc.Space(h=12),
+            dmc.CardSection(
+                dash_quill.Quill(
+                    value=to_html(annot.md_content),
+                    id=ids.texteditor,
+                    maxLength=10000,
+                    modules={
+                        "toolbar": DEFAULT_TOOLBAR_MODS,
+                        "clipboard": {
+                            "matchVisual": True,
+                        },
+                    },
+                )
+            ),
+        ],
+        style={"display": "none"} if edit_mode == False else None,
+    )
     return dmc.Container(
         [
-            dmc.Anchor(
-                dmc.Group(
-                    [
-                        get_icon(icon=icons.arrow_back),
-                        dmc.Text("Annotations", weight=500),
-                    ]
-                ),
-                href=f"{PATH_PREFIX}annotations",
-            ),
+            header,
             dmc.Space(h=20),
             dmc.Container(
                 [
                     dmc.Grid(
                         [
                             dmc.Col(
-                                dmc.Card(
-                                    [
-                                        dmc.Text(annot.title, weight=700, size="2rem"),
-                                        dmc.Space(h=2),
-                                        dmc.Divider(),
-                                        dmc.Space(h=6),
-                                        dmc.Group(
-                                            [
-                                                dcc.Markdown(annot.md_content),
-                                            ],
-                                            noWrap=True,
-                                        ),
-                                    ],
-                                    withBorder=True,
-                                ),
+                                [annot_content_card, text_editor],
                                 className="col-md-9",
                             ),
                             dmc.Col(
                                 [
-                                    dmc.Card(
-                                        [
-                                            dmc.Stack(
-                                                [
-                                                    dmc.Stack(
-                                                        [
-                                                            dmc.Text(
-                                                                "Author",
-                                                                color="dimmed",
-                                                                size="sm",
-                                                            ),
-                                                            dmc.Anchor(
-                                                                [
-                                                                    dmc.Group(
-                                                                        [
-                                                                            dmc.Avatar(
-                                                                                annot.user.initials,
-                                                                                radius="xl",
-                                                                                color="blue",
-                                                                            ),
-                                                                            dmc.Stack(
-                                                                                [
-                                                                                    dmc.Text(
-                                                                                        annot.user.username,
-                                                                                        size="sm",
-                                                                                        weight=500,
-                                                                                    ),
-                                                                                    dmc.Text(
-                                                                                        annot.user.full_name,
-                                                                                        size="sm",
-                                                                                    ),
-                                                                                ],
-                                                                                spacing=0,
-                                                                            ),
-                                                                        ],
-                                                                        spacing="xs",
-                                                                    ),
-                                                                ],
-                                                                href=f"{PATH_PREFIX}annotations?q={annot.user.username}",
-                                                                variant="text",
-                                                            ),
-                                                        ],
-                                                        spacing=4,
-                                                    ),
-                                                    dmc.Stack(
-                                                        [
-                                                            dmc.Text(
-                                                                "Created at",
-                                                                color="dimmed",
-                                                                size="sm",
-                                                            ),
-                                                            dmc.Text(
-                                                                annot.time_str,
-                                                                size="sm",
-                                                            ),
-                                                        ],
-                                                        spacing=4,
-                                                    ),
-                                                    dmc.Stack(
-                                                        [
-                                                            dmc.Text(
-                                                                "Dashboard Reference",
-                                                                color="dimmed",
-                                                                size="sm",
-                                                            ),
-                                                            dmc.Anchor(
-                                                                dmc.Button(
-                                                                    "Open Dashboard",
-                                                                    color="teal",
-                                                                    variant="outline",
-                                                                    rightIcon=get_icon(
-                                                                        icon=icons.open_in_new_tab
-                                                                    ),
-                                                                ),
-                                                                target="_blank",
-                                                                href=f"{PATH_PREFIX}{annot.url}",
-                                                                variant="text",
-                                                            ),
-                                                        ],
-                                                        spacing=4,
-                                                    ),
-                                                    dmc.Stack(
-                                                        [
-                                                            dmc.Text(
-                                                                "Datasets",
-                                                                color="dimmed",
-                                                                size="sm",
-                                                            ),
-                                                            dmc.Group(
-                                                                [
-                                                                    dmc.Badge(
-                                                                        t.value,
-                                                                        variant="outline",
-                                                                    )
-                                                                    for t in ds_types
-                                                                ],
-                                                                spacing=8,
-                                                                style={"rowGap": 8},
-                                                            ),
-                                                        ],
-                                                        spacing=4,
-                                                    ),
-                                                    dmc.Stack(
-                                                        [
-                                                            dmc.Text(
-                                                                "Dashboard Time Range",
-                                                                color="dimmed",
-                                                                size="sm",
-                                                            ),
-                                                            dashboard_time_range,
-                                                        ],
-                                                        spacing=4,
-                                                    ),
-                                                    dmc.Group(delete_btn),
-                                                ]
-                                            )
-                                        ],
-                                        withBorder=False,
-                                        bg="transparent",
-                                    )
+                                    side_element,
                                 ],
                                 className="col-lg-3",
                             ),
@@ -454,21 +525,7 @@ annotation_skeleton = dmc.Card(
 )
 
 
-plaio = PagedListSearchableAIO(
-    items=[
-        annotation_skeleton,
-        dmc.Divider(),
-        annotation_skeleton,
-        dmc.Divider(),
-        annotation_skeleton,
-        dmc.Divider(),
-        annotation_skeleton,
-        dmc.Divider(),
-        annotation_skeleton,
-        dmc.Divider(),
-        annotation_skeleton,
-    ]
-)
+plaio = PagedListSearchableAIO(items=[annotation_skeleton, dmc.Divider()] * 6)
 
 
 def layout(**kwargs):
@@ -488,7 +545,7 @@ def layout(**kwargs):
             dcc.Location(id=ids.url, refresh=True),
             dmc.Group(
                 [
-                    dmc.Text("Annotations", weight=600 ,size="lg"),
+                    dmc.Text("Annotations", weight=600, size="lg"),
                     dmc.Anchor(
                         get_icon(icons.help, width=18),
                         href=f"{PATH_PREFIX}docs#annotations",
@@ -562,8 +619,38 @@ def update_annotation_container(search, href):
         raise PreventUpdate
     cookies = flask.request.cookies
     current_user = get_user_from_cookies(cookies)
+    edit_mode = "true" in qargs_dict.get("edit", "false").lower()
     annot = get_annotation(int(annot_id), cookies.get("auth"))
-    return annot_container(annot, current_user_sub=current_user.sub)
+    return annot_container(
+        annot, current_user_sub=current_user.sub, href=href, edit_mode=edit_mode
+    )
+
+
+# edit annotation
+@callback(
+    Output(ids.url, "href"),
+    Input(ids.save_btn, "n_clicks"),
+    State(ids.texteditor, "value"),
+    State(ids.url, "search"),
+    State(ids.url, "href"),
+)
+def update_annotation_content(nc, value, search, href):
+    if nc is not None:
+        if not "annot_id" in search:
+            raise PreventUpdate
+        qargs_dict = qargs_to_dict(search)
+        annot_id = qargs_dict.get("annot_id")
+        if annot_id is None:
+            raise PreventUpdate
+        cookies = flask.request.cookies
+        auth_cookie = cookies.get("auth")
+        annot_md_content = to_markdown(value)
+        if update_annotation(
+            annot_id=annot_id, annot_content=annot_md_content, auth_cookie=auth_cookie
+        ):
+            return href.split("&edit")[0]
+        raise PreventUpdate
+    raise PreventUpdate
 
 
 @callback(
