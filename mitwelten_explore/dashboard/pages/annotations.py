@@ -13,7 +13,13 @@ from dashboard.api_clients.userdata_client import (
     update_annotation,
 )
 from dashboard.api_clients.taxonomy_client import get_taxon
-from dashboard.models import UrlSearchArgs, to_typed_dataset, Annotation, DatasetType
+from dashboard.models import (
+    UrlSearchArgs,
+    to_typed_dataset,
+    Annotation,
+    DatasetType,
+    AppUser,
+)
 from dashboard.styles import icons, get_icon
 from dashboard.utils.communication import (
     parse_nested_qargs,
@@ -234,7 +240,7 @@ def get_annotation_list(annotations):
 
 
 def annot_container(
-    annot: Annotation, current_user_sub=None, href=None, edit_mode=False
+    annot: Annotation, current_user: AppUser = None, href=None, edit_mode=False
 ):
     ds_types = get_dataset_types(annot)
     time_range = get_dataset_time_range(annot)
@@ -248,13 +254,21 @@ def annot_container(
     edit_btn = None
     cancel_btn = None
     save_btn = None
-    if current_user_sub == annot.user_sub:
+    if "explore_admin" in current_user.roles:
         delete_btn = dmc.Button(
             color="red",
             children="Delete Annotation",
             id={"role": ids.delete_annot_role, "index": annot.id},
             style={"display": "none"} if edit_mode else None,
         )
+    if current_user.sub == annot.user_sub:
+        if delete_btn is None:
+            delete_btn = dmc.Button(
+                color="red",
+                children="Delete Annotation",
+                id={"role": ids.delete_annot_role, "index": annot.id},
+                style={"display": "none"} if edit_mode else None,
+            )
         edit_btn = dmc.Anchor(
             dmc.Button(
                 children="Edit",
@@ -622,7 +636,7 @@ def update_annotation_container(search, href):
     edit_mode = "true" in qargs_dict.get("edit", "false").lower()
     annot = get_annotation(int(annot_id), cookies.get("auth"))
     return annot_container(
-        annot, current_user_sub=current_user.sub, href=href, edit_mode=edit_mode
+        annot, current_user=current_user, href=href, edit_mode=edit_mode
     )
 
 
