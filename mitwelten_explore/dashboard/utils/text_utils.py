@@ -1,5 +1,50 @@
+import base64
+import bleach
+
 import datetime
+import markdown
+from markdownify import markdownify
 import re
+
+DEFAULT_OK_TAGS = [
+    "h1",
+    "h2",
+    "a",
+    "img",
+    "strong",
+    "b",
+    "em",
+    "i",
+    "",
+    "ul",
+    "li",
+    "p",
+    "br",
+    "ol",
+    "blockquote",
+    "code",
+    "u",
+]
+DEFAULT_OK_ATTRIBUTES = {"a": ["href", "rel", "target"], "img": ["src", "alt", "title"]}
+
+
+def to_markdown(html_content):
+    clean_value = bleach.clean(
+        html_content, tags=DEFAULT_OK_TAGS, attributes=DEFAULT_OK_ATTRIBUTES
+    )
+    return markdownify(clean_value, heading_style="ATX")
+
+
+def to_html(md_content):
+    return markdown.markdown(md_content)
+
+
+def to_base64(content):
+    return base64.b64encode(content.encode()).decode()
+
+
+def from_base64(encoded_content):
+    return base64.b64decode(encoded_content.encode()).decode()
 
 
 def format_datetime(datetime_str):

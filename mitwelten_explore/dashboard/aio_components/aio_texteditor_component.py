@@ -13,38 +13,14 @@ from dash import (
     clientside_callback,
     ClientsideFunction,
 )
-import bleach
 from dash_iconify import DashIconify
 import datetime
 import uuid
 import dash_mantine_components as dmc
 import dash_bootstrap_components as dbc
-from markdownify import markdownify
 from dash.exceptions import PreventUpdate
-import base64
+from dashboard.utils.text_utils import to_base64, from_base64, to_markdown
 
-# TODO: Move html to md converting to utils
-
-DEFAULT_OK_TAGS = [
-    "h1",
-    "h2",
-    "a",
-    "img",
-    "strong",
-    "b",
-    "em",
-    "i",
-    "",
-    "ul",
-    "li",
-    "p",
-    "br",
-    "ol",
-    "blockquote",
-    "code",
-    "u",
-]
-DEFAULT_OK_ATTRIBUTES = {"a": ["href", "rel", "target"], "img": ["src", "alt", "title"]}
 
 DEFAULT_TOOLBAR_MODS = [
     [{"header": "1"}, {"header": "2"}, "bold", "italic"],
@@ -54,21 +30,6 @@ DEFAULT_TOOLBAR_MODS = [
     ],
     ["link"],
 ]
-
-
-def to_base64(content):
-    return base64.b64encode(content.encode()).decode()
-
-
-def from_base64(encoded_content):
-    return base64.b64decode(encoded_content.encode()).decode()
-
-
-def to_markdown(html_content):
-    clean_value = bleach.clean(
-        html_content, tags=DEFAULT_OK_TAGS, attributes=DEFAULT_OK_ATTRIBUTES
-    )
-    return markdownify(clean_value, heading_style="ATX")
 
 
 class TextEditorAIO(html.Div):
@@ -143,8 +104,6 @@ class TextEditorAIO(html.Div):
 
     def __init__(
         self,
-        allowed_tags=DEFAULT_OK_TAGS,
-        allowed_attributes=DEFAULT_OK_ATTRIBUTES,
         toolbar_mods=DEFAULT_TOOLBAR_MODS,
         store_props=dict(storage_type="local"),
         aio_id=None,
@@ -152,7 +111,7 @@ class TextEditorAIO(html.Div):
         self.aio_id = aio_id if aio_id is not None else str(uuid.uuid4())
         self.store_props = store_props.copy() if store_props else {}
 
-        default_html = ""#"""<p>describe what you have found...</p><br><br><br>"""
+        default_html = ""  # """<p>describe what you have found...</p><br><br><br>"""
         tabs = dmc.Tabs(
             [
                 dmc.Space(h=12),
@@ -368,11 +327,7 @@ class TextEditorAIO(html.Div):
             valueb64 = data.get("content")
             if valueb64 is not None:
                 value = from_base64(valueb64)
-
-                clean_value = bleach.clean(
-                    value, tags=DEFAULT_OK_TAGS, attributes=DEFAULT_OK_ATTRIBUTES
-                )
-                h = markdownify(clean_value, heading_style="ATX")
+                h = to_markdown(value)
                 mod_time = data.get("time")
                 time_str = None
                 if mod_time is not None:
@@ -402,7 +357,6 @@ class TextEditorAIO(html.Div):
     )
     def clear_input_fields(ts, data):
         if data is not None:
-            print(data)
             return "", "", None
         raise PreventUpdate
 
