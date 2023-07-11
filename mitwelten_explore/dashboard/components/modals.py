@@ -12,6 +12,7 @@ from dashboard.api_clients.pollinator_results_client import (
 )
 from dashboard.api_clients.gbif_cache_client import get_gbif_detection_count
 from dashboard.api_clients.environment_entries_client import get_legend
+from dashboard.components.dataset_presentation import deployment_info_spoiler
 from dashboard.components.labels import badge_de, badge_en
 from dashboard.components.selects import agg_fcn_select, confidence_threshold_select
 
@@ -49,84 +50,45 @@ def viz_single_dataset_select_modal(opened, id="select_ts_modal"):
 
 
 def generate_viz_timeseries_select_modal_children(store_data):
-    print("todo: move to classes")
     if store_data is None:
         return []
 
     list_entries = []
     for i in range(len(store_data)):
         data = store_data[i]
-        trace_type = data.get("type")
         ds = to_typed_dataset(store_data[i])
-        trace_id = None
-        icon = None
-        description = None
-        location_name = None
-        single_viz_url = None
-        unit = None
-        if trace_type == DatasetType.meteodata:
-            trace_id = dmc.Code(data.get("param_id"))
-            icon = get_icon(icon=icons.meteoswiss, width=32)
-            description = dmc.Text(data.get("param_desc"), size="md")
-            unit = dmc.Badge(data.get("unit"), color="teal")
 
-            location_name = dmc.Text(data.get("station_name"), size="sm")
-
-        elif trace_type == DatasetType.birds:
-            trace_id = dmc.Code(data.get("datum_id"))
-            icon = get_icon(icon="game-icons:seagull", width=32)
-            description = dmc.Text(data.get("label_sci"), size="md")
-            unit = dmc.Badge(data.get("rank"), color="teal")
-
-            location_name = dmc.Text("Mitwelten Deployments", size="sm")
-        elif trace_type == DatasetType.distinct_species:
-            trace_id = dmc.Code(ds.get_id())
-            icon = get_icon(ds.get_icon(), width=32)
-            description = dmc.Text(ds.get_title(), size="md")
-            unit = dmc.Badge(ds.get_unit(), color="teal")
-
-            location_name = dmc.Text(ds.get_location(), size="sm")
-
-        elif ds.type == DatasetType.gbif_observations:
-            trace_id = dmc.Code(ds.get_id())
-            icon = get_icon(icon=ds.get_icon(), width=32)
-            description = dmc.Text(ds.get_title(), size="md")
-            unit = dmc.Badge(ds.get_unit(), color="teal")
-            location_name = dmc.Text(ds.get_location(), size="sm")
-
-        elif trace_type == DatasetType.pax:
-            trace_id = dmc.Code(data.get("node_label"))
-            icon = get_icon(icon=icons.pax_counter, width=32)
-            description = dmc.Text("Pax Counter", size="md")
-            unit = dmc.Badge("PAX", color="teal")
-
-            location_name = dmc.Text(
-                f"Mitwelten Deployment {data.get('deployment_id')}", size="sm"
-            )
-        elif trace_type == DatasetType.pollinators:
-            ds = PollinatorDataset(**data)
-            trace_id = dmc.Code(ds.get_unit())
-            icon = get_icon(icon=icons.bee, width=32)
-            description = dmc.Text(ds.get_title(), size="md")
-            unit = dmc.Badge(ds.get_unit(), color="teal")
-
-            location_name = dmc.Text(ds.get_location(), size="sm")
-
-        elif trace_type in [
+        if not ds.type in [
+            DatasetType.meteodata,
+            DatasetType.birds,
+            DatasetType.distinct_species,
+            DatasetType.gbif_observations,
+            DatasetType.pax,
+            DatasetType.pollinators,
             DatasetType.env_humi,
             DatasetType.env_temp,
             DatasetType.env_moist,
         ]:
-            trace_id = dmc.Code(data.get("node_label"))
-            icon = get_icon(icon=icons.env_sensors, width=32)
-            description = dmc.Text(data.get("param_desc"), size="md")
-            unit = dmc.Badge(data.get("unit"), color="teal")
-
-            location_name = dmc.Text(
-                f"Mitwelten Deployment {data.get('deployment_id')}", size="sm"
-            )
-        else:
             continue
+
+        location_name = dmc.Group(
+            [
+                get_icon(icon=icons.location_marker),
+                dmc.Text(ds.get_location(), size="md"),
+            ],
+            spacing=2,
+        )
+        if ds.type in [
+            DatasetType.distinct_species,
+            DatasetType.pollinators,
+            DatasetType.pax,
+            DatasetType.multi_pax,
+            DatasetType.env_humi,
+            DatasetType.env_moist,
+            DatasetType.env_temp,
+        ]:
+            if ds.deployment_id is not None:
+                location_name = deployment_info_spoiler(ds.deployment_id, location_name)
 
         single_viz_url = (
             f"{PATH_PREFIX}viz/timeseries?{urlencode_dict(dict(trace=data))}"
@@ -134,29 +96,47 @@ def generate_viz_timeseries_select_modal_children(store_data):
         if i > 0:
             list_entries.append(dmc.Divider())
         list_entries.append(
-            dmc.Anchor(
+            dmc.Grid(
                 [
-                    dmc.Grid(
-                        [
-                            dmc.Col(dmc.Group([icon, trace_id]), span=2),
-                            dmc.Col(dmc.Group([description, unit]), span=7),
-                            dmc.Col(
-                                dmc.Group(
-                                    [
-                                        get_icon(
-                                            icon="material-symbols:location-on-outline"
+                    dmc.Col(
+                        dmc.Anchor(
+                            dmc.Grid(
+                                [
+                                    dmc.Col(
+                                        dmc.Group(
+                                            [
+                                                get_icon(ds.get_icon(), width=32),
+                                                dmc.Code(ds.get_id()),
+                                            ]
                                         ),
-                                        location_name,
-                                    ],
-                                    spacing=4,
-                                ),
-                                span=3,
+                                        span=3,
+                                    ),
+                                    dmc.Col(
+                                        dmc.Group(
+                                            [
+                                                dmc.Text(ds.get_title(), size="md"),
+                                                dmc.Badge(ds.get_unit(), color="teal"),
+                                            ]
+                                        ),
+                                        span=9,
+                                    ),
+                                ]
                             ),
-                        ]
-                    )
-                ],
-                href=single_viz_url,
-                variant="text",
+                            href=single_viz_url,
+                            variant="text",
+                        ),
+                        span=6,
+                    ),
+                    dmc.Col(
+                        dmc.Group(
+                            [
+                                location_name,
+                            ],
+                            spacing=4,
+                        ),
+                        span=6,
+                    ),
+                ]
             )
         )
     return list_entries
@@ -183,132 +163,70 @@ def generate_viz_map_select_modal_children(store_data, id_role):
     list_entries = []
     for i in range(len(store_data)):
         ds = to_typed_dataset(store_data[i])
-        if ds.type == DatasetType.birds:
-            trace_id = dmc.Code(ds.datum_id)
-            icon = get_icon(ds.get_icon(), width=32)
-            description_components = [dmc.Text(ds.label_sci, size="md")]
-            if ds.label_en:
-                description_components.append(dmc.Text(ds.label_en, size="xs"))
-            if ds.label_de:
-                description_components.append(dmc.Text(ds.label_de, size="xs"))
-            unit = dmc.Badge(ds.rank.value, color="teal")
-            description = dmc.Group(description_components, spacing="xs")
-            location_name = dmc.Text("Mitwelten Deployments", size="sm")
-            list_entries.append(
-                dmc.Grid(
-                    [
-                        dmc.Col(
-                            dmc.Group(
-                                [
-                                    dmc.Checkbox(
-                                        color="teal",
-                                        id={
-                                            "role": id_role,
-                                            "index": str(store_data[i]),
-                                        },
-                                        checked=False,
-                                    ),
-                                    icon,
-                                    trace_id,
-                                ]
-                            ),
-                            span=2,
-                        ),
-                        dmc.Col(dmc.Group([description, unit]), span=7),
-                        dmc.Col(
-                            dmc.Group(
-                                [
-                                    get_icon(icon=icons.location_marker),
-                                    location_name,
-                                ],
-                                spacing=4,
-                            ),
-                            span=3,
-                        ),
-                    ]
-                )
-            )
-        elif ds.type == DatasetType.distinct_species:
-            trace_id = dmc.Code(ds.get_id())
-            icon = get_icon(ds.get_icon(), width=32)
+        if not ds.type in [
+            DatasetType.birds,
+            DatasetType.distinct_species,
+            DatasetType.gbif_observations,
+        ]:
+            continue
 
-            unit = dmc.Badge(ds.get_unit(), color="teal")
-            location_name = dmc.Text(ds.get_location(), size="sm")
-            description = dmc.Text(ds.get_title())
-            list_entries.append(
-                dmc.Grid(
-                    [
-                        dmc.Col(
-                            dmc.Group(
-                                [
-                                    dmc.Checkbox(
-                                        color="teal",
-                                        id={
-                                            "role": id_role,
-                                            "index": str(store_data[i]),
-                                        },
-                                        checked=False,
-                                    ),
-                                    icon,
-                                    trace_id,
-                                ]
-                            ),
-                            span=2,
+        location_name = dmc.Group(
+            [
+                get_icon(icon=icons.location_marker),
+                dmc.Text(ds.get_location(), size="md"),
+            ],
+            spacing=2,
+        )
+        if ds.type in [
+            DatasetType.distinct_species,
+            DatasetType.pollinators,
+            DatasetType.pax,
+            DatasetType.env_humi,
+            DatasetType.env_moist,
+            DatasetType.env_temp,
+        ]:
+            if ds.deployment_id is not None:
+                location_name = deployment_info_spoiler(ds.deployment_id, location_name)
+
+        list_entries.append(
+            dmc.Grid(
+                [
+                    dmc.Col(
+                        dmc.Group(
+                            [
+                                dmc.Checkbox(
+                                    color="teal",
+                                    id={
+                                        "role": id_role,
+                                        "index": str(store_data[i]),
+                                    },
+                                    checked=False,
+                                ),
+                                get_icon(ds.get_icon(), width=32),
+                                dmc.Code(ds.get_id()),
+                            ]
                         ),
-                        dmc.Col(dmc.Group([description, unit]), span=7),
-                        dmc.Col(
-                            dmc.Group(
-                                [
-                                    get_icon(icon=icons.location_marker),
-                                    location_name,
-                                ],
-                                spacing=4,
-                            ),
-                            span=3,
+                        span=2,
+                    ),
+                    dmc.Col(
+                        dmc.Group(
+                            [
+                                dmc.Text(ds.get_title()),
+                                dmc.Badge(ds.get_unit(), color="teal"),
+                            ]
                         ),
-                    ]
-                )
+                        span=5,
+                    ),
+                    dmc.Col(
+                        location_name,
+                        span=5,
+                    ),
+                ]
             )
-        elif ds.type == DatasetType.gbif_observations:
-            trace_id = dmc.Code(ds.datum_id)
-            icon = get_icon(ds.get_icon(), width=32)
-            description = dmc.Text(ds.get_title(), size="md")
-            unit = dmc.Badge(ds.rank.value, color="teal")
-            location_name = dmc.Text(ds.get_location(), size="sm")
-            list_entries.append(
-                dmc.Grid(
-                    [
-                        dmc.Col(
-                            dmc.Group(
-                                [
-                                    dmc.Checkbox(
-                                        color="teal",
-                                        id={
-                                            "role": id_role,
-                                            "index": str(store_data[i]),
-                                        },
-                                        checked=False,
-                                    ),
-                                    icon,
-                                    trace_id,
-                                ]
-                            ),
-                            span=2,
-                        ),
-                        dmc.Col(dmc.Group([description, unit]), span=7),
-                        dmc.Col(
-                            dmc.Group(
-                                [
-                                    get_icon(icon=icons.location_marker),
-                                    location_name,
-                                ],
-                                spacing=4,
-                            ),
-                            span=3,
-                        ),
-                    ]
-                )
-            )
+        )
+        if i > 0:
+            list_entries.append(dmc.Divider())
+
     environment_legend = get_legend()
     default_datasets = [MultiPaxDataset()]
     for key in environment_legend.keys():
@@ -350,7 +268,7 @@ def generate_viz_map_select_modal_children(store_data, id_role):
                                 dmc.Badge(ds.get_unit(), color="teal"),
                             ]
                         ),
-                        span=7,
+                        span=5,
                     ),
                     dmc.Col(
                         dmc.Group(
@@ -360,95 +278,50 @@ def generate_viz_map_select_modal_children(store_data, id_role):
                             ],
                             spacing=4,
                         ),
-                        span=3,
+                        span=5,
                     ),
                 ]
             )
         )
+        list_entries.append(dmc.Divider())
     return list_entries
 
 
 def generate_viz_compare_select_modal_children(store_data, id_role):
-    print("todo: move to classes")
     if store_data is None:
         return []
-
     list_entries = []
     for i in range(len(store_data)):
         ds = to_typed_dataset(store_data[i])
-        data = store_data[i]
-        trace_type = data.get("type")
-        trace_id = None
-        icon = None
-        description = None
-        location_name = None
-        single_viz_url = None
-        unit = None
-        if ds.type == DatasetType.meteodata:
-            trace_id = dmc.Code(data.get("param_id"))
-            icon = get_icon(icon=icons.meteoswiss, width=32)
-            description = dmc.Text(data.get("param_desc"), size="md")
-            unit = dmc.Badge(data.get("unit"), color="teal")
-
-            location_name = dmc.Text(data.get("station_name"), size="sm")
-
-        elif ds.type == DatasetType.birds:
-            trace_id = dmc.Code(data.get("datum_id"))
-            icon = get_icon(ds.get_icon(), width=32)
-            description = dmc.Text(data.get("label_sci"), size="md")
-            unit = dmc.Badge(data.get("rank"), color="teal")
-
-            location_name = dmc.Text("Mitwelten Deployments", size="sm")
-        elif ds.type == DatasetType.distinct_species:
-            trace_id = dmc.Code(ds.get_id())
-            icon = get_icon(ds.get_icon(), width=32)
-            description = dmc.Text(ds.get_title(), size="md")
-            unit = dmc.Badge(ds.get_unit(), color="teal")
-
-            location_name = dmc.Text(ds.get_location(), size="sm")
-
-        elif ds.type == DatasetType.gbif_observations:
-            trace_id = dmc.Code(ds.get_id())
-            icon = get_icon(icon=ds.get_icon(), width=32)
-            description = dmc.Text(ds.get_title(), size="md")
-            unit = dmc.Badge(ds.get_unit(), color="teal")
-            location_name = dmc.Text(ds.get_location(), size="sm")
-
-        elif ds.type == DatasetType.pax:
-            trace_id = dmc.Code(data.get("node_label"))
-            icon = get_icon(icon=icons.pax_counter, width=32)
-            description = dmc.Text("Pax Counter", size="md")
-            unit = dmc.Badge("PAX", color="teal")
-
-            location_name = dmc.Text(
-                f"Mitwelten Deployment {data.get('deployment_id')}", size="sm"
-            )
-
-        elif ds.type in [
+        if not ds.type in [
+            DatasetType.pollinators,
+            DatasetType.pax,
+            DatasetType.meteodata,
+            DatasetType.birds,
+            DatasetType.gbif_observations,
+            DatasetType.distinct_species,
             DatasetType.env_humi,
             DatasetType.env_temp,
             DatasetType.env_moist,
         ]:
-            trace_id = dmc.Code(data.get("node_label"))
-            icon = get_icon(icon=icons.env_sensors, width=32)
-            description = dmc.Text(data.get("param_desc"), size="md")
-            unit = dmc.Badge(data.get("unit"), color="teal")
-
-            location_name = dmc.Text(
-                f"Mitwelten Deployment {data.get('deployment_id')}", size="sm"
-            )
-
-        elif ds.type == DatasetType.pollinators:
-            ds = PollinatorDataset(**data)
-            trace_id = dmc.Code(ds.get_unit())
-            icon = get_icon(icon=icons.bee, width=32)
-            description = dmc.Text(ds.get_title(), size="md")
-            unit = dmc.Badge(ds.get_unit(), color="teal")
-
-            location_name = dmc.Text(ds.get_location(), size="sm")
-
-        else:
             continue
+        location_name = dmc.Group(
+            [
+                get_icon(icon=icons.location_marker),
+                dmc.Text(ds.get_location(), size="md"),
+            ],
+            spacing=2,
+        )
+        if ds.type in [
+            DatasetType.distinct_species,
+            DatasetType.pollinators,
+            DatasetType.pax,
+            DatasetType.env_humi,
+            DatasetType.env_moist,
+            DatasetType.env_temp,
+        ]:
+            if ds.deployment_id is not None:
+                location_name = deployment_info_spoiler(ds.deployment_id, location_name)
 
         if i > 0:
             list_entries.append(dmc.Divider())
@@ -460,30 +333,101 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
                             [
                                 dmc.Checkbox(
                                     color="teal",
-                                    id={"role": id_role, "index": str(data)},
+                                    id={"role": id_role, "index": str(store_data[i])},
                                     checked=False,
                                 ),
-                                icon,
-                                trace_id,
+                                get_icon(icon=ds.get_icon(), width=32),
+                                dmc.Code(ds.get_id()),
                             ]
                         ),
                         span=2,
                     ),
-                    # dmc.Col(dmc.Group([icon, trace_id]), span=2),
-                    dmc.Col(dmc.Group([description, unit]), span=7),
                     dmc.Col(
                         dmc.Group(
                             [
-                                get_icon(icon=icons.location_marker),
-                                location_name,
-                            ],
-                            spacing=4,
+                                dmc.Text(ds.get_title(), size="md"),
+                                dmc.Badge(ds.get_unit(), color="teal"),
+                            ]
                         ),
-                        span=3,
+                        span=5,
+                    ),
+                    dmc.Col(
+                        location_name,
+                        span=5,
                     ),
                 ]
             )
         )
+    return list_entries
+
+
+def generate_viz_deployment_select_modal_children(store_data):
+    if store_data is None:
+        return []
+
+    list_entries = []
+    for i in range(len(store_data)):
+        ds = to_typed_dataset(store_data[i])
+        if ds.type in [DatasetType.distinct_species, DatasetType.pollinators]:
+
+            location_name = dmc.Group(
+                [
+                    get_icon(icon=icons.location_marker),
+                    dmc.Text(ds.get_location(), size="md"),
+                ],
+                spacing=2,
+            )
+            if ds.deployment_id is not None:
+                location_name = deployment_info_spoiler(ds.deployment_id, location_name)
+
+            deployment_viz_url = f"{PATH_PREFIX}viz/deployment?{urlencode_dict(dict(dataset=ds.to_dataset()))}"
+            if i > 0:
+                list_entries.append(dmc.Divider())
+            list_entries.append(
+                dmc.Grid(
+                    [
+                        dmc.Col(
+                            dmc.Anchor(
+                                dmc.Grid(
+                                    [
+                                        dmc.Col(
+                                            dmc.Group(
+                                                [
+                                                    get_icon(
+                                                        icon=ds.get_icon(), width=32
+                                                    ),
+                                                    dmc.Code(ds.get_id()),
+                                                ]
+                                            ),
+                                            span=3,
+                                        ),
+                                        dmc.Col(
+                                            dmc.Group(
+                                                [
+                                                    dmc.Text(ds.get_title(), size="md"),
+                                                    dmc.Badge(
+                                                        ds.get_unit(), color="teal"
+                                                    ),
+                                                ]
+                                            ),
+                                            span=9,
+                                        ),
+                                    ]
+                                ),
+                                href=deployment_viz_url,
+                                variant="text",
+                            ),
+                            span=6,
+                        ),
+                        dmc.Col(
+                            location_name,
+                            span=6,
+                        ),
+                    ]
+                )
+            )
+        else:
+            continue
     return list_entries
 
 
@@ -782,50 +726,3 @@ def confirm_dialog(id, submit_id, text=None, title="Are you sure you want to con
         title=dmc.Text(title, weight=500),
         opened=True,
     )
-
-
-def generate_viz_deployment_select_modal_children(store_data):
-    if store_data is None:
-        return []
-
-    list_entries = []
-    for i in range(len(store_data)):
-        ds = to_typed_dataset(store_data[i])
-        if ds.type in [DatasetType.distinct_species, DatasetType.pollinators]:
-            trace_id = dmc.Code(ds.get_id())
-            icon = get_icon(icon=ds.get_icon(), width=32)
-            description = dmc.Text(ds.get_title(), size="md")
-            unit = dmc.Badge(ds.get_unit(), color="teal")
-
-            location_name = dmc.Text(ds.get_location(), size="sm")
-
-            deployment_viz_url = f"{PATH_PREFIX}viz/deployment?{urlencode_dict(dict(dataset=ds.to_dataset()))}"
-            if i > 0:
-                list_entries.append(dmc.Divider())
-            list_entries.append(
-                dmc.Anchor(
-                    [
-                        dmc.Grid(
-                            [
-                                dmc.Col(dmc.Group([icon, trace_id]), span=2),
-                                dmc.Col(dmc.Group([description, unit]), span=7),
-                                dmc.Col(
-                                    dmc.Group(
-                                        [
-                                            get_icon(icon=icons.location_marker),
-                                            location_name,
-                                        ],
-                                        spacing=4,
-                                    ),
-                                    span=3,
-                                ),
-                            ]
-                        )
-                    ],
-                    href=deployment_viz_url,
-                    variant="text",
-                )
-            )
-        else:
-            continue
-    return list_entries

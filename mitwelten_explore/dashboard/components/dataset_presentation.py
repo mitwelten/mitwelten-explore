@@ -494,7 +494,7 @@ def deployment_info_spoiler(deployment_ids, location_information=None):
         return dmc.Spoiler(
             showLabel="Show All",
             hideLabel="Hide",
-            maxHeight=60,
-            children=dmc.Stack(deployment_list, spacing=4),
+            maxHeight=80,
+            children=dmc.Stack(deployment_list, spacing=6),
         )
     return None
