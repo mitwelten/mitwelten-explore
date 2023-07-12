@@ -8,7 +8,10 @@ from dashboard.styles import icons, get_icon
 from dashboard.components.navbar import ThemeSwitchAIO
 from uuid import uuid4
 from dashboard.aio_components.aio_time_range_picker_component import TimeRangeAIO
-from dashboard.aio_components.aio_list_component import PagedListSearchableAIO
+from dashboard.aio_components.aio_list_component import (
+    PagedListSearchableAIO,
+    SearchableListAIO,
+)
 from dashboard.aio_components.aio_texteditor_component import TextEditorAIO
 from dashboard.components.overlays import chart_loading_overlay, datasource_indicator
 from dashboard.api_clients.bird_results_client import get_detection_list_by_deployment
@@ -475,12 +478,7 @@ def update_select_modal(is_open, data):
             ]
         return dmc.Stack(
             [
-                dmc.ScrollArea(
-                    dmc.Stack(collected_traces),
-                    offsetScrollbars=True,
-                    type="scroll",
-                    style={"height": "60vh"},
-                ),
+                SearchableListAIO(items=collected_traces, height="60vh"),
                 dmc.Group(
                     dmc.Anchor(
                         dmc.Button("Cancel", color="gray", variant="outline"),

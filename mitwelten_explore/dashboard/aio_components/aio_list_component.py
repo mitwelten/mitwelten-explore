@@ -160,7 +160,7 @@ class PagedListSearchableAIO(html.Div):
                         className="d-flex w-100",
                     ),
                     fluid=True,
-                    px=0
+                    px=0,
                 ),
             ]
         )
@@ -178,7 +178,9 @@ class PagedListSearchableAIO(html.Div):
         State(ids.config_store(MATCH), "data"),
         Input(ids.search_input_store(MATCH), "data"),
     )
-    def update_pager_on_new_data(page, ts, query, clear_btn, data, items_per_page, search_input_store):
+    def update_pager_on_new_data(
+        page, ts, query, clear_btn, data, items_per_page, search_input_store
+    ):
         trg = ctx.triggered_id
         if trg is not None:
             items_per_page = items_per_page if items_per_page else 20
@@ -354,5 +356,142 @@ class PagedListAIO(html.Div):
                         spacing=STACK_SPACING,
                     ),
                 )
+
+        raise PreventUpdate
+
+
+class SearchableListAIO(html.Div):
+    class ids:
+        store = lambda aio_id: {
+            "component": "SearchableListAIO",
+            "subcomponent": "store",
+            "aio_id": aio_id,
+        }
+
+        scroll_area = lambda aio_id: {
+            "component": "SearchableListAIO",
+            "subcomponent": "scroll_area",
+            "aio_id": aio_id,
+        }
+        search_input = lambda aio_id: {
+            "component": "SearchableListAIO",
+            "subcomponent": "search_input",
+            "aio_id": aio_id,
+        }
+        search_input_store = lambda aio_id: {
+            "component": "SearchableListAIO",
+            "subcomponent": "search_input_store",
+            "aio_id": aio_id,
+        }
+        clear_input_btn = lambda aio_id: {
+            "component": "SearchableListAIO",
+            "subcomponent": "clear_input_btn",
+            "aio_id": aio_id,
+        }
+
+    ids = ids
+
+    def __init__(
+        self,
+        items=[],
+        legend=None,
+        store_props=None,  # dict(storage_type="local"),
+        aio_id=None,
+        height="90vh",
+        use_loadingoverlay=True,
+    ):
+        self.aio_id = aio_id if aio_id is not None else str(uuid.uuid4())
+        self.store_props = store_props.copy() if store_props else {}
+
+        if use_loadingoverlay:
+            scrollarea = dmc.ScrollArea(
+                className="flex-grow-1",
+                children=dmc.LoadingOverlay(
+                    id=self.ids.scroll_area(self.aio_id),
+                    children=dmc.Stack(items, spacing=STACK_SPACING),
+                ),
+                type="scroll",
+            )
+        else:
+            scrollarea = dmc.ScrollArea(
+                className="flex-grow-1",
+                id=self.ids.scroll_area(self.aio_id),
+                children=dmc.Stack(items, spacing=STACK_SPACING),
+                type="scroll",
+            )
+
+        super().__init__(
+            [
+                dcc.Store(
+                    data=items,
+                    id=self.ids.store(self.aio_id),
+                    **self.store_props,
+                ),
+                dcc.Store(
+                    data=None,
+                    id=self.ids.search_input_store(self.aio_id),
+                ),
+                dmc.Container(
+                    dmc.Stack(
+                        [
+                            dmc.TextInput(
+                                # label="Search in Results",
+                                id=self.ids.search_input(self.aio_id),
+                                icon=DashIconify(icon="ic:sharp-search"),
+                                rightSection=dmc.ActionIcon(
+                                    DashIconify(icon="ic:outline-clear"),
+                                    variant="transparent",
+                                    id=self.ids.clear_input_btn(self.aio_id),
+                                ),
+                            ),
+                            legend,
+                            scrollarea,
+                        ],
+                        style=dict(height=height),
+                        className="d-flex w-100",
+                    ),
+                    fluid=True,
+                    px=0,
+                ),
+            ]
+        )
+
+    @callback(
+        # Output(ids.pager(MATCH), "page"),
+        # Output(ids.pager(MATCH), "total"),
+        Output(ids.scroll_area(MATCH), "children"),
+        Output(ids.search_input(MATCH), "value"),
+        Input(ids.store(MATCH), "modified_timestamp"),
+        Input(ids.search_input(MATCH), "value"),
+        Input(ids.clear_input_btn(MATCH), "n_clicks"),
+        State(ids.store(MATCH), "data"),
+        Input(ids.search_input_store(MATCH), "data"),
+    )
+    def update_pager_on_new_data(ts, query, clear_btn, data, search_input_store):
+        trg = ctx.triggered_id
+        if trg is not None:
+            trg = trg.subcomponent
+            if trg == "store":
+                search_input = ""
+                if search_input_store is not None:
+                    search_input = search_input_store
+                    data = filter_data(data, search_input_store)
+
+                return dmc.Stack(data, spacing=STACK_SPACING), search_input
+            elif trg == "search_input":
+                if query is not None:
+                    if len(query) >= MIN_CHARS:
+
+                        data = filter_data(data, query)
+                return dmc.Stack(data, spacing=STACK_SPACING), no_update
+
+            elif trg == "clear_input_btn":
+                return dmc.Stack(data, spacing=STACK_SPACING), ""
+
+            elif trg == "search_input_store":
+                if search_input_store is not None:
+
+                    data = filter_data(data, search_input_store)
+                return dmc.Stack(data, spacing=STACK_SPACING), no_update
 
         raise PreventUpdate

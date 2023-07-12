@@ -46,6 +46,7 @@ def viz_single_dataset_select_modal(opened, id="select_ts_modal"):
         closeOnClickOutside=False,
         closeOnEscape=False,
         overlayBlur=8,
+        children=dmc.Center(dmc.Loader()),
     )
 
 
@@ -96,47 +97,54 @@ def generate_viz_timeseries_select_modal_children(store_data):
         if i > 0:
             list_entries.append(dmc.Divider())
         list_entries.append(
-            dmc.Grid(
-                [
-                    dmc.Col(
-                        dmc.Anchor(
-                            dmc.Grid(
-                                [
-                                    dmc.Col(
-                                        dmc.Group(
-                                            [
-                                                get_icon(ds.get_icon(), width=32),
-                                                dmc.Code(ds.get_id()),
-                                            ]
+            dmc.Card(
+                dmc.Grid(
+                    [
+                        dmc.Col(
+                            dmc.Anchor(
+                                dmc.Grid(
+                                    [
+                                        dmc.Col(
+                                            dmc.Group(
+                                                [
+                                                    get_icon(ds.get_icon(), width=32),
+                                                    dmc.Code(ds.get_id()),
+                                                ]
+                                            ),
+                                            span=3,
                                         ),
-                                        span=3,
-                                    ),
-                                    dmc.Col(
-                                        dmc.Group(
-                                            [
-                                                dmc.Text(ds.get_title(), size="md"),
-                                                dmc.Badge(ds.get_unit(), color="teal"),
-                                            ]
+                                        dmc.Col(
+                                            dmc.Group(
+                                                [
+                                                    dmc.Text(ds.get_title(), size="md"),
+                                                    dmc.Badge(
+                                                        ds.get_unit(), color="teal"
+                                                    ),
+                                                ]
+                                            ),
+                                            span=9,
                                         ),
-                                        span=9,
-                                    ),
-                                ]
+                                    ]
+                                ),
+                                href=single_viz_url,
+                                variant="text",
                             ),
-                            href=single_viz_url,
-                            variant="text",
+                            span=6,
                         ),
-                        span=6,
-                    ),
-                    dmc.Col(
-                        dmc.Group(
-                            [
-                                location_name,
-                            ],
-                            spacing=4,
+                        dmc.Col(
+                            dmc.Group(
+                                [
+                                    location_name,
+                                ],
+                                spacing=4,
+                            ),
+                            span=6,
                         ),
-                        span=6,
-                    ),
-                ]
+                    ]
+                ),
+                px=0,
+                py=4,
+                radius=0,
             )
         )
     return list_entries
@@ -154,6 +162,7 @@ def viz_compare_select_modal(
         closeOnClickOutside=False,
         closeOnEscape=False,
         overlayBlur=8,
+        children=dmc.Center(dmc.Loader()),
     )
 
 
@@ -326,36 +335,43 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
         if i > 0:
             list_entries.append(dmc.Divider())
         list_entries.append(
-            dmc.Grid(
-                [
-                    dmc.Col(
-                        dmc.Group(
-                            [
-                                dmc.Checkbox(
-                                    color="teal",
-                                    id={"role": id_role, "index": str(store_data[i])},
-                                    checked=False,
-                                ),
-                                get_icon(icon=ds.get_icon(), width=32),
-                                dmc.Code(ds.get_id()),
-                            ]
+            dmc.Card(
+                dmc.Grid(
+                    [
+                        dmc.Col(
+                            dmc.Group(
+                                [
+                                    dmc.Checkbox(
+                                        color="teal",
+                                        id={
+                                            "role": id_role,
+                                            "index": str(store_data[i]),
+                                        },
+                                        checked=False,
+                                    ),
+                                    get_icon(icon=ds.get_icon(), width=32),
+                                    dmc.Code(ds.get_id()),
+                                ]
+                            ),
+                            span=2,
                         ),
-                        span=2,
-                    ),
-                    dmc.Col(
-                        dmc.Group(
-                            [
-                                dmc.Text(ds.get_title(), size="md"),
-                                dmc.Badge(ds.get_unit(), color="teal"),
-                            ]
+                        dmc.Col(
+                            dmc.Group(
+                                [
+                                    dmc.Text(ds.get_title(), size="md"),
+                                    dmc.Badge(ds.get_unit(), color="teal"),
+                                ]
+                            ),
+                            span=5,
                         ),
-                        span=5,
-                    ),
-                    dmc.Col(
-                        location_name,
-                        span=5,
-                    ),
-                ]
+                        dmc.Col(
+                            location_name,
+                            span=5,
+                        ),
+                    ]
+                ),
+                p=0,
+                radius=0,
             )
         )
     return list_entries
@@ -384,46 +400,53 @@ def generate_viz_deployment_select_modal_children(store_data):
             if i > 0:
                 list_entries.append(dmc.Divider())
             list_entries.append(
-                dmc.Grid(
-                    [
-                        dmc.Col(
-                            dmc.Anchor(
-                                dmc.Grid(
-                                    [
-                                        dmc.Col(
-                                            dmc.Group(
-                                                [
-                                                    get_icon(
-                                                        icon=ds.get_icon(), width=32
-                                                    ),
-                                                    dmc.Code(ds.get_id()),
-                                                ]
+                dmc.Card(
+                    dmc.Grid(
+                        [
+                            dmc.Col(
+                                dmc.Anchor(
+                                    dmc.Grid(
+                                        [
+                                            dmc.Col(
+                                                dmc.Group(
+                                                    [
+                                                        get_icon(
+                                                            icon=ds.get_icon(), width=32
+                                                        ),
+                                                        dmc.Code(ds.get_id()),
+                                                    ]
+                                                ),
+                                                span=3,
                                             ),
-                                            span=3,
-                                        ),
-                                        dmc.Col(
-                                            dmc.Group(
-                                                [
-                                                    dmc.Text(ds.get_title(), size="md"),
-                                                    dmc.Badge(
-                                                        ds.get_unit(), color="teal"
-                                                    ),
-                                                ]
+                                            dmc.Col(
+                                                dmc.Group(
+                                                    [
+                                                        dmc.Text(
+                                                            ds.get_title(), size="md"
+                                                        ),
+                                                        dmc.Badge(
+                                                            ds.get_unit(), color="teal"
+                                                        ),
+                                                    ]
+                                                ),
+                                                span=9,
                                             ),
-                                            span=9,
-                                        ),
-                                    ]
+                                        ]
+                                    ),
+                                    href=deployment_viz_url,
+                                    variant="text",
                                 ),
-                                href=deployment_viz_url,
-                                variant="text",
+                                span=6,
                             ),
-                            span=6,
-                        ),
-                        dmc.Col(
-                            location_name,
-                            span=6,
-                        ),
-                    ]
+                            dmc.Col(
+                                location_name,
+                                span=6,
+                            ),
+                        ]
+                    ),
+                    px=0,
+                    py=4,
+                    radius=0,
                 )
             )
         else:
