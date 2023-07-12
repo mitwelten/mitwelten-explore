@@ -567,7 +567,7 @@ def layout(**kwargs):
                         target="_blank",
                     ),
                 ],
-                align="center",
+                align="top",
             ),
             dmc.Space(h=12),
             plaio,

@@ -9,6 +9,7 @@ from dashboard.aio_components.aio_list_component import PagedListSearchableAIO
 from dashboard.components.dataset_presentation import pax_deployment_select_card
 from dashboard.api_clients.deployments_client import get_deployments
 from dashboard.charts.map_charts import generate_scatter_map_plot
+from configuration import PATH_PREFIX
 
 
 class PageIds(object):
@@ -65,7 +66,18 @@ def layout(**qargs):
                 [
                     dmc.Col(
                         children=[
-                            dmc.Text("PAX Datasets", weight=700, size="lg"),
+                            dmc.Group(
+                                [
+                                    dmc.Text("PAX Datasets", weight=700, size="lg"),
+                                    dmc.Anchor(
+                                        get_icon(icons.help, width=18),
+                                        href=f"{PATH_PREFIX}docs#datasets",
+                                        variant="text",
+                                        target="_blank",
+                                    ),
+                                ],
+                                align="top",
+                            ),
                             dmc.Space(h=12),
                             dmc.Grid(
                                 [

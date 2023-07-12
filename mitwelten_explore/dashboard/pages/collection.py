@@ -11,6 +11,7 @@ from dashboard.aio_components.aio_list_component import (
 from dashboard.components.lists import generate_selected_data_list
 from dashboard.components.notifications import generate_notification
 from dashboard.styles import get_icon, icons
+from configuration import PATH_PREFIX
 
 dash.register_page(
     __name__,
@@ -102,13 +103,29 @@ list_legend = dmc.Card(
     pt=4,
     pb=12,
 )
-plaio = PagedListSearchableAIO(items=[], legend=list_legend)
+
+list_skeleton = dmc.Skeleton(width="100%", height=60)
+
+plaio = PagedListSearchableAIO(
+    items=[list_skeleton, dmc.Divider()] * 10, legend=list_legend
+)
 
 
 def layout(**qargs):
     return dmc.Container(
         [
-            dmc.Text("Collected Datasets", weight=600, size="lg"),
+            dmc.Group(
+                [
+                    dmc.Text("Collected Datasets", weight=600, size="lg"),
+                    dmc.Anchor(
+                        get_icon(icons.help, width=18),
+                        href=f"{PATH_PREFIX}docs#collection",
+                        variant="text",
+                        target="_blank",
+                    ),
+                ],
+                align="top",
+            ),
             dmc.Space(h=8),
             plaio,
         ],

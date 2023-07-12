@@ -12,7 +12,8 @@ from dashboard.api_clients.taxonomy_client import (
 )
 from dashboard.components.dataset_presentation import taxon_list_card
 from dashboard.components.modals import taxon_select_modal
-
+from dashboard.styles import icons, get_icon
+from configuration import PATH_PREFIX
 import uuid
 import json
 
@@ -40,14 +41,45 @@ dash.register_page(__name__, path="/select/taxon")
 
 level_select_radiogroup = dmc.RadioGroup(
     [
-        dmc.Radio(str(l).title(), value=l, color="teal")
+        dmc.Radio(dmc.Text(str(l).title(), weight=500), value=l, color="teal")
         for l in reversed([e.value for e in RankEnum])
     ],
     id=ids.level_select_rg,
     value=RankEnum.species,
-    label="Select a level",
+    # label="Select a level",
     size="sm",
-    mb=10,
+    offset=4
+)
+
+title_group = dmc.Group(
+    [
+        dmc.Stack(
+            [
+                dmc.Group(
+                    [
+                        dmc.Text("Taxon Detections", weight=700, size="lg"),
+                        dmc.Anchor(
+                            get_icon(icons.help, width=18),
+                            href=f"{PATH_PREFIX}docs#datasets",
+                            variant="text",
+                            target="_blank",
+                        ),
+                    ],
+                    align="top",
+                ),
+                dmc.Text("Detections of Birds and Insects"),
+            ],
+            spacing=0,
+        ),
+        dmc.Stack(
+            [
+                dmc.Text("Select a level", size="sm", weight=500),
+                level_select_radiogroup,
+            ],
+            spacing=0,
+        ),
+    ],
+    spacing="5rem",
 )
 
 
@@ -55,7 +87,8 @@ def layout(**qargs):
     return dmc.Container(
         [
             html.Div(id=ids.modal_div),
-            level_select_radiogroup,
+            title_group,
+            dmc.Space(h=12),
             plaio,
         ],
         fluid=True,

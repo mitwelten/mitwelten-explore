@@ -8,6 +8,7 @@ from dashboard.styles import icons, get_icon
 from dashboard.components.dataset_presentation import bird_dataset_card
 from dashboard.api_clients.deployments_client import get_deployments
 from dashboard.charts.map_charts import generate_scatter_map_plot
+from configuration import PATH_PREFIX
 
 dash.register_page(__name__, path="/select/bird")
 
@@ -56,7 +57,18 @@ def layout(**qargs):
                 [
                     dmc.Col(
                         children=[
-                            dmc.Text("Bird Diversity", weight=700, size="lg"),
+                            dmc.Group(
+                                [
+                                    dmc.Text("Bird Diversity", weight=700, size="lg"),
+                                    dmc.Anchor(
+                                        get_icon(icons.help, width=18),
+                                        href=f"{PATH_PREFIX}docs#datasets",
+                                        variant="text",
+                                        target="_blank",
+                                    ),
+                                ],
+                                align="top",
+                            ),
                             dmc.Text("Number of distinct species heard"),
                             dmc.Space(h=12),
                             dmc.MultiSelect(
