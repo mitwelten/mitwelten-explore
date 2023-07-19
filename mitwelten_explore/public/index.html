@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mitwelten Explore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="public/style.css">
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+    <nav class="nav" id="navbar">
+        <div class="container-fluid px-2">
+
+            <div class="hstack gap-3">
+                <div class="hstack gap-1 mt-1">
+                    <img src="public/images/mitwelten_logo.png">
+                    <div id="navbartext">MITWELTEN EXPLORE</div>
+                </div>
+                <div class=" ms-auto mt-1">
+                    <a href="/app/"><button type="button" class="btn btn-outline-primary">Sign In</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid contentct">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="container">
+                    <h1><small class="display-6 text-muted">Welcome to</small><br>
+                        <b class="bold_title">MITWELTEN EXPLORE</b>
+                    </h1>
+                    <h3 class="display-6">Explore the Biodiversity in and around <small class="hltext">Basel</small>
+                    </h3>
+                    <br>
+                    <p class="lead"><a href="/app">Sign in</a> or <a href="/app">Register</a> to Analyze Our Discoveries
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="container">
+                    <div id="carouselCaptions" class="carousel slide  shadow-sm" data-bs-ride="carousel">
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#carouselCaptions" data-bs-slide-to="0" class="active"
+                                aria-current="true" aria-label="Slide 1"></button>
+                            <button type="button" data-bs-target="#carouselCaptions" data-bs-slide-to="1"
+                                aria-label="Slide 2"></button>
+                            <button type="button" data-bs-target="#carouselCaptions" data-bs-slide-to="2"
+                                aria-label="Slide 3"></button>
+                            <button type="button" data-bs-target="#carouselCaptions" data-bs-slide-to="3"
+                                aria-label="Slide 4"></button>
+                            <button type="button" data-bs-target="#carouselCaptions" data-bs-slide-to="4"
+                                aria-label="Slide 5"></button>
+                            <button type="button" data-bs-target="#carouselCaptions" data-bs-slide-to="5"
+                                aria-label="Slide 6"></button>
+                        </div>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="public/images/taxond.png" class="d-block w-100" alt="...">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>Explore Species 🦅</h5>
+                                    <p>Explore the spatial and temporal activity of more than 200 detected species</p>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="public/images/deploymentd.png" class="d-block w-100" alt="...">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>Habitat-specific biodiversity 🌲</h5>
+                                    <p>Discover the ontodiversity in specific places</p>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="public/images/compd.png" class="d-block w-100" alt="...">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>Compare different datasets 🔬</h5>
+                                    <p>Find the factors that influence biodiversity</p>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="public/images/mapd.png" class="d-block w-100" alt="...">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>Spatial activity 🗺</h5>
+                                    <p>Analyze spatial differences and find out where you could sight certain species
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="public/images/tsd.png" class="d-block w-100" alt="...">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>Spot trends over time 📅</h5>
+                                    <p>Learn about the seasonal and daily changes in biodiversity</p>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="public/images/annotd.png" class="d-block w-100" alt="...">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>Share your insights 💡</h5>
+                                    <p>Let other users know what you discovered</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselCaptions"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselCaptions"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="navbar fixed-bottom p-2  border-top">
+            <div class="col-md-4 d-flex align-items-center">
+                <a href="https://www.fhnw.ch/" target="_blank"><img src="public/images/fhnw-logo.svg"></a>
+            </div>
+            <div class="col-md-4 d-flex align-items-center">
+                <a href="https://www.mitwelten.org/" target="_blank">
+                    <b>
+                        SNF Mitwelten
+                    </b>
+                </a>
+            </div>
+            <div class="col-md-auto d-flex align-items-center">
+                <a href="https://github.com/mitwelten/mitwelten-explore" target="_blank">
+                    <img src="public/images/github.svg">
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
