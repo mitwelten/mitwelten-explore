@@ -161,13 +161,14 @@ def correlation_matrix_heatmap(matrix, labels, light_mode=True):
     return fig
 
 
-def fft_single(amplitude, periods_s, light_mode):
+def fft_single(amplitude, periods_s, light_mode, color="#15AABF"):
     fig = go.Figure()
     fig.update_layout(
         margin=dict(l=20, r=20, t=20, b=20),
         template="plotly_white" if light_mode else "plotly_dark",
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
+        # autosize=True
     )
     fig.add_trace(
         go.Scatter(
@@ -179,8 +180,17 @@ def fft_single(amplitude, periods_s, light_mode):
             customdata=[None] + [str(datetime.timedelta(seconds=f)) for f in periods_s],
             hovertemplate="<b>Period: %{customdata}</b><br>Amplitude: %{y} <br><extra></extra>",
             showlegend=False,
+            marker_color=color,
         )
     )
+
+    if len(amplitude) < 2:
+        fig.add_annotation(
+            text="Decrease the time bucket size to compute the fourier transform",
+            xref="paper",
+            yref="paper",
+            showarrow=False,
+        )
     fig.update_xaxes(
         type="log",
         autorange="reversed",

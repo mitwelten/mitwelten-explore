@@ -2,19 +2,23 @@
     /*left: 50%;
     transform: translateX(-50%);
     */
-    right:0px;
+    right: 0px;
     top: 28px;
 
 }
 
+.ts_tod_chart .js-plotly-plot .plotly .modebar {
+    right: 28px;
+    top: 4px;
+
+}
 
 .ql-editor {
-   
+
     max-height: 35vh;
     min-height: 20vh;
 
-    
+
     /*max-height: max-content;*/
     overflow-y: auto;
 }
-

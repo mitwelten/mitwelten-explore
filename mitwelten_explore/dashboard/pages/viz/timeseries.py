@@ -51,7 +51,10 @@ from dashboard.charts.time_series_charts import (
     empty_figure,
 )
 from dashboard.charts.map_charts import generate_scatter_map_plot
+from dashboard.charts.analytic_charts import fft_single
 from dashboard.models import UrlSearchArgs, DatasetType, Annotation, to_typed_dataset
+from dashboard.utils.ts import compute_fft, create_fft_bins
+
 from uuid import uuid4
 
 
@@ -76,10 +79,17 @@ class PageIds(object):
     tod_chart = str(uuid4())
     tod_chart_type = str(uuid4())
     map_chart = str(uuid4())
+    fft_chart = str(uuid4())
     datasource_indicator = str(uuid4())
 
 
 ids = PageIds()
+
+TABS_CARD_STYLE = {
+    "borderTop": "0px",
+    "borderTopLeftRadius": "0px",
+    "borderTopRightRadius": "0px",
+}
 annot_editor = TextEditorAIO()
 
 affix = affix_menu(
@@ -213,83 +223,148 @@ def layout(**qargs):
                     # time of day card
                     dmc.Col(
                         [
-                            dmc.Card(
+                            dmc.Tabs(
+                                color="teal",
+                                value="tod",
+                                variant="outline",
                                 children=[
-                                    dmc.Group(
+                                    dmc.TabsList(
                                         [
-                                            dmc.Group(
-                                                [
-                                                    dmc.Text("Time of Day", weight=500),
-                                                ]
+                                            dmc.Tab(
+                                                dmc.Text("Time of Day", weight=500),
+                                                value="tod",
                                             ),
-                                            dmc.Group(
-                                                [
-                                                    timeseries_chart_config_menu(
-                                                        chart_type_id=ids.tod_chart_type,
-                                                        position="left-end",
-                                                    ),
-                                                ]
-                                            ),
-                                        ],
-                                        position="apart",
+                                        ]
                                     ),
-                                    chart_loading_overlay(
-                                        [
-                                            dcc.Store(ids.store_tod_data),
-                                            dcc.Graph(
-                                                id=ids.tod_chart,
-                                                style={"height": "33vh"},
-                                                figure=empty_figure(),
-                                            ),
-                                        ],
-                                        position="right",
+                                    dmc.TabsPanel(
+                                        value="tod",
+                                        children=dmc.Card(
+                                            [
+                                                chart_loading_overlay(
+                                                    [
+                                                        dcc.Store(ids.store_tod_data),
+                                                        dmc.Group(
+                                                            timeseries_chart_config_menu(
+                                                                chart_type_id=ids.tod_chart_type,
+                                                                position="left-end",
+                                                            ),
+                                                            position="right",
+                                                            style={
+                                                                "position": "absolute",
+                                                                "right": 4,
+                                                                "top": 4,
+                                                                "zIndex": 1000,
+                                                            },
+                                                        ),
+                                                        dcc.Graph(
+                                                            id=ids.tod_chart,
+                                                            style={"height": "35vh"},
+                                                            figure=empty_figure(),
+                                                            className="ts_tod_chart",
+                                                            config=dict(
+                                                                displaylogo=False,
+                                                                modeBarButtonsToRemove=[
+                                                                    "pan",
+                                                                    "select",
+                                                                    "lasso",
+                                                                    "zoom",
+                                                                    "dragmode",
+                                                                    "autoscale",
+                                                                    "zoomin",
+                                                                    "zoomout",
+                                                                ],
+                                                            ),
+                                                        ),
+                                                    ],
+                                                    position="right",
+                                                    style={"height": "100%"},
+                                                ),
+                                            ],
+                                            withBorder=True,
+                                            style=TABS_CARD_STYLE,
+                                            p=0,
+                                        ),
                                     ),
                                 ],
-                                withBorder=True,
-                                style={"height": "100%"},
                             ),
                         ],
                         className="col-xl-6",
+                        style={"height": "42vh"},
                     ),
                     dmc.Col(
-                        [
-                            dmc.Grid(
-                                [
-                                    # Summary Card
-                                    dmc.Col(
+                        style={"height": "42vh"},
+                        className="col-xl-6",
+                        children=[
+                            dmc.Tabs(
+                                color="teal",
+                                value="map",
+                                variant="outline",
+                                h="100%",
+                                maw="100%",
+                                children=[
+                                    dmc.TabsList(
                                         [
-                                            dmc.Card(
-                                                children=[],
-                                                id=ids.statsagg_card,
-                                                withBorder=True,
-                                                style={"height": "100%"},
+                                            dmc.Tab(
+                                                dmc.Text("Map", weight=500),
+                                                value="map",
+                                            ),
+                                            dmc.Tab(
+                                                dmc.Text("Stats", weight=500),
+                                                value="stats",
+                                            ),
+                                            dmc.Tab(
+                                                dmc.Text("FFT", weight=500),
+                                                value="fft",
                                             ),
                                         ],
-                                        className="col-md-6",
                                     ),
-                                    # Map Card
-                                    dmc.Col(
-                                        [
-                                            dmc.Card(
-                                                children=[
-                                                    dcc.Graph(
-                                                        style={"height": "100%"},
-                                                        className="p-0",
-                                                        id=ids.map_chart,
-                                                    )
-                                                ],
-                                                withBorder=True,
-                                                style={"height": "100%"},
+                                    dmc.TabsPanel(
+                                        value="map",
+                                        children=dmc.Card(
+                                            dcc.Graph(
                                                 className="p-0",
+                                                id=ids.map_chart,
+                                                style={"height": "35vh"},
                                             ),
-                                        ],
-                                        className="col-md-6",
+                                            withBorder=True,
+                                            style=TABS_CARD_STYLE,
+                                            p=0,
+                                            h="100%",
+                                        ),
+                                    ),
+                                    dmc.TabsPanel(
+                                        value="stats",
+                                        children=dmc.Card(
+                                            children=dmc.ScrollArea(
+                                                id=ids.statsagg_card,
+                                                h="100%",
+                                                type="scroll",
+                                            ),
+                                            withBorder=True,
+                                            style=TABS_CARD_STYLE,
+                                            h="35vh",
+                                        ),
+                                    ),
+                                    dmc.TabsPanel(
+                                        value="fft",
+                                        children=dmc.Card(
+                                            dmc.CardSection(
+                                                dcc.Graph(
+                                                    className="p-0",
+                                                    id=ids.fft_chart,
+                                                    responsive=True,
+                                                    style={"height": "35vh"},
+                                                    figure=empty_figure(),
+                                                )
+                                            ),
+                                            withBorder=True,
+                                            style=TABS_CARD_STYLE,
+                                            p=0,
+                                        ),
                                     ),
                                 ],
-                                style={"height": "100%"},
-                            )
+                            ),
                         ],
-                        className="col-xl-6",
                     ),
                 ],
             ),
@@ -555,6 +630,31 @@ def update_map_plot(search_args):
             location_info.get("name"),
             location_info.get("id"),
         )
+
+
+# update fft
+@callback(
+    Output(ids.fft_chart, "figure"),
+    Input(ids.url, "search"),  # state --> duplicated execution?
+    Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
+    # Input(ids.store_ts_data, "modified_timestamp"),
+    Input(ids.store_ts_data, "data"),
+)
+def update_fft(search, theme, data):
+    if data is None:
+        raise PreventUpdate
+    times = data.get("times")
+    values = data.get("values")
+    if isinstance(times, list) and isinstance(values, list):
+        try:
+            amplitude, periods = compute_fft(amplitude=values, times=times)
+            binned_amplitude, seconds = create_fft_bins(amplitude, periods)
+            return fft_single(
+                amplitude=binned_amplitude, periods_s=seconds, light_mode=theme
+            )
+        except:
+            return empty_figure()
+    return empty_figure()
 
 
 # update datasource indicator

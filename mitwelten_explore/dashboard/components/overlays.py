@@ -5,9 +5,10 @@ from configuration import PATH_PREFIX
 from dashboard.utils.communication import urlencode_dict
 
 
-def chart_loading_overlay(children, position="left"):
+def chart_loading_overlay(children, position="left", style=None):
     return dmc.LoadingOverlay(
         children,
+        style=style,
         overlayOpacity=0,
         transitionDuration=400,
         loader=dmc.Card(
