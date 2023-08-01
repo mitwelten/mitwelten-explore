@@ -107,7 +107,7 @@ list_legend = dmc.Card(
 list_skeleton = dmc.Skeleton(width="100%", height=60)
 
 plaio = PagedListSearchableAIO(
-    items=[list_skeleton, dmc.Divider()] * 10, legend=list_legend
+    items=[list_skeleton, dmc.Divider()] * 10, legend=list_legend, height="88vh"
 )
 
 
