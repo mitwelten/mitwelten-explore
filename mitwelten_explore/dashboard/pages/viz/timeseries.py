@@ -81,6 +81,7 @@ class PageIds(object):
     map_chart = str(uuid4())
     fft_chart = str(uuid4())
     datasource_indicator = str(uuid4())
+    tabs_selector = str(uuid4())
 
 
 ids = PageIds()
@@ -296,6 +297,7 @@ def layout(**qargs):
                         className="col-xl-6",
                         children=[
                             dmc.Tabs(
+                                id=ids.tabs_selector,
                                 color="teal",
                                 value="map",
                                 variant="outline",
@@ -349,13 +351,18 @@ def layout(**qargs):
                                         value="fft",
                                         children=dmc.Card(
                                             dmc.CardSection(
-                                                dcc.Graph(
-                                                    className="p-0",
-                                                    id=ids.fft_chart,
-                                                    responsive=True,
-                                                    style={"height": "35vh"},
-                                                    figure=empty_figure(),
-                                                )
+                                                chart_loading_overlay(
+                                                    [
+                                                        dcc.Graph(
+                                                            className="p-0",
+                                                            id=ids.fft_chart,
+                                                            responsive=True,
+                                                            style={"height": "35vh"},
+                                                            figure=empty_figure(),
+                                                        )
+                                                    ],
+                                                    position="right",
+                                                ),
                                             ),
                                             withBorder=True,
                                             style=TABS_CARD_STYLE,
@@ -605,10 +612,11 @@ def update_time_series_chart(theme, ts, data, chart_type):
     Output(ids.statsagg_card, "children"),
     Input(ids.store_statsagg_data, "modified_timestamp"),
     State(ids.store_statsagg_data, "data"),
+    Input(ids.tabs_selector, "value"),
     prevent_initial_call=True,
 )
-def update_statsagg_card(ts, data):
-    if data is None:
+def update_statsagg_card(ts, data, tab):
+    if data is None or "stats" not in tab:
         raise PreventUpdate
     return statsagg_table(data)
 
@@ -617,8 +625,11 @@ def update_statsagg_card(ts, data):
 @callback(
     Output(ids.map_chart, "figure"),
     Input(ids.url, "search"),
+    Input(ids.tabs_selector, "value"),
 )
-def update_map_plot(search_args):
+def update_map_plot(search_args, tab):
+    if "map" not in tab:
+        raise PreventUpdate
     if search_args is not None:
         query_args = parse_nested_qargs(qargs_to_dict(search_args))
         if query_args.get("trace") is None:
@@ -630,6 +641,7 @@ def update_map_plot(search_args):
             location_info.get("name"),
             location_info.get("id"),
         )
+    raise PreventUpdate
 
 
 # update fft
@@ -639,9 +651,10 @@ def update_map_plot(search_args):
     Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
     # Input(ids.store_ts_data, "modified_timestamp"),
     Input(ids.store_ts_data, "data"),
+    Input(ids.tabs_selector, "value"),
 )
-def update_fft(search, theme, data):
-    if data is None:
+def update_fft(search, theme, data, tab):
+    if data is None or "fft" not in tab:
         raise PreventUpdate
     times = data.get("times")
     values = data.get("values")
