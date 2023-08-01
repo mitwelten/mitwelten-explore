@@ -258,6 +258,7 @@ nav_settings_target = dmc.Menu(
                 ],
                 px=NAV_TARGET_PADDING_X,
                 style={"cursor": "pointer"},
+                h="39px"
             ),
         ),
         dmc.MenuDropdown(
