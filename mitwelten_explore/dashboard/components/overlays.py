@@ -62,6 +62,7 @@ def tooltip(
             withArrow=arrow,
             openDelay=opendelay,
             color=color,
+            events="hover",
         )
 
 
