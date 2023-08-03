@@ -216,7 +216,7 @@ def layout(**qargs):
                     ),
                 ],
                 withBorder=True,
-                className="bg-transparent",
+                #className="bg-transparent",
             ),
             dmc.Space(h=12),
             dmc.Grid(
