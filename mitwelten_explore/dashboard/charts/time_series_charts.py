@@ -208,6 +208,7 @@ def generate_multi_ts_figure(
                         customdata=customdata,
                         mode="lines",
                         hovertemplate="%{x}<br><b>%{customdata}</b><extra></extra>",
+                        showlegend=False
                     )
                 )
 
