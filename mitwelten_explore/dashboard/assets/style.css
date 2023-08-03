@@ -22,3 +22,11 @@
     /*max-height: max-content;*/
     overflow-y: auto;
 }
+
+.tooltip .tooltip-inner {
+    --bs-tooltip-bg: #364FC7;
+}
+
+.tooltip .tooltip-arrow::before {
+    --bs-tooltip-bg: #364FC7;
+}
