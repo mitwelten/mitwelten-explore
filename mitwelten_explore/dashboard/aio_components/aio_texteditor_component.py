@@ -121,13 +121,6 @@ class TextEditorAIO(html.Div):
                             [
                                 dmc.Tab("Text Editor", value="edit_annot"),
                                 dmc.Tab("Preview", value="preview_annot"),
-                                dmc.ActionIcon(
-                                    DashIconify(
-                                        icon="tabler:window-minimize", height="1.2rem"
-                                    ),
-                                    id=self.ids.minimize(self.aio_id),
-                                    ml="auto",
-                                ),
                             ],
                             grow=False,
                         ),
@@ -243,12 +236,40 @@ class TextEditorAIO(html.Div):
                     },
                     header=dmc.Group(
                         [
-                            DashIconify(icon="mdi:drag", width=21, inline=True),
-                            dmc.Text("Edit annotation"),
+                            dmc.Group(
+                                [
+                                    DashIconify(icon="mdi:drag", width=21, inline=True),
+                                    dmc.Text("Edit Annotation"),
+                                ],
+                                spacing="sm",
+                            ),
+                            dmc.Tooltip(
+                                position="left",
+                                label=dmc.Text("Hide Editor", weight=300),
+                                withArrow=True,
+                                openDelay=100,
+                                color="indigo.9",
+                                children=[
+                                    dmc.ActionIcon(
+                                        DashIconify(
+                                            icon="tabler:window-minimize",
+                                            height="1.2rem",
+                                        ),
+                                        id=self.ids.minimize(self.aio_id),
+                                    )
+                                ],
+                            ),
                         ],
-                        spacing="sm",
+                        position="apart",
+                        style={
+                            "position": "absolute",
+                            "top": 0,
+                            "left": 8,
+                            "right": 8,
+                            "height": "32px",
+                        },
                     ),
-                    header_style={"cursor": "move"},
+                    header_style={"cursor": "move", "height": "32px"},
                     children=[dmc.Group([], spacing="sm", position="right"), tabs],
                     body_class_name="py-0",
                     class_name="annotation_editor",
@@ -256,20 +277,6 @@ class TextEditorAIO(html.Div):
                 ),
             ],
         )
-
-    """
-    # validate title
-    @callback(
-        Output(ids.title_input(MATCH), "error"),
-        Input(ids.title_input(MATCH), "value"),
-    )
-    def update_title_error(value):
-        if value is not None:
-            if len(value) > 0:
-                return None
-        else:
-            return "Enter a Title"
-    """
 
     # enable publish_btn
     @callback(
