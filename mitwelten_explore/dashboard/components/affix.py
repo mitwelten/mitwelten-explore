@@ -11,8 +11,8 @@ def datasource_affix(id):
     )
 
 
-def affix_button(id, icon):
-    return dmc.ActionIcon(
+def affix_button(id, icon, tooltip_text = None):
+    actionicon =  dmc.ActionIcon(
         get_icon(icon=icon, height=30),
         variant="filled",
         radius="xl",
@@ -20,6 +20,10 @@ def affix_button(id, icon):
         color="teal",
         id=id,
     )
+    if tooltip_text is None:
+        return actionicon
+    else:
+        return dmc.Tooltip(children=actionicon, label=tooltip_text,position="left",color="teal")
 
 
 def affix_menu(menu_children, id=str(uuid.uuid4())):

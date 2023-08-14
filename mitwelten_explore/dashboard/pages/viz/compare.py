@@ -322,7 +322,8 @@ def layout(**qargs):
                                     dmc.TabsPanel(
                                         dmc.Card(
                                             id=ids.stats_card,
-                                            withBorder=True,
+                                            withBorder=False,
+                                            p=0,
                                         ),
                                         value="stats",
                                     ),
@@ -333,10 +334,12 @@ def layout(**qargs):
                                                     id=ids.corr_matrix_card,
                                                     withBorder=False,
                                                     pl=0,
+                                                    py=0,
                                                 ),
                                                 dmc.Card(
                                                     id=ids.fft_card,
                                                     withBorder=False,
+                                                    py=0,
                                                 ),
                                             ],
                                             grow=True,
@@ -805,8 +808,9 @@ def update_stats(data, search, pn):
                     table,
                 ],
                 withBorder=True,
+                radius="md",
                 style={
-                    "border": f"1px solid {MULTI_VIZ_COLORSCALE[i]}",
+                    # "border": f"1px solid {MULTI_VIZ_COLORSCALE[i]}",
                     "borderTop": f"6px solid {MULTI_VIZ_COLORSCALE[i]}",
                 },
             )
