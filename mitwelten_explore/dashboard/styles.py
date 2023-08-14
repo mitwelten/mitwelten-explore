@@ -112,7 +112,7 @@ def get_icon(icon=None, width=None, **kwargs):
             return DashIconify(icon=icon, **kwargs)
 
 
-MULTI_VIZ_COLORSCALE = [
+"""MULTI_VIZ_COLORSCALE = [
     "#228BE6",  # blue.6
     "#40C057",  # green.6
     "#7950F2",  # violet.6
@@ -130,6 +130,19 @@ MULTI_VIZ_COLORSCALE_MT = [
     "yellow.6",
     "grape.6",
 ]
+"""
+MULTI_VIZ_COLORSCALE = [
+    "#0FB5AE",
+    "#4046CA",
+    "#F68511",
+    "#DE3D82",
+    "#7E84FA",
+    "#72E06A",
+    "#147AF3",
+    "#7326D3",
+    "#E8C600",
+]
+
 
 SINGLE_CHART_COLOR = "#12B886"  #  #teal.6
 

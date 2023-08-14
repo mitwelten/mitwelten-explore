@@ -48,7 +48,6 @@ from dashboard.styles import (
     get_icon,
     SEQUENTIAL_COLORSCALES,
     MULTI_VIZ_COLORSCALE,
-    MULTI_VIZ_COLORSCALE_MT,
     MAPBOX_LAYERS,
     MAP_LAYER_DESCRIPTIONS,
     MAP_LAYERS_WITH_LEGEND,
@@ -348,7 +347,7 @@ def layout(**qargs):
                                         min=0,
                                         max=100,
                                         precision=2,
-                                        color=MULTI_VIZ_COLORSCALE_MT[0],
+                                        color="customcolors.0",
                                         marks=[
                                             {"value": 20, "label": "20%"},
                                             {"value": 50, "label": "50%"},
@@ -374,7 +373,7 @@ def layout(**qargs):
                                         step=0.1,
                                         precision=2,
                                         max=100,
-                                        color=MULTI_VIZ_COLORSCALE_MT[1],
+                                        color="customcolors.1",
                                         mb=20,
                                         marks=[
                                             {"value": 20, "label": "20%"},

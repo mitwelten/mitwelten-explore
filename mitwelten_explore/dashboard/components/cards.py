@@ -354,12 +354,12 @@ def dataset_info_cards(args: UrlSearchArgs, config_btn_role):
                     spacing=2,
                 ),
                 withBorder=True,
-                radius=0,
+                radius="md",
                 p=6,
                 style={
                     # "borderColor": MULTI_VIZ_COLORSCALE[i],
-                    "border": f"1px solid {MULTI_VIZ_COLORSCALE[i]}",
-                    "borderLeft": f"6px solid {MULTI_VIZ_COLORSCALE[i]}",
+                    # "border": f"1px solid {MULTI_VIZ_COLORSCALE[i]}",
+                    "borderLeft": f"8px solid {MULTI_VIZ_COLORSCALE[i]}",
                 },
             )
         )

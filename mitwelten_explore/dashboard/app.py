@@ -38,6 +38,19 @@ notification_provider = dmc.NotificationsProvider(
 app.layout = dmc.MantineProvider(
     theme={
         "colorScheme": "light",
+        "colors": {
+            "customcolors": [
+                "#0FB5AE",
+                "#4046CA",
+                "#F68511",
+                "#DE3D82",
+                "#7E84FA",
+                "#72E06A",
+                "#147AF3",
+                "#7326D3",
+                "#E8C600",
+            ]
+        },
     },
     id="mt-provider",
     children=[
