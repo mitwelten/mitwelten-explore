@@ -26,13 +26,26 @@ class DashboardCard:
                     [
                         dmc.Group(
                             [
-                                get_icon(icon=self.icon, width="1.5rem"),
-                                dmc.Text(self.title, size="1.2rem", weight=500),
-                                dmc.Text(
-                                    self.subtitle,
-                                    size="1rem",
-                                    italic=True,
-                                    weight=300,
+                                dmc.MediaQuery(
+                                    get_icon(icon=self.icon, width="1.5rem"),
+                                    smallerThan="xl",
+                                    styles={"display": "none"},
+                                ),
+                                dmc.Stack(
+                                    [
+                                        dmc.Text(
+                                            self.title,
+                                            size="1.2rem",
+                                            weight=500,
+                                        ),
+                                        dmc.Text(
+                                            self.subtitle,
+                                            size="1rem",
+                                            italic=True,
+                                            weight=300,
+                                        ),
+                                    ],
+                                    spacing=0,
                                 ),
                             ],
                             style={"rowGap": "1px"},
@@ -57,6 +70,12 @@ taxon_dashboard_data = [
         url="viz/taxon/2475532",
     ),
     DashboardCard(
+        title="Hummeln",
+        subtitle="Bombus",
+        icon=icons.bee,
+        url="viz/taxon/1340278",
+    ),
+    DashboardCard(
         title="Mauersegler",
         subtitle="Apus apus",
         icon=icons.bird,
@@ -67,12 +86,6 @@ taxon_dashboard_data = [
         subtitle="Insecta",
         icon=icons.bee,
         url="viz/taxon/216",
-    ),
-    DashboardCard(
-        title="Hummeln",
-        subtitle="Bombus",
-        icon=icons.bee,
-        url="viz/taxon/1340278",
     ),
     DashboardCard(
         title="Schwebfliege (GBIF)",
@@ -147,7 +160,7 @@ ts_dashboard_data = [
     ),
     DashboardCard(
         title="Bird Detections",
-        subtitle="",
+        subtitle="All Deployments",
         icon=icons.bird,
         color="#A9E34B",
         url="viz/timeseries?trace=%7B%27type%27%3A+%27birds%27%2C+%27datum_id%27%3A+212%2C+%27label_de%27%3A+None%2C+%27label_en%27%3A+%27Bird%27%2C+%27label_sci%27%3A+%27Aves%27%2C+%27rank%27%3A+%27CLASS%27%2C+%27deployment_filter%27%3A+%5B%5D%7D&agg=None&bucket=1d&from=2021-03-04T19%3A07%3A36&confidence=0.7",
@@ -168,6 +181,29 @@ ts_dashboard_data = [
     ),
 ]
 
+deployment_dashboard_data = [
+    DashboardCard(
+        title="Audio Logger 679",
+        subtitle="Reinacherheide",
+        icon=icons.bird,
+        color="#3BC9DB",
+        url="viz/deployment?dataset=%7B%27type%27%3A+%27birds_by_depl%27%2C+%27deployment_id%27%3A+%5B679%5D%7D",
+    ),
+    DashboardCard(
+        title="Pollinator Cams",
+        subtitle="Merian Gärten",
+        icon=icons.bee,
+        color="#3BC9DB",
+        url="viz/deployment?dataset=%7B%27type%27%3A+%27pollinators%27%2C+%27deployment_id%27%3A+%5B33%2C+35%2C+37%2C+39%2C+40%2C+41%2C+88%2C+43%2C+44%2C+45%2C+47%2C+48%2C+51%2C+56%2C+57%2C+58%2C+59%2C+60%5D%2C+%27pollinator_class%27%3A+None%7D",
+    ),
+    DashboardCard(
+        title="Audio Logger 64",
+        subtitle="Gundeli",
+        icon=icons.bird,
+        color="#3BC9DB",
+        url="viz/deployment?dataset=%7B%27type%27%3A+%27birds_by_depl%27%2C+%27deployment_id%27%3A+%5B64%5D%7D",
+    ),
+]
 
 not_yet_func_alert = dmc.Alert(
     dmc.Text(
@@ -237,13 +273,33 @@ annots_card = dmc.Anchor(
     target="_blank",
 )
 
+SHOW_MORE_LABEL = "Show More"
+SPOILER_MAH = 83
+
 
 def layout(**kwargs):
     return dmc.Container(
         [
             dcc.Location("annots_url", refresh=False),
-            dmc.Title("Mitwelten Explore", align="center"),
-            dmc.Space(h=40),
+            dmc.Space(h=12),
+            dmc.Stack(
+                [
+                    dmc.Title("MITWELTEN EXPLORE"),
+                    dmc.Group(
+                        [
+                            dmc.Text(
+                                "Explore the Biodiversity in and around",
+                                size="xl",
+                                weight=300,
+                            ),
+                            dmc.Text("Basel", size="xl", color="teal.5", weight=400),
+                        ],
+                        spacing=4,
+                    ),
+                ],
+                spacing=4,
+            ),
+            dmc.Space(h=18),
             dmc.Grid(
                 [
                     dmc.Col(
@@ -268,13 +324,28 @@ def layout(**kwargs):
                                             ),
                                         ]
                                     ),
-                                    dmc.SimpleGrid(
+                                    dmc.Spoiler(
                                         children=[
-                                            d.get_card() for d in taxon_dashboard_data
+                                            dmc.SimpleGrid(
+                                                children=[
+                                                    d.get_card()
+                                                    for d in taxon_dashboard_data
+                                                ],
+                                                cols=3,
+                                                breakpoints=[
+                                                    {
+                                                        "maxWidth": 500,
+                                                        "cols": 2,
+                                                        "spacing": "sm",
+                                                    },
+                                                ],
+                                            ),
+                                            dmc.Space(h=8),
                                         ],
-                                        cols=2,
+                                        showLabel=SHOW_MORE_LABEL,
+                                        hideLabel="Hide",
+                                        maxHeight=SPOILER_MAH,
                                     ),
-                                    dmc.Space(h=8),
                                     dmc.Group(
                                         [
                                             dmc.Text(
@@ -289,13 +360,21 @@ def layout(**kwargs):
                                             ),
                                         ]
                                     ),
-                                    dmc.SimpleGrid(
+                                    dmc.Spoiler(
                                         children=[
-                                            d.get_card() for d in compare_dashboard_data
+                                            dmc.SimpleGrid(
+                                                children=[
+                                                    d.get_card()
+                                                    for d in compare_dashboard_data
+                                                ],
+                                                cols=2,
+                                            ),
+                                            dmc.Space(h=8),
                                         ],
-                                        cols=2,
+                                        showLabel=SHOW_MORE_LABEL,
+                                        hideLabel="Hide",
+                                        maxHeight=SPOILER_MAH,
                                     ),
-                                    dmc.Space(h=8),
                                     dmc.Group(
                                         [
                                             dmc.Text(
@@ -310,13 +389,21 @@ def layout(**kwargs):
                                             ),
                                         ]
                                     ),
-                                    dmc.SimpleGrid(
+                                    dmc.Spoiler(
                                         children=[
-                                            d.get_card() for d in map_dashboard_data
+                                            dmc.SimpleGrid(
+                                                children=[
+                                                    d.get_card()
+                                                    for d in map_dashboard_data
+                                                ],
+                                                cols=2,
+                                            ),
+                                            dmc.Space(h=8),
                                         ],
-                                        cols=2,
+                                        showLabel=SHOW_MORE_LABEL,
+                                        hideLabel="Hide",
+                                        maxHeight=55,
                                     ),
-                                    dmc.Space(h=8),
                                     dmc.Group(
                                         [
                                             dmc.Text(
@@ -331,12 +418,58 @@ def layout(**kwargs):
                                             ),
                                         ]
                                     ),
-                                    dmc.SimpleGrid(
+                                    dmc.Spoiler(
                                         children=[
-                                            d.get_card() for d in ts_dashboard_data
+                                            dmc.SimpleGrid(
+                                                children=[
+                                                    d.get_card()
+                                                    for d in ts_dashboard_data
+                                                ],
+                                                cols=3,
+                                                pb=12,
+                                                breakpoints=[
+                                                    {
+                                                        "maxWidth": 900,
+                                                        "cols": 2,
+                                                        "spacing": "sm",
+                                                    },
+                                                ],
+                                            ),
+                                            dmc.Space(h=8),
                                         ],
-                                        cols=2,
-                                        pb=12,
+                                        showLabel=SHOW_MORE_LABEL,
+                                        hideLabel="Hide",
+                                        maxHeight=SPOILER_MAH,
+                                    ),
+                                    dmc.Group(
+                                        [
+                                            dmc.Text(
+                                                "Deployment Dashboards",
+                                                size="1rem",
+                                                weight=500,
+                                            ),
+                                            dmc.Text(
+                                                "Explore the Biodiversity in a specific area",
+                                                size="md",
+                                                weight=300,
+                                            ),
+                                        ]
+                                    ),
+                                    dmc.Spoiler(
+                                        children=[
+                                            dmc.SimpleGrid(
+                                                children=[
+                                                    d.get_card()
+                                                    for d in deployment_dashboard_data
+                                                ],
+                                                cols=2,
+                                                pb=12,
+                                            ),
+                                            dmc.Space(h=8),
+                                        ],
+                                        showLabel=SHOW_MORE_LABEL,
+                                        hideLabel="Hide",
+                                        maxHeight=SPOILER_MAH,
                                     ),
                                 ],
                                 spacing="sm",
