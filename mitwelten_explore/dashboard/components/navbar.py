@@ -258,7 +258,7 @@ nav_settings_target = dmc.Menu(
                 ],
                 px=NAV_TARGET_PADDING_X,
                 style={"cursor": "pointer"},
-                h="39px"
+                h="39px",
             ),
         ),
         dmc.MenuDropdown(
@@ -349,6 +349,7 @@ nav_user_element = dmc.Group(
     ],
     spacing=0,
     pr=8,
+    pl=NAV_TARGET_PADDING_X,
 )
 
 nav_bar = dmc.Group(
@@ -360,14 +361,21 @@ nav_bar = dmc.Group(
                 nav_collection_target,
                 nav_viz_target,
                 nav_annotations_target,
-                nav_docs_target,
-                nav_settings_target,
             ],
             spacing=0,
             noWrap=True,
             mt=1,
         ),
-        nav_user_element,
+        dmc.Group(
+            [
+                nav_docs_target,
+                nav_settings_target,
+                nav_user_element,
+            ],
+            spacing=0,
+            noWrap=True,
+            mt=1,
+        ),
     ],
     style={"width": "100%", "height": "45px"},
     className="shadow-sm",
