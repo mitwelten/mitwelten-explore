@@ -6,15 +6,32 @@ Visual Exploration for Urban Biodiversity Monitoring
 
 Mitwelten Explore is an application for exploring biodiversity in and around Basel.
 
-## Content
+## Dashboards
 
 
 
-<details>
-  <summary>Explore Species 🦅</summary>
-  <p>Explore the spatial and temporal activity of more than 200 detected species</p>
-  <img src="mitwelten_explore/public/images/taxond.png" name="Taxon Dashboard" width=50%>
-</details>
+### Species Dashboard 🦅
+Explore the spatial and temporal activity of more than 200 detected species
+![Taxon Dashboard](mitwelten_explore/public/images/taxond.png)
+
+### Habitat-specific biodiversity 🌲
+Discover the ontodiversity in specific places
+![Deployment Dashboard](mitwelten_explore/public/images/deploymentd.png)
+
+### Compare different datasets 🔬
+Find the factors that influence biodiversity
+![Comparison Dashboard](mitwelten_explore/public/images/compd.png)
+
+### Analyze spatial activities 🗺
+Analyze spatial differences and find out where you could spot certain species
+![Map Dashboard](mitwelten_explore/public/images/mapd.png)
+
+### Spot trends over time 📅
+Learn about the seasonal and daily changes in biodiversity
+![Ts Dashboard](mitwelten_explore/public/images/tsd.png)
+
+
+
 
 ## Deployment
 
