@@ -79,7 +79,7 @@ nav_dataset_target = dmc.Menu(
                     href=PATH_PREFIX + "select/pollinator",
                 ),
                 dmc.MenuItem(
-                    "Mitwelten Bird Deployments",
+                    "Mitwelten Bird Diversity",
                     icon=get_icon(icons.bird, 24),
                     href=PATH_PREFIX + "select/bird",
                 ),
