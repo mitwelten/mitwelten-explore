@@ -8,12 +8,13 @@ Mitwelten Explore is an application for exploring biodiversity in and around Bas
 
 ## Content
 
-Explore Species 🦅
-
->Explore the spatial and temporal activity of more than 200 detected species
-![taxondashboard](mitwelten_explore/public/images/taxond.png)
 
 
+<details>
+  <summary>Explore Species 🦅</summary>
+  <p>Explore the spatial and temporal activity of more than 200 detected species</p>
+  <img src="mitwelten_explore/public/images/taxond.png" name="Taxon Dashboard" width=50%>
+</details>
 
 ## Deployment
 
