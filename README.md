@@ -10,6 +10,16 @@ Mitwelten Explore is an application for exploring biodiversity in and around Bas
 
 ![steps](mitwelten_explore/public/images/diagram-steps_github.png)
 
+## Available Data Categories
+
+- Taxon: Detections of a species, genus, order, family, class, phylum, or kingdom. This includes birds and pollinators.
+- Pollinator: pollinators detected from the Mitwelten pollinator study.
+- Bird Diversity: The number of distinct species observed at specific locations.
+- Meteodata: Meteodata from MeteoSwiss.
+- PAX: Values of the PAX sensors.
+- ENV Measurements: Temperature, humidity and soil moisture recorded by the Environment Sensor Nodes.
+- Taxon (GBIF): observations of a species, genus, order, family, class, phylum, or kingdom from external sources provided by GBIF.
+
 ## Dashboards
 
 ### Species Dashboard 🦅
