@@ -2,16 +2,23 @@
 
 This page gives an overview of the datasets that are available in this tool.
 
-## Meteodata
+## Dataset categories
 
-*Datasets can be selected in [Datasets > Meteodata](select/meteo)*
+Category|Data source|description
+:---|-|-
+[Detections by Taxonomy](select/taxon)|[Mitwelten](https://www.mitwelten.org), [GBIF](https://www.gbif.org/)|Number of detections of a selected taxon. A taxon can be a Species, Genus,Family, Order, Class, Phylum or Kingdom. For every Taxon there exist two datasets, Mitwelten detections and GBIF Detections. 
+[Mitwelten Pollinators](select/pollinator)|[Mitwelten](https://www.mitwelten.org)|Pollinator detections of a specific pollinator category or at a specific location.
+[Mitwelten Bird Diversity](select/bird)|[Mitwelten](https://www.mitwelten.org)|The number of distinct bird species recorded at specific locations.
+[Mitwelten PAX](select/pax)|[Mitwelten](https://www.mitwelten.org)|PAX values recorded at specific locations.
+[Meteodata](select/meteo)|[MeteoSchweiz](https://www.meteoschweiz.admin.ch/)|Meteodata recorded at different locations.
+[Mitwelten ENV](select/env)|[Mitwelten](https://www.mitwelten.org)|Air temperature, humidity and soil moisture values (2021 only).
 
 
-Meteodata are provided by [MeteoSchweiz](https://www.meteoschweiz.admin.ch/).
-The parameters are available in raw form and as aggregated values, with the aggregation described in the respective parameter name.
+
+---
 
 
-## Bird Dataset
+## Bird Detections
 
 *The Bird Dataset is located in [Datasets > Detections by Taxonomy](select/taxon)*
 
@@ -27,11 +34,6 @@ Recording periods were not uniform across all microphones. A smaller recording p
 
 
 
-## Pax Data
-
-*PAX data can be selected in [Datasets > Mitwelten PAX](select/pax)*
-
-A PAX Counter is a system that counts smartphones. As part of the Mitwelten project, PAX counters were developed that receive periodically transmitted signals from smartphones and transmit the number of unique smartphones within a radius of a few meters as a measured value. The sum of the detected devices per time interval is transmitted. If a device is in range over several measurement intervals, it is counted in each measurement. For PAX counters connected via WiFi, the measurement interval is much smaller than for LoRa devices, which makes a direct comparison impossible.
 
 
 ## Pollinators
@@ -59,6 +61,20 @@ On the captured images, flowers are cut out with an ML object recognition model,
 
 <img src="assets/images/polli_taxonomy.png" style="maxWidth:100%;" />
 
+## Pax Data
+
+*PAX data can be selected in [Datasets > Mitwelten PAX](select/pax)*
+
+A PAX Counter is a system that counts smartphones. As part of the Mitwelten project, PAX counters were developed that receive periodically transmitted signals from smartphones and transmit the number of unique smartphones within a radius of a few meters as a measured value. The sum of the detected devices per time interval is transmitted. If a device is in range over several measurement intervals, it is counted in each measurement. For PAX counters connected via WiFi, the measurement interval is much smaller than for LoRa devices, which makes a direct comparison impossible.
+
+
+## Meteodata
+
+*Datasets can be selected in [Datasets > Meteodata](select/meteo)*
+
+
+Meteodata are provided by [MeteoSchweiz](https://www.meteoschweiz.admin.ch/).
+The parameters are available in raw form and as aggregated values, with the aggregation described in the respective parameter name.
 
 
 ## Env Sensor Data
@@ -73,9 +89,6 @@ Following parameters were measured by multiple low-power sensor nodes at differe
 * Relative air humidity, 30cm above ground (%RH)
 * Soil moisture, 5cm underneath the surface (Absolute value between 0 and 1024)
 
-## Location Characteristics
-
-*Work in progress*
 
 ## GBIF Records
 
