@@ -205,15 +205,6 @@ deployment_dashboard_data = [
     ),
 ]
 
-not_yet_func_alert = dmc.Alert(
-    dmc.Text(
-        "This website is currently under development and is not yet functional.",
-    ),
-    title=dmc.Text("Work in progress", size="1.1rem"),
-    color="yellow",
-    withCloseButton=True,
-)
-
 
 quickstart_card = dmc.Anchor(
     [
@@ -522,7 +513,6 @@ def layout(**kwargs):
                 ],
                 gutter="xl",
             ),
-            dmc.Affix(not_yet_func_alert, position={"bottom": 30, "right": 30}),
         ],
         className="container-xl",
     )
