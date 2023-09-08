@@ -47,7 +47,35 @@ Learn about the seasonal and daily changes in biodiversity
 
 ## Deployment
 
-### 1. Build docker image
+### Run locally
+
+1. Create a file `.env`:
+```sh
+cd mitwelten-explore
+nano .env
+```
+
+Write the KeyCloak parameters and the domain name to the file:
+```conf
+KC_SERVER_URL="https://auth.mitwelten.org/auth/"
+KC_CLIENT_ID="explore"
+KC_REALM_NAME="mitwelten"
+DOMAIN_NAME="http://localhost:8081"
+#REDIS_HOST="localhost" #optional
+#REDIS_PORT=6379 #optional
+```
+
+2. Install python packages:
+```sh
+cd mitwelten_explore
+pip install -r requirements.txt
+```
+3. Run the application
+```sh
+uvicorn main:app --port 8081 --reload
+```
+
+### Build docker image
 
 ```sh
 git clone https://github.com/mitwelten/mitwelten-explore.git
@@ -55,13 +83,13 @@ cd mitwelten-explore/mitwelten_explore
 docker build  -t cr.gitlab.fhnw.ch/mitwelten/docker-infrastructure/mitwelten-explore:0.1 .
 ```
 
-### 2. Push the image to the registry (optional)
+### Push the image to the registry (optional)
 
 ```sh
 docker push cr.gitlab.fhnw.ch/mitwelten/docker-infrastructure/mitwelten-explore:0.1
 docker push cr.gitlab.fhnw.ch/mitwelten/docker-infrastructure/mitwelten-explore:latest
 ```
-### 3. Run the container
+### Run the container
 ```sh
 docker run --rm -d -p 8081:80 \
     --env KC_SERVER_URL=https://auth.mitwelten.org/auth/ \
@@ -84,7 +112,7 @@ REDIS_HOST|no|host of a redis instance for caching requests
 REDIS_PORT|no|port of a redis database
 
 
-### 4. Run in docker compose
+### Run in docker compose
 
 Minimal example
 ```yaml
