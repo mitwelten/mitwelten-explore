@@ -65,16 +65,23 @@ cards = [
         color="teal",
     ),
     DSCard(
+        name="Mitwelten Bird Diversity",
+        icon=icons.bee,
+        text="Number of distinct species head at different locations by deployment",
+        url="select/pollinator",
+        color="teal",
+    ),
+    DSCard(
         name="Meteodata",
         icon=icons.meteoswiss,
-        text="Meteodata provided by MeteoSchweiz",
+        text="Meteodata provided by MeteoSchweiz - A variety of parameters from nearby meteo stations",
         url="select/meteo",
         color="red",
     ),
     DSCard(
         name="PAX Data",
         icon=icons.pax_counter,
-        text="Presence of Smartphones",
+        text="Presence of Smartphones at specific locations. The measurements were made using PAX counters",
         url="select/pax",
         color="cyan",
     ),
@@ -94,16 +101,6 @@ cards = [
     ),
 ]
 
-cards_in_progress = [
-    DSCard(
-        name="Location Characteristics",
-        icon=icons.search_location,
-        text="Characteristics of the measurement locations",
-        url=None,
-        color="gray",
-    ),
-]
-
 
 layout = dmc.Container(
     [
@@ -115,10 +112,6 @@ layout = dmc.Container(
         dmc.Space(h=20),
         dmc.Divider(),
         dmc.Space(h=20),
-        dmc.SimpleGrid(
-            cols=2,
-            children=[c.to_card() for c in cards]
-            + [c.to_card_no_link() for c in cards_in_progress],
-        ),
+        dmc.SimpleGrid(cols=2, children=[c.to_card() for c in cards]),
     ],
 )
