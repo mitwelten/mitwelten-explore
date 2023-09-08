@@ -31,6 +31,10 @@ All annotations are listed in the [Annotations page](annotations).
 To see a filtered view that only contains your own annotations, hover over your username in the page header, then click on [**My Annotations**](annotations?my_annotations=true).
 
 
+## Edit an annotation
+
+To edit an annotation that you have written, click on the "Edit" Button to the right of the annotation content.
+
 ## Delete an annotation
 
 *Users are only allowed to delete their own annotations.*

@@ -68,7 +68,7 @@ A Dashboard that compares Mitwelten detections of the class Insecta, Air tempera
 
 ## Taxon Dashboard
 
-the taxon dashboard was developed to analyze the temporal and spatial activity of species or higher taxonomic classes.
+The taxon dashboard was developed to analyze the temporal and spatial activity of species or higher taxonomic classes.
 There are two ways to access the Taxon Dashboard:
 * If a taxon dataset is in the collection, there will be a button **Taxon Dashboard** next to the dataset name in [your Collection](collection)
 * There is a direct link to the Taxon Dashboard for every taxon in the [Detections by Taxonomy](/app/select/taxon) selection page, after clicking on an item in the list.
@@ -97,4 +97,52 @@ A Taxon Dashboard for the order Apodiformes is shown in the image below.
 <img src="assets/images/taxon_dashboard.png" style="maxWidth:75%;border:1px solid gray;" />
 </div>
 
+
+## Map Dashboard
+
+The map dashboard is intended for analyzing the spatial dimension of datasets. It can be used to analyze a single dataset or for the comparison of to datasets.
+
+Supported dataset types are
+* Detections by taxonomy (GBIF and Mitwelten)
+* Bird diversity
+* Dashboard-specific default datasets:
+  * PAX Counters
+  * Environment factors (Sun exposure, Distance to rivers or lakes, Fragmentation of the area ...)
+
+The Dashboard contains following components:
+* An interactive map to visualize the data
+* A legend with dataset-specific configuration options and a button to toggle the visibility
+* Map layer configuration options
+* Map type options to switch to a bubble map visualization
+
+
+A Map Dashboard that visualizes detected birds of the order Apodiformes is shown below.
+
+<div style="padding:15px 15px 15px 15px">
+<img src="assets/images/map_dashboard.png" style="maxWidth:75%;border:1px solid gray;" />
+</div>
+
+
+## Deployment Dashboard
+
+The deployment dashboard was developed to analyze biodiversity recorded by a specific deployment or by a set of deployments.
+
+Supported dataset types are
+* Bird diversity 
+* Mitwelten pollinators
+
+The Dashboard contains following components:
+* A pie chart that shows a breakdown of the detections into species
+* A list of detected species with links to the respective taxon dashboards
+* A map that shows
+  * The location(s) of the data collection with blue markers
+  * Points where the environment characteristics are known
+* Information about the collected raw data
+* A Spider Plot that visualizes the environment characteristics
+
+A Deployment Dashboard for the Audio Deployment 679 is shown below.
+
+<div style="padding:15px 15px 15px 15px">
+<img src="assets/images/deployment_dashboard.png" style="maxWidth:75%;border:1px solid gray;" />
+</div>
 

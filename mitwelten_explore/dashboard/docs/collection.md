@@ -15,3 +15,5 @@ In the collection overview, ther are dashboard links for every collected dataset
 
 To remove a collected dataset from the collection, click on the red button with a trash icon and confirm your action.
 
+To remove all datasets from your collection, hover over your username in the navbar and click on "Clear Collection".
+
