@@ -15,7 +15,7 @@ dash-bootstrap-components==1.4.1
 dash-bootstrap-templates==1.0.8
 dash-quill==0.0.4
 h3==3.7.6
-pydantic==1.10.2
+pydantic==1.10.13
 redis==4.5.5
 markdownify==0.11.6
 markdown==3.4.3
