@@ -1,0 +1,35 @@
+# direct dependencies of mitwelten-explore.
+# lock with:
+# uv pip compile requirements.in -o requirements.txt --python-version 3.13 --python-platform x86_64-manylinux_2_28 --upgrade
+
+# web server / auth
+fastapi
+uvicorn
+a2wsgi
+python-keycloak
+jwcrypto
+PyJWT
+python-dotenv
+
+# dash app
+dash
+flask
+dash-mantine-components
+dash-iconify
+dash-bootstrap-components
+dash-bootstrap-templates
+plotly
+
+# data handling
+numpy
+pandas
+scipy
+h3
+requests
+requests-cache
+redis
+
+# text / annotations
+markdown
+markdownify
+bleach
