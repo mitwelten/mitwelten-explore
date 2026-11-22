@@ -1,5 +1,5 @@
 import datetime
-from enum import Enum
+from enum import StrEnum
 from configuration import DEFAULT_AGGREGATION, DEFAULT_CONFIDENCE
 from dashboard.styles import icons, icon_urls
 from dashboard.utils.text_utils import format_datetime
@@ -62,7 +62,7 @@ class Annotation:
         return self.timestamp < other.timestamp
 
 
-class DatasetType(str, Enum):
+class DatasetType(StrEnum):
     meteodata = "meteodata"
     birds = "birds"
     flowers = "flowers"
@@ -88,7 +88,7 @@ rank_hierarchy_list = [
 ]
 
 
-class RankEnum(str, Enum):
+class RankEnum(StrEnum):
     kingdom = "KINGDOM"
     phylum = "PHYLUM"
     _class = "CLASS"
@@ -358,7 +358,7 @@ class MultiPaxDataset:
         return "pax"
 
 
-class PollinatorClass(str, Enum):
+class PollinatorClass(StrEnum):
     fliege = "fliege"
     wildbiene = "wildbiene"
     schwebfliege = "schwebfliege"
