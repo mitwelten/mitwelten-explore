@@ -4,13 +4,16 @@ from markdownify import markdownify
 
 cr = CachedRequest("third_party_cache",2*60*60)
 
+# Wikimedia APIs answer 403 to the default python-requests User-Agent
+WIKIMEDIA_HEADERS = {"User-Agent": "MitweltenExplore/1.0 (https://explore.mitwelten.org)"}
+
 def get_wiki_summary(sciname, lang="de", char_limit=None):
     url = "https://{}.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles={}".format(
         lang, sciname
     )
     if char_limit is not None:
         url += "&exchars={}".format(char_limit)
-    result = cr.get(url).json()
+    result = cr.get(url, headers=WIKIMEDIA_HEADERS).json()
     page_id = next(iter(result["query"]["pages"]))
     summary = {
         "extract": result["query"]["pages"][page_id].get("extract"),
@@ -28,7 +31,7 @@ def generate_wiki_link(sciname, lang="de"):
 
 def request_image_extmetadata(image_name):
     url = f"https://commons.wikimedia.org/w/api.php?action=query&titles=File:{image_name}&prop=imageinfo&iiprop=user|userid|canonicaltitle|url|extmetadata&format=json"
-    req = cr.get(url)
+    req = cr.get(url, headers=WIKIMEDIA_HEADERS)
     if req.status_code == 200:
         result = req.json()
         
