@@ -36,16 +36,7 @@ import datetime
 from uuid import uuid4
 
 
-import dash_quill
-
-DEFAULT_TOOLBAR_MODS = [
-    [{"header": "1"}, {"header": "2"}, "bold", "italic"],
-    [
-        {"list": "ordered"},
-        {"list": "bullet"},
-    ],
-    ["link"],
-]
+from dashboard.aio_components.aio_texteditor_component import rich_text_editor
 
 dash.register_page(__name__, path="/annotations")
 
@@ -443,16 +434,9 @@ def annot_container(
             dmc.Text(annot.title, fw=700, fz="2rem"),
             dmc.Space(h=12),
             dmc.CardSection(
-                dash_quill.Quill(
-                    value=to_html(annot.md_content),
+                rich_text_editor(
                     id=ids.texteditor,
-                    maxLength=10000,
-                    modules={
-                        "toolbar": DEFAULT_TOOLBAR_MODS,
-                        "clipboard": {
-                            "matchVisual": True,
-                        },
-                    },
+                    html=to_html(annot.md_content),
                 )
             ),
         ],
@@ -644,7 +628,7 @@ def update_annotation_container(search, href):
 @callback(
     Output(ids.url, "href"),
     Input(ids.save_btn, "n_clicks"),
-    State(ids.texteditor, "value"),
+    State(ids.texteditor, "html"),
     State(ids.url, "search"),
     State(ids.url, "href"),
 )

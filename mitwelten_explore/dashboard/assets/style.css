@@ -13,14 +13,14 @@
 
 }
 
-.ql-editor {
-
+/* annotation editor (dmc.RichTextEditor) */
+.mantine-RichTextEditor-content {
     max-height: 35vh;
-    min-height: 20vh;
-
-
-    /*max-height: max-content;*/
     overflow-y: auto;
+}
+
+.mantine-RichTextEditor-content .ProseMirror {
+    min-height: 20vh;
 }
 
 .tooltip .tooltip-inner {

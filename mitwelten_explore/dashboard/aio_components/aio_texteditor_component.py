@@ -1,4 +1,3 @@
-import dash_quill
 from dash import (
     Dash,
     Output,
@@ -23,13 +22,33 @@ from dashboard.utils.text_utils import to_base64, from_base64, to_markdown
 
 
 DEFAULT_TOOLBAR_MODS = [
-    [{"header": "1"}, {"header": "2"}, "bold", "italic"],
-    [
-        {"list": "ordered"},
-        {"list": "bullet"},
-    ],
-    ["link"],
+    ["H1", "H2", "Bold", "Italic"],
+    ["OrderedList", "BulletList"],
+    ["Link", "Unlink"],
 ]
+
+EDITOR_EXTENSIONS = [
+    {
+        "StarterKit": {
+            "heading": {"levels": [1, 2]},
+            "codeBlock": False,
+            "strike": False,
+            "horizontalRule": False,
+        }
+    },
+    {"Placeholder": {"placeholder": "Describe what you have found..."}},
+]
+
+
+def rich_text_editor(id, html="", toolbar_mods=DEFAULT_TOOLBAR_MODS):
+    """Annotation text editor; its `html` prop holds the content (was dash_quill `value`)."""
+    return dmc.RichTextEditor(
+        id=id,
+        html=html,
+        extensions=EDITOR_EXTENSIONS,
+        toolbar={"sticky": True, "controlsGroups": toolbar_mods},
+        debounce=300,
+    )
 
 
 class TextEditorAIO(html.Div):
@@ -137,16 +156,10 @@ class TextEditorAIO(html.Div):
                             # debounce=100
                         ),
                         dmc.Space(h=4),
-                        dash_quill.Quill(
+                        rich_text_editor(
                             id=self.ids.editor_input(self.aio_id),
-                            value=default_html,
-                            maxLength=10000,
-                            modules={
-                                "toolbar": toolbar_mods,
-                                "clipboard": {
-                                    "matchVisual": True,
-                                },
-                            },
+                            html=default_html,
+                            toolbar_mods=toolbar_mods,
                         ),
                         dmc.Space(h=12),
                         dmc.Group(
@@ -291,7 +304,7 @@ class TextEditorAIO(html.Div):
     # update store
     @callback(
         Output(ids.store(MATCH), "data"),
-        Input(ids.editor_input(MATCH), "value"),
+        Input(ids.editor_input(MATCH), "html"),
         Input(ids.title_input(MATCH), "value"),
     )
     def update_store(value, title):
@@ -356,7 +369,7 @@ class TextEditorAIO(html.Div):
     # clear store on publish
     @callback(
         Output(ids.title_input(MATCH), "value"),
-        Output(ids.editor_input(MATCH), "value"),
+        Output(ids.editor_input(MATCH), "html"),
         Output(ids.annot_published_store(MATCH), "data", allow_duplicate=True),
         Input(ids.annot_published_store(MATCH), "modified_timestamp"),
         State(ids.annot_published_store(MATCH), "data"),
