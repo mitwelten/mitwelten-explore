@@ -105,4 +105,4 @@ def render_docs_content(active):
             f"#{active}",
         )
     else:
-        return no_update  
+        return no_update

@@ -11,7 +11,7 @@ window.dash_clientside.clientside = {
 
                 id = JSON.stringify(sortObjectByKeys(id));
             }
-            
+
             dragElement(document.getElementById(id));
 
             function sortObjectByKeys(obj) {
@@ -19,7 +19,7 @@ window.dash_clientside.clientside = {
                     .sort()
                     .reduce((acc, key) => ({ ...acc, [key]: obj[key] }), {});
             }
-            
+
 
             function dragElement(elmnt) {
                 var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;

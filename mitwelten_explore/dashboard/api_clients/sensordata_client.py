@@ -7,7 +7,7 @@ def get_pax_timeseries(deployment_id,bucket_width,  time_from=None, time_to = No
     res = cr.get(url)
     if res.status_code == 200:
         return res.json()
-       
+
     return None
 
 def get_pax_tod(deployment_id,bucket_width_m,  time_from=None, time_to = None):
@@ -15,7 +15,7 @@ def get_pax_tod(deployment_id,bucket_width_m,  time_from=None, time_to = None):
     res = cr.get(url)
     if res.status_code == 200:
         return res.json()
-       
+
     return None
 
 def get_pax_locations(deployment_id=None, time_from=None, time_to = None):
@@ -23,7 +23,7 @@ def get_pax_locations(deployment_id=None, time_from=None, time_to = None):
     res = cr.get(url)
     if res.status_code == 200:
         return res.json()
-       
+
     return None
 
 
@@ -32,7 +32,7 @@ def get_env_timeseries(deployment_id,measurement_type, aggregation, bucket_width
     res = cr.get(url)
     if res.status_code == 200:
         return res.json()
-       
+
     return None
 
 def get_env_tod(deployment_id,measurement_type, aggregation, bucket_width_m,  time_from=None, time_to = None):
@@ -40,5 +40,5 @@ def get_env_tod(deployment_id,measurement_type, aggregation, bucket_width_m,  ti
     res = cr.get(url)
     if res.status_code == 200:
         return res.json()
-       
+
     return None

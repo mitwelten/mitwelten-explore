@@ -34,7 +34,7 @@ def request_image_extmetadata(image_name):
     req = cr.get(url, headers=WIKIMEDIA_HEADERS)
     if req.status_code == 200:
         result = req.json()
-        
+
         page_id = next(iter(result["query"]["pages"]))
         if page_id == "-1":
             return None
@@ -63,10 +63,8 @@ def generate_image_attribution(image_url):
                 artist_md += f", [{license}]({license_url})"
             elif license is not None:
                 artist_md += f", {license} "
-                
+
             return artist_md
         except AttributeError:
             return None
     return None
-
-
