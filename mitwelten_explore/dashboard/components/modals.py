@@ -45,7 +45,7 @@ def viz_single_dataset_select_modal(opened, id="select_ts_modal"):
         withCloseButton=False,
         closeOnClickOutside=False,
         closeOnEscape=False,
-        overlayBlur=8,
+        overlayProps={"blur": 8},
         children=dmc.Center(dmc.Loader()),
     )
 
@@ -161,7 +161,7 @@ def viz_compare_select_modal(
         withCloseButton=False,
         closeOnClickOutside=False,
         closeOnEscape=False,
-        overlayBlur=8,
+        overlayProps={"blur": 8},
         children=dmc.Center(dmc.Loader()),
     )
 
@@ -615,9 +615,9 @@ def taxon_select_modal(taxon_id, id_role, gbif_add_id_role):
                                         },
                                     ),
                                 ],
-                                className="col-md-4"
+                                span={"base": 12, "sm": 4}
                                 if selected_taxon.image_url
-                                else "col-md-auto",
+                                else {"base": 12, "sm": "content"},
                             ),
                             dmc.GridCol(
                                 [
@@ -631,9 +631,9 @@ def taxon_select_modal(taxon_id, id_role, gbif_add_id_role):
                                         },
                                     ),
                                 ],
-                                className="col-md-8"
+                                span={"base": 12, "sm": 8}
                                 if selected_taxon.image_url
-                                else "col-md-auto",
+                                else {"base": 12, "sm": "content"},
                                 # pl=40,
                             ),
                         ],

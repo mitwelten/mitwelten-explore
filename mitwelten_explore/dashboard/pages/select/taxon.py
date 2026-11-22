@@ -40,15 +40,17 @@ dash.register_page(__name__, path="/select/taxon")
 
 
 level_select_radiogroup = dmc.RadioGroup(
-    [
-        dmc.Radio(dmc.Text(str(l).title(), fw=500), value=l, color="teal")
-        for l in reversed([e.value for e in RankEnum])
-    ],
+    dmc.Group(
+        [
+            dmc.Radio(dmc.Text(str(l).title(), fw=500), value=l, color="teal", size="sm")
+            for l in reversed([e.value for e in RankEnum])
+        ],
+        mt=4,
+    ),
     id=ids.level_select_rg,
     value=RankEnum.species,
     # label="Select a level",
     size="sm",
-    offset=4
 )
 
 title_group = dmc.Group(

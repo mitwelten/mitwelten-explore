@@ -2,6 +2,7 @@ from dash import Dash, Output, Input, State, html, dcc, callback, MATCH, ctx, no
 import uuid
 from dash.exceptions import PreventUpdate
 import dash_mantine_components as dmc
+from dashboard.components.overlays import loading_overlay
 import math
 from dash_iconify import DashIconify
 
@@ -111,7 +112,7 @@ class PagedListSearchableAIO(html.Div):
         if use_loadingoverlay:
             scrollarea = dmc.ScrollArea(
                 className="flex-grow-1",
-                children=dmc.LoadingOverlay(
+                children=loading_overlay(
                     id=self.ids.scroll_area(self.aio_id),
                     children=dmc.Stack(items[:items_per_page], gap=STACK_SPACING),
                 ),
@@ -147,13 +148,14 @@ class PagedListSearchableAIO(html.Div):
                             ),
                             legend,
                             scrollarea,
-                            dmc.Pagination(
-                                total=n_pages,
-                                siblings=1,
-                                page=1,
-                                id=self.ids.pager(self.aio_id),
-                                grow=False,
-                                position="center",
+                            dmc.Group(
+                                dmc.Pagination(
+                                    total=n_pages,
+                                    siblings=1,
+                                    value=1,
+                                    id=self.ids.pager(self.aio_id),
+                                ),
+                                justify="center",
                             ),
                         ],
                         style=dict(height=height),
@@ -166,11 +168,11 @@ class PagedListSearchableAIO(html.Div):
         )
 
     @callback(
-        Output(ids.pager(MATCH), "page"),
+        Output(ids.pager(MATCH), "value"),
         Output(ids.pager(MATCH), "total"),
         Output(ids.scroll_area(MATCH), "children"),
         Output(ids.search_input(MATCH), "value"),
-        Input(ids.pager(MATCH), "page"),
+        Input(ids.pager(MATCH), "value"),
         Input(ids.store(MATCH), "modified_timestamp"),
         Input(ids.search_input(MATCH), "value"),
         Input(ids.clear_input_btn(MATCH), "n_clicks"),
@@ -303,20 +305,21 @@ class PagedListAIO(html.Div):
                                 className="flex-grow-1",
                                 # id=self.ids.scroll_area(self.aio_id),
                                 # children=dmc.Stack(items[:ITEMS_PER_PAGE]),
-                                children=dmc.LoadingOverlay(
+                                children=loading_overlay(
                                     id=self.ids.scroll_area(self.aio_id),
                                     children=dmc.Stack(
                                         items[:items_per_page], gap=STACK_SPACING
                                     ),
                                 ),
                             ),
-                            dmc.Pagination(
-                                total=n_pages,
-                                siblings=1,
-                                page=1,
-                                id=self.ids.pager(self.aio_id),
-                                grow=False,
-                                position="center",
+                            dmc.Group(
+                                dmc.Pagination(
+                                    total=n_pages,
+                                    siblings=1,
+                                    value=1,
+                                    id=self.ids.pager(self.aio_id),
+                                ),
+                                justify="center",
                             ),
                         ],
                         style=dict(height=height),
@@ -328,10 +331,10 @@ class PagedListAIO(html.Div):
         )
 
     @callback(
-        Output(ids.pager(MATCH), "page"),
+        Output(ids.pager(MATCH), "value"),
         Output(ids.pager(MATCH), "total"),
         Output(ids.scroll_area(MATCH), "children"),
-        Input(ids.pager(MATCH), "page"),
+        Input(ids.pager(MATCH), "value"),
         Input(ids.store(MATCH), "modified_timestamp"),
         State(ids.store(MATCH), "data"),
         State(ids.config_store(MATCH), "data"),
@@ -406,7 +409,7 @@ class SearchableListAIO(html.Div):
         if use_loadingoverlay:
             scrollarea = dmc.ScrollArea(
                 className="flex-grow-1",
-                children=dmc.LoadingOverlay(
+                children=loading_overlay(
                     id=self.ids.scroll_area(self.aio_id),
                     children=dmc.Stack(items, gap=STACK_SPACING),
                 ),
@@ -457,7 +460,7 @@ class SearchableListAIO(html.Div):
         )
 
     @callback(
-        # Output(ids.pager(MATCH), "page"),
+        # Output(ids.pager(MATCH), "value"),
         # Output(ids.pager(MATCH), "total"),
         Output(ids.scroll_area(MATCH), "children"),
         Output(ids.search_input(MATCH), "value"),

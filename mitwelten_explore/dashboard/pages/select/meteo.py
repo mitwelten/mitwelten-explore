@@ -2,6 +2,7 @@ import dash
 from dash import dcc, callback, Input, Output, State, ctx, no_update, ALL
 from dash.exceptions import PreventUpdate
 import dash_mantine_components as dmc
+from dashboard.components.overlays import loading_overlay
 from dashboard.styles import get_icon, icons
 from dashboard.aio_components.aio_list_component import PagedListSearchableAIO
 from dashboard.data_handler import (
@@ -291,8 +292,8 @@ def layout(**qargs):
                     dmc.GridCol(
                         [
                             dmc.Space(h=12),
-                            dmc.LoadingOverlay(
-                                plaio_meteo, transitionDuration=200, overlayOpacity=0
+                            loading_overlay(
+                                plaio_meteo, overlay_opacity=0
                             ),
                         ],
                         span={"base": 12, "md": 7},

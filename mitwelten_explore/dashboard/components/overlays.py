@@ -1,3 +1,4 @@
+from dash import dcc, html
 import dash_mantine_components as dmc
 from dashboard.styles import icons, get_icon
 from dashboard.models import to_typed_dataset, DatasetType, UrlSearchArgs
@@ -5,13 +6,34 @@ from configuration import PATH_PREFIX
 from dashboard.utils.communication import urlencode_dict
 
 
+def loading_overlay(children, id=None, style=None, overlay_opacity=0.75, custom_spinner=None):
+    """Show a loader on top of `children` while a callback updates them.
+
+    Replaces the wrapper-style `dmc.LoadingOverlay` of DMC 0.12, which no longer
+    takes children (DMC >= 0.14 only has a controlled `visible` overlay).
+    `overlay_opacity` is the opacity of the white cover (0 = children stay fully visible).
+    If `id` is given, it is set on an inner div so that callbacks can keep writing
+    to `Output(id, "children")`.
+    """
+    if id is not None:
+        children = html.Div(children, id=id)
+    return dcc.Loading(
+        children,
+        parent_style={"position": "relative", **(style or {})},
+        overlay_style={"visibility": "visible", "opacity": 1 - overlay_opacity}
+        if overlay_opacity < 1
+        else None,
+        custom_spinner=custom_spinner if custom_spinner is not None else dmc.Loader(),
+        delay_show=100,
+    )
+
+
 def chart_loading_overlay(children, position="left", style=None):
-    return dmc.LoadingOverlay(
+    return loading_overlay(
         children,
         style=style,
-        overlayOpacity=0,
-        transitionDuration=400,
-        loader=dmc.Card(
+        overlay_opacity=0,
+        custom_spinner=dmc.Card(
             dmc.Group(
                 [
                     dmc.Loader(
@@ -62,7 +84,6 @@ def tooltip(
             withArrow=arrow,
             openDelay=opendelay,
             color=color,
-            events="hover",
         )
 
 

@@ -44,15 +44,13 @@ def timeseries_chart_config_menu(
     menu_dd_children = []
     if chart_type_id:
         type_radiogroup = dmc.RadioGroup(
-            [dmc.Radio(l, value=k) for k, l in TS_CHART_TYPES],
+            dmc.Stack([dmc.Radio(l, value=k, size="sm") for k, l in TS_CHART_TYPES], gap="xs"),
             id=chart_type_id,
             persistence=True,
             value=TS_CHART_TYPES[0][0]
             if default_chart_type_index is None
             else TS_CHART_TYPES[default_chart_type_index][0],
-            orientation="vertical",
             size="sm",
-            spacing="xs",
             pl=8,
             pb=8,
         )
@@ -74,13 +72,11 @@ def timeseries_chart_config_menu(
 
     if layout_type_id:
         layout_type_radiogroup = dmc.RadioGroup(
-            [dmc.Radio(l, value=k) for k, l in TS_CHART_LAYOUTS],
+            dmc.Stack([dmc.Radio(l, value=k, size="sm") for k, l in TS_CHART_LAYOUTS], gap="xs"),
             id=layout_type_id,
             persistence=True,
             value=TS_CHART_LAYOUTS[1][0],
-            orientation="vertical",
             size="sm",
-            spacing="xs",
             pl=8,
             pb=8,
         )

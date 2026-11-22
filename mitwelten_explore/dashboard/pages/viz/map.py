@@ -3,6 +3,7 @@ from dash import dcc, callback, Input, Output, State, ctx, html, no_update, ALL
 from dash.exceptions import PreventUpdate
 import flask
 import dash_mantine_components as dmc
+from dashboard.components.overlays import chart_loading_overlay
 from dashboard.aio_components.aio_hexbinmap_component import (
     H3HexBinMapMultiAIO,
     LocationData,
@@ -237,35 +238,7 @@ def layout(**qargs):
             dmc.Grid(
                 [
                     dmc.GridCol(
-                        dmc.LoadingOverlay(
-                            multihexmap,
-                            overlayOpacity=0,
-                            transitionDuration=400,
-                            loader=dmc.Card(
-                                dmc.Group(
-                                    [
-                                        dmc.Loader(
-                                            size="sm",
-                                            color="teal.5",
-                                        ),
-                                        dmc.Text(
-                                            "Loading",
-                                            c="gray.9",
-                                            fw=500,
-                                            size="md",
-                                        ),
-                                    ],
-                                ),
-                                style={
-                                    "position": "absolute",
-                                    "bottom": 10,
-                                    "left": 10,
-                                    "backgroundColor": "rgba(245, 245, 245,0.8)",
-                                },
-                                py=3,
-                                px=5,
-                            ),
-                        ),
+                        chart_loading_overlay(multihexmap),
                         span={"base": 12, "sm": 10},
                     ),
                     dmc.GridCol(

@@ -3,6 +3,7 @@ from dash import dcc, callback, Input, Output, State, ctx, html, no_update, ALL
 from dash.exceptions import PreventUpdate
 import flask
 import dash_mantine_components as dmc
+from dashboard.components.overlays import loading_overlay
 from dashboard.models import UrlSearchArgs, to_typed_dataset, Annotation, DatasetType
 from dashboard.styles import icons, get_icon
 from dashboard.components.navbar import ThemeSwitchAIO
@@ -280,7 +281,7 @@ def layout(**qargs):
                 [
                     dmc.GridCol(
                         [
-                            dmc.AccordionMultiple(
+                            dmc.Accordion(
                                 [
                                     dmc.AccordionItem(
                                         [
@@ -297,7 +298,7 @@ def layout(**qargs):
                                                         justify="center",
                                                         p=0,
                                                     ),
-                                                    dmc.LoadingOverlay(
+                                                    loading_overlay(
                                                         dcc.Graph(
                                                             id=ids.pie_chart,
                                                             figure=no_data_figure(
@@ -306,8 +307,7 @@ def layout(**qargs):
                                                             config=dict(
                                                                 displayModeBar=False,
                                                             ),
-                                                        ),
-                                                        transitionDuration=400,
+                                                        )
                                                     ),
                                                 ]
                                             ),
@@ -350,7 +350,7 @@ def layout(**qargs):
                                                         id=ids.data_stats_indicator,
                                                         justify="center",
                                                     ),
-                                                    dmc.LoadingOverlay(
+                                                    loading_overlay(
                                                         dcc.Graph(
                                                             id=ids.data_bar_chart,
                                                             figure=no_data_figure(
@@ -359,8 +359,7 @@ def layout(**qargs):
                                                             config=dict(
                                                                 displayModeBar=False,
                                                             ),
-                                                        ),
-                                                        transitionDuration=400,
+                                                        )
                                                     ),
                                                 ]
                                             ),
@@ -392,6 +391,7 @@ def layout(**qargs):
                                     ),
                                 ],
                                 variant="contained",
+                                multiple=True,
                                 value=["detections"],
                                 # value="detections",
                                 styles={"content": {"padding": 0}},
@@ -400,7 +400,7 @@ def layout(**qargs):
                         span={"base": 12, "md": 5},
                     ),
                     dmc.GridCol(
-                        dmc.LoadingOverlay(plaio, transitionDuration=400),
+                        loading_overlay(plaio),
                         span={"base": 12, "md": 7},
                     ),
                 ],

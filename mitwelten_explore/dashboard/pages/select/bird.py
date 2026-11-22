@@ -2,6 +2,7 @@ import dash
 from dash import callback, Input, Output, State, no_update, ctx, ALL, html, dcc
 from dash.exceptions import PreventUpdate
 import dash_mantine_components as dmc
+from dashboard.components.overlays import loading_overlay
 from uuid import uuid4
 import json
 from dashboard.styles import icons, get_icon
@@ -123,7 +124,7 @@ def layout(**qargs):
                     dmc.GridCol(
                         [
                             dmc.Space(h=12),
-                            dmc.LoadingOverlay(
+                            loading_overlay(
                                 id=ids.dataset_card_div,
                                 children=bird_dataset_card(
                                     id_role=ids.add_trace,

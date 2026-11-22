@@ -2,6 +2,7 @@ import dash
 from dash import html, dcc, callback, Input, Output, State
 from dash.exceptions import PreventUpdate
 import dash_mantine_components as dmc
+from dashboard.components.overlays import loading_overlay
 from dashboard.models import UrlSearchArgs, to_typed_dataset
 from dashboard.styles import icons, get_icon
 from dashboard.utils.communication import parse_nested_qargs, qargs_to_dict
@@ -199,7 +200,7 @@ def layout(**qargs):
                 dmc.Stack(
                     [
                         list_legend,
-                        dmc.LoadingOverlay(
+                        loading_overlay(
                             dmc.Stack(gap=2, id=ids.result_list_stack),
                         ),
                     ]

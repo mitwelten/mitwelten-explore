@@ -1,4 +1,5 @@
 import dash_mantine_components as dmc
+from dashboard.components.overlays import loading_overlay
 from dash import dcc
 from dashboard.api_clients.taxonomy_client import get_parent_taxonomy
 from dashboard.styles import icons, MULTI_VIZ_COLORSCALE, get_icon
@@ -20,7 +21,7 @@ def taxon_stat_card(total_det_id, n_deployments_id):
             [
                 dmc.Stack(
                     [
-                        dmc.LoadingOverlay(
+                        loading_overlay(
                             dmc.Text(
                                 id=total_det_id,
                                 fz=32,

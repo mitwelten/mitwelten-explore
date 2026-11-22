@@ -5,7 +5,7 @@ import uuid
 
 def datasource_affix(id):
     return dmc.Affix(
-        dmc.Loader(color="gray", size="xs", variant="dots"),
+        dmc.Loader(color="gray", size="xs", type="dots"),
         id=id,
         position={"bottom": 1, "left": 20},
     )

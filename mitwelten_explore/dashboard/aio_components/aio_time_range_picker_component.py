@@ -87,11 +87,12 @@ class TimeRangeAIO(html.Div):
                             ),
                             visibleFrom="md",
                         ),
-                        dmc.DateRangePicker(
+                        dmc.DatePickerInput(
+                            type="range",
                             id=self.ids.date_range_picker(self.aio_id),
                             value=dates,
                             style={"minWidth": 260},
-                            icon=DashIconify(
+                            leftSection=DashIconify(
                                 icon="material-symbols:date-range-outline"
                             ),
                             clearable=False,
@@ -160,7 +161,7 @@ class TimeRangeAIO(html.Div):
         Input(ids.date_range_picker(MATCH), "value"),
     )
     def update_store_on_change(dr):
-        if dr is not None:
+        if dr is not None and None not in dr:
             try:
                 dr_s = datetime.datetime.fromisoformat(dr[0])
                 dr_e = datetime.datetime.fromisoformat(dr[1])
@@ -185,6 +186,8 @@ class TimeRangeAIO(html.Div):
             if trg == "store_set":
                 if store_data is not None:
                     return store_data
+            if dr is None or None in dr:
+                return no_update
             try:
                 dr_s = datetime.datetime.strptime(dr[0], "%Y-%m-%d")
                 dr_e = datetime.datetime.strptime(dr[1], "%Y-%m-%d")

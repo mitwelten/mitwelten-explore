@@ -321,14 +321,8 @@ def layout(**kwargs):
                                                     d.get_card()
                                                     for d in taxon_dashboard_data
                                                 ],
-                                                cols=3,
-                                                breakpoints=[
-                                                    {
-                                                        "maxWidth": 500,
-                                                        "cols": 2,
-                                                        "spacing": "sm",
-                                                    },
-                                                ],
+                                                cols={"base": 2, "xs": 3},
+                                                spacing={"base": "sm", "xs": "md"},
                                             ),
                                             dmc.Space(h=8),
                                         ],
@@ -415,15 +409,9 @@ def layout(**kwargs):
                                                     d.get_card()
                                                     for d in ts_dashboard_data
                                                 ],
-                                                cols=3,
+                                                cols={"base": 2, "md": 3},
+                                                spacing={"base": "sm", "md": "md"},
                                                 pb=12,
-                                                breakpoints=[
-                                                    {
-                                                        "maxWidth": 900,
-                                                        "cols": 2,
-                                                        "spacing": "sm",
-                                                    },
-                                                ],
                                             ),
                                             dmc.Space(h=8),
                                         ],

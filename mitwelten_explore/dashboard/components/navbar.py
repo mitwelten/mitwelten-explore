@@ -312,7 +312,7 @@ nav_user_element = dmc.Group(
                                 "Clear collection",
                                 id="clear_collection_button",
                                 variant="subtle",
-                                compact=True,
+                                size="compact-sm",
                                 color="red",
                                 pl=0,
                             ),
