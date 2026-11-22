@@ -113,7 +113,6 @@ numpy==2.5.5
     # via
     #   -r requirements.in
     #   dash-bootstrap-templates
-    #   pandas
     #   scipy
 opentelemetry-api==1.45.2
     # via fastapi
@@ -121,8 +120,6 @@ packaging==26.3
     # via
     #   deprecation
     #   plotly
-pandas==3.1.1
-    # via -r requirements.in
 platformdirs==4.14.8
     # via requests-cache
 plotly==7.1.0
@@ -140,8 +137,6 @@ pydantic-core==2.50.5
     # via pydantic
 pyjwt==2.15.1
     # via -r requirements.in
-python-dateutil==4.0.0
-    # via pandas
 python-dotenv==1.2.4
     # via -r requirements.in
 python-keycloak==7.1.1
@@ -185,8 +180,6 @@ typing-inspection==0.4.5
     # via
     #   fastapi
     #   pydantic
-tzdata==2026.6
-    # via python-dateutil
 url-normalize==4.0.0
     # via requests-cache
 urllib3==2.8.0

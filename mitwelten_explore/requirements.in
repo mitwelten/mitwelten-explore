@@ -22,7 +22,6 @@ plotly
 
 # data handling
 numpy
-pandas
 scipy
 h3
 requests

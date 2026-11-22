@@ -1,7 +1,6 @@
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from dashboard.styles import MULTI_VIZ_COLORSCALE
-import pandas as pd
 
 
 def minute_to_tod(minutes):
