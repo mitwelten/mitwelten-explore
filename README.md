@@ -45,61 +45,92 @@ Learn about the seasonal and daily changes in biodiversity
 
 
 
-## Deployment
+## Setup
 
-### Run locally
+Requires Python 3.13.
 
-1. Create a file `.env`:
 ```sh
-cd mitwelten-explore
-nano .env
+cd mitwelten_explore
+python3.13 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-Write the KeyCloak parameters and the domain name to the file:
+Configure Keycloak and the public URL in a file `.env` in the repository root (or as environment variables):
+
 ```conf
-KC_SERVER_URL="https://auth.mitwelten.org/auth/"
-KC_CLIENT_ID="explore"
-KC_REALM_NAME="mitwelten"
+KC_SERVER_URL="https://auth.yourdomain.org/auth/"
+KC_CLIENT_ID="client-id"
+KC_REALM_NAME="realm"
 DOMAIN_NAME="http://localhost:8081"
 #REDIS_HOST="localhost" #optional
 #REDIS_PORT=6379 #optional
 ```
 
-2. Install python packages:
+The port in `DOMAIN_NAME` must be an allowed redirect URI (`<DOMAIN_NAME>/callback`) of the Keycloak client.
+
+## Running
+
 ```sh
 cd mitwelten_explore
-pip install -r requirements.txt
-```
-3. Run the application
-```sh
-uvicorn main:app --port 8081 --reload
+source .venv/bin/activate
+uvicorn main:app --port 8081 --reload   # http://localhost:8081/
 ```
 
-### Build docker image
+## Dependency Upgrade Procedure
 
-```sh
-git clone https://github.com/mitwelten/mitwelten-explore.git
-cd mitwelten-explore/mitwelten_explore
-docker build  -t cr.gitlab.fhnw.ch/mitwelten/docker-infrastructure/mitwelten-explore:0.1 .
-```
+The image contains Python, the dependencies and the app code.
 
-### Push the image to the registry (optional)
+- [`requirements.in`](mitwelten_explore/requirements.in): direct dependencies, edit this file when installing new packages
+- [`requirements.txt`](mitwelten_explore/requirements.txt): fully pinned lock file, generated from `requirements.in` (needs `uv`, see below)
 
-```sh
-docker push cr.gitlab.fhnw.ch/mitwelten/docker-infrastructure/mitwelten-explore:0.1
-docker push cr.gitlab.fhnw.ch/mitwelten/docker-infrastructure/mitwelten-explore:latest
-```
+1. Re-resolve all dependencies to their latest versions (for the Python version and platform of the image):
+
+    ```sh
+    cd mitwelten_explore
+    uv pip compile requirements.in -o requirements.txt --python-version 3.13 --python-platform x86_64-manylinux_2_28 --upgrade
+    ```
+
+    To bump the Python version, change `FROM python:3.13-slim` in the [`Dockerfile`](mitwelten_explore/Dockerfile) and `--python-version` above.
+
+    Dash Mantine Components requires a specific React version, which is set with `_set_react_version` in [`dashboard/app.py`](mitwelten_explore/dashboard/app.py).
+    When it gets a major upgrade, check its [migration guide](https://www.dash-mantine-components.com/migration).
+
+2. Test locally (see above): the home page, each dataset selection page, adding a dataset to the collection (notification),
+   each dashboard type (time series, compare with all tabs, map with hexagons and bubbles, deployment, taxon), the docs,
+   writing and editing an annotation, the dark theme and a mobile-sized window.
+
+3. Build and scan the image (`--pull` gets the latest base image with its security fixes):
+
+    ```sh
+    cd mitwelten_explore
+    docker build --pull --platform linux/amd64 -t mitwelten-explore:test .
+    trivy image --severity HIGH,CRITICAL --ignore-unfixed mitwelten-explore:test
+    ```
+
+4. Tag and push the image to your registry
+   (a registry that rejects build attestations needs `--provenance=false --sbom=false` in `docker build`):
+
+    ```sh
+    docker build --pull --platform linux/amd64 --provenance=false --sbom=false -t <registry>/mitwelten-explore:<major.minor> -t <registry>/mitwelten-explore:latest .
+    docker push <registry>/mitwelten-explore:<major.minor>
+    docker push <registry>/mitwelten-explore:latest
+    ```
+
+5. On the server, pull and recreate the `mitwelten-explore` container.
+
+## Deployment
+
 ### Run the container
 ```sh
 docker run --rm -d -p 8081:80 \
-    --env KC_SERVER_URL=https://auth.mitwelten.org/auth/ \
-    --env KC_CLIENT_ID=explore \
-    --env KC_REALM_NAME=mitwelten \
+    --env KC_SERVER_URL=https://auth.yourdomain.org/auth/ \
+    --env KC_CLIENT_ID=client-id \
+    --env KC_REALM_NAME=realm \
     --env DOMAIN_NAME=http://localhost:8081 \
-    #--env REDIS_HOST=redis_cache \
-    #--env REDIS_PORT=6379 \
-    cr.gitlab.fhnw.ch/mitwelten/docker-infrastructure/mitwelten-explore:latest
+    <registry>/mitwelten-explore:latest
 ```
+Add `--env REDIS_HOST=... --env REDIS_PORT=...` to cache data API requests in Redis.
 
 Environment variables
 name|required|description
@@ -120,20 +151,20 @@ version: '3.3'
 
 services:
   mitwelten-explore:
-    image: cr.gitlab.fhnw.ch/mitwelten/docker-infrastructure/mitwelten-explore:latest
+    image: <registry>/mitwelten-explore:latest
     restart: always
     container_name: mitwelten-explore
     environment:
-      - KC_SERVER_URL=https://auth.mitwelten.org/auth/
-      - KC_CLIENT_ID=explore
-      - KC_REALM_NAME=mitwelten
-      - DOMAIN_NAME=https://explore.mitwelten.org
+      - KC_SERVER_URL=https://auth.yourdomain.org/auth/
+      - KC_CLIENT_ID=client-id
+      - KC_REALM_NAME=realm
+      - DOMAIN_NAME=https://explore.yourdomain.org
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.mwexplore.loadbalancer.server.port=80"
 
       # for http
-      - "traefik.http.routers.mwexplore_insecure.rule=Host(`explore.mitwelten.org`)"
+      - "traefik.http.routers.mwexplore_insecure.rule=Host(`explore.yourdomain.org`)"
       - "traefik.http.routers.mwexplore_insecure.entrypoints=http"
 
       # redirect to https
@@ -141,7 +172,7 @@ services:
       - "traefik.http.routers.mwexplore_insecure.middlewares=mwexplore-https"
 
       # for https
-      - "traefik.http.routers.mwexplore.rule=Host(`explore.mitwelten.org`)"
+      - "traefik.http.routers.mwexplore.rule=Host(`explore.yourdomain.org`)"
       - "traefik.http.routers.mwexplore.entrypoints=https"
       - "traefik.http.routers.mwexplore.tls.certresolver=ssl"
 ```
@@ -204,13 +235,13 @@ services:
       - "traefik.http.routers.kc.tls.certresolver=ssl"
 
   mitwelten-explore:
-    image: cr.gitlab.fhnw.ch/mitwelten/docker-infrastructure/mitwelten-explore:latest
+    image: <registry>/mitwelten-explore:latest
     restart: always
     container_name: mitwelten-explore
     environment:
       - KC_SERVER_URL=https://auth.yourdomain.org/auth/
-      - KC_CLIENT_ID=explore
-      - KC_REALM_NAME=mitwelten
+      - KC_CLIENT_ID=client-id
+      - KC_REALM_NAME=realm
       - DOMAIN_NAME=https://explore.yourdomain.org
       - REDIS_HOST=redis_cache
       - REDIS_PORT=6379
