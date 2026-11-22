@@ -23,18 +23,17 @@ nav_logo_target = dmc.Anchor(
     dmc.Group(
         [
             html.Img(src=MITWELTEN_LOGO, height="36px"),
-            dmc.MediaQuery(
-                dmc.Text("MITWELTEN EXPLORE", weight=700, lts=0),
-                smallerThan="lg",
-                styles={"display": "none"},
+            dmc.Box(
+                dmc.Text("MITWELTEN EXPLORE", fw=700, lts=0),
+                visibleFrom="lg",
             ),
         ],
-        spacing=2,
+        gap=2,
         style=nav_style_inactive,
         id="nav_header_home",
     ),
     href=PATH_PREFIX,
-    variant="text",
+    c="inherit",
 )
 
 nav_dataset_target = dmc.Menu(
@@ -42,23 +41,20 @@ nav_dataset_target = dmc.Menu(
         dmc.MenuTarget(
             dmc.Group(
                 [
-                    dmc.MediaQuery(
-                        dmc.Text("Datasets", weight=500),
-                        smallerThan="lg",
-                        styles={"display": "none"},
+                    dmc.Box(
+                        dmc.Text("Datasets", fw=500),
+                        visibleFrom="lg",
                     ),
-                    dmc.MediaQuery(
+                    dmc.Box(
                         get_icon(icon=icons.database, width=24),
-                        largerThan="lg",
-                        styles={"display": "none"},
+                        hiddenFrom="lg",
                     ),
-                    dmc.MediaQuery(
+                    dmc.Box(
                         get_icon(icon=icons.arrow_down_expand, width=16),
-                        smallerThan="lg",
-                        styles={"display": "none"},
+                        visibleFrom="lg",
                     ),
                 ],
-                spacing=4,
+                gap=4,
                 style=nav_style_inactive,
                 # id={"role":"navbar_target", "index":"select"},
                 id="nav_header_select",
@@ -70,33 +66,33 @@ nav_dataset_target = dmc.Menu(
                 dmc.MenuLabel("Datasets"),
                 dmc.MenuItem(
                     "Detections by Taxonomy",
-                    icon=get_icon(icons.hierarchy, 24),
+                    leftSection=get_icon(icons.hierarchy, 24),
                     href=PATH_PREFIX + "select/taxon",
                 ),
                 dmc.MenuItem(
                     "Mitwelten Pollinators",
-                    icon=get_icon(icons.bee, 24),
+                    leftSection=get_icon(icons.bee, 24),
                     href=PATH_PREFIX + "select/pollinator",
                 ),
                 dmc.MenuItem(
                     "Mitwelten Bird Diversity",
-                    icon=get_icon(icons.bird, 24),
+                    leftSection=get_icon(icons.bird, 24),
                     href=PATH_PREFIX + "select/bird",
                 ),
                 dmc.MenuItem(
                     "Meteodata",
-                    icon=get_icon(icons.meteoswiss, 24),
+                    leftSection=get_icon(icons.meteoswiss, 24),
                     href=PATH_PREFIX + "select/meteo",
                 ),
                 dmc.MenuItem(
                     "Mitwelten PAX",
-                    icon=get_icon(icons.pax_counter, 24),
+                    leftSection=get_icon(icons.pax_counter, 24),
                     href=PATH_PREFIX + "select/pax",
                 ),
                 dmc.MenuDivider(),
                 dmc.MenuItem(
                     "All Datasets",
-                    icon=get_icon(icons.database, 24),
+                    leftSection=get_icon(icons.database, 24),
                     href=PATH_PREFIX + "select",
                 ),
             ]
@@ -109,17 +105,15 @@ nav_dataset_target = dmc.Menu(
 nav_collection_target = dmc.Anchor(
     dmc.Group(
         [
-            dmc.MediaQuery(
-                dmc.Text("Collection", weight=500),
-                smallerThan="lg",
-                styles={"display": "none"},
+            dmc.Box(
+                dmc.Text("Collection", fw=500),
+                visibleFrom="lg",
             ),
-            dmc.MediaQuery(
+            dmc.Box(
                 get_icon(icon=icons.bookmark, width=24),
-                largerThan="lg",
-                styles={"display": "none"},
+                hiddenFrom="lg",
             ),
-            dmc.MediaQuery(
+            dmc.Box(
                 dmc.Badge(
                     "0",
                     size="md",
@@ -130,18 +124,17 @@ nav_collection_target = dmc.Anchor(
                     p=0,
                     id="sidebar_selected_trace_number",
                 ),
-                smallerThan="sm",
-                styles={"display": "none"},
+                visibleFrom="sm",
             ),
         ],
-        spacing=4,
+        gap=4,
         id="nav_header_collection",
         style=nav_style_inactive,
         px=NAV_TARGET_PADDING_X,
-        noWrap=True,
+        wrap="nowrap",
     ),
     href=PATH_PREFIX + "collection",
-    variant="text",
+    c="inherit",
     target="_self",
 )
 
@@ -150,23 +143,20 @@ nav_viz_target = dmc.Menu(
         dmc.MenuTarget(
             dmc.Group(
                 [
-                    dmc.MediaQuery(
-                        dmc.Text("Visualize", weight=500),
-                        smallerThan="lg",
-                        styles={"display": "none"},
+                    dmc.Box(
+                        dmc.Text("Visualize", fw=500),
+                        visibleFrom="lg",
                     ),
-                    dmc.MediaQuery(
+                    dmc.Box(
                         get_icon(icon=icons.scatter_chart, width=24),
-                        largerThan="lg",
-                        styles={"display": "none"},
+                        hiddenFrom="lg",
                     ),
-                    dmc.MediaQuery(
+                    dmc.Box(
                         get_icon(icon=icons.arrow_down_expand, width=16),
-                        smallerThan="lg",
-                        styles={"display": "none"},
+                        visibleFrom="lg",
                     ),
                 ],
-                spacing=4,
+                gap=4,
                 style=nav_style_inactive,
                 px=NAV_TARGET_PADDING_X,
                 id="nav_header_viz",
@@ -177,22 +167,22 @@ nav_viz_target = dmc.Menu(
                 dmc.MenuLabel("Visualize"),
                 dmc.MenuItem(
                     "Single Time Series",
-                    icon=get_icon(icons.single_chart, 16),
+                    leftSection=get_icon(icons.single_chart, 16),
                     href=PATH_PREFIX + "viz/timeseries",
                 ),
                 dmc.MenuItem(
                     "Compare Datasets",
-                    icon=get_icon(icons.multi_chart, 16),
+                    leftSection=get_icon(icons.multi_chart, 16),
                     href=PATH_PREFIX + "viz/compare",
                 ),
                 dmc.MenuItem(
                     "Map",
-                    icon=get_icon(icons.map_chart, 16),
+                    leftSection=get_icon(icons.map_chart, 16),
                     href=PATH_PREFIX + "viz/map",
                 ),
                 dmc.MenuItem(
                     "Deployment",
-                    icon=get_icon(icons.location_poi, 16),
+                    leftSection=get_icon(icons.location_poi, 16),
                     href=PATH_PREFIX + "viz/deployment",
                 ),
             ]
@@ -205,47 +195,43 @@ nav_viz_target = dmc.Menu(
 nav_annotations_target = dmc.Anchor(
     dmc.Group(
         [
-            dmc.MediaQuery(
-                dmc.Text("Annotations", weight=500),
-                smallerThan="lg",
-                styles={"display": "none"},
+            dmc.Box(
+                dmc.Text("Annotations", fw=500),
+                visibleFrom="lg",
             ),
-            dmc.MediaQuery(
+            dmc.Box(
                 get_icon(icon=icons.annotation_bank, width=24),
-                largerThan="lg",
-                styles={"display": "none"},
+                hiddenFrom="lg",
             ),
         ],
-        spacing="xs",
+        gap="xs",
         id="nav_header_annotations",
         px=NAV_TARGET_PADDING_X,
         style=nav_style_inactive,
     ),
     href=PATH_PREFIX + "annotations",
-    variant="text",
+    c="inherit",
 )
 
 nav_docs_target = dmc.Anchor(
     dmc.Group(
         [
-            dmc.MediaQuery(
-                dmc.Text("Docs", weight=500),
-                smallerThan="lg",
-                styles={"display": "none"},
+            dmc.Box(
+                dmc.Text("Docs", fw=500),
+                visibleFrom="lg",
             ),
-            dmc.MediaQuery(
+            dmc.Box(
                 get_icon(icons.info, width=24),
-                largerThan="lg",
-                styles={"display": "none"},
+                hiddenFrom="lg",
             ),
         ],
-        spacing="xs",
+        gap="xs",
         style=nav_style_inactive,
         id="nav_header_docs",
         px=NAV_TARGET_PADDING_X,
     ),
     href=PATH_PREFIX + "docs",
-    variant="text",
+    c="inherit",
 )
 
 
@@ -264,7 +250,7 @@ nav_settings_target = dmc.Menu(
         dmc.MenuDropdown(
             [
                 dmc.MenuLabel("Theme"),
-                dmc.Group(theme_switch, position="center"),
+                dmc.Group(theme_switch, justify="center"),
             ]
         ),
     ],
@@ -286,13 +272,13 @@ nav_user_element = dmc.Group(
                                 color="indigo.6",
                                 variant="filled",
                             ),
-                            dmc.MediaQuery(
+                            dmc.Box(
                                 dmc.Stack(
                                     [
                                         dmc.Text(
                                             "",
                                             id="username_nav",
-                                            weight=600,
+                                            fw=600,
                                             size="sm",
                                         ),
                                         dmc.Text(
@@ -301,18 +287,16 @@ nav_user_element = dmc.Group(
                                             id="fullname_nav",
                                         ),
                                     ],
-                                    spacing=0,
+                                    gap=0,
                                 ),
-                                smallerThan="lg",
-                                styles={"display": "none"},
+                                visibleFrom="lg",
                             ),
-                            dmc.MediaQuery(
+                            dmc.Box(
                                 get_icon(icon=icons.arrow_down_expand, width=16),
-                                smallerThan="sm",
-                                styles={"display": "none"},
+                                visibleFrom="sm",
                             ),
                         ],
-                        spacing=6,
+                        gap=6,
                         style={"cursor": "pointer"},
                     ),
                 ),
@@ -320,7 +304,7 @@ nav_user_element = dmc.Group(
                     [
                         dmc.MenuItem(
                             "My Annotations",
-                            icon=get_icon(icon=icons.annotation_bank, width=16),
+                            leftSection=get_icon(icon=icons.annotation_bank, width=16),
                             href=PATH_PREFIX + "annotations?my_annotations=true",
                         ),
                         dmc.MenuItem(
@@ -328,16 +312,16 @@ nav_user_element = dmc.Group(
                                 "Clear collection",
                                 id="clear_collection_button",
                                 variant="subtle",
-                                compact=True,
+                                size="compact-sm",
                                 color="red",
                                 pl=0,
                             ),
-                            icon=get_icon(icon=icons.trash, width=16),
+                            leftSection=get_icon(icon=icons.trash, width=16),
                         ),
                         dmc.MenuDivider(),
                         dmc.MenuItem(
                             "Logout",
-                            icon=get_icon(icons.logout, width=16),
+                            leftSection=get_icon(icons.logout, width=16),
                             href="/logout",
                             refresh=True,
                         ),
@@ -347,7 +331,7 @@ nav_user_element = dmc.Group(
             trigger="hover",
         ),
     ],
-    spacing=0,
+    gap=0,
     pr=8,
     pl=NAV_TARGET_PADDING_X,
 )
@@ -362,8 +346,8 @@ nav_bar = dmc.Group(
                 nav_viz_target,
                 nav_annotations_target,
             ],
-            spacing=0,
-            noWrap=True,
+            gap=0,
+            wrap="nowrap",
             mt=1,
         ),
         dmc.Group(
@@ -372,14 +356,14 @@ nav_bar = dmc.Group(
                 nav_settings_target,
                 nav_user_element,
             ],
-            spacing=0,
-            noWrap=True,
+            gap=0,
+            wrap="nowrap",
             mt=1,
         ),
     ],
     style={"width": "100%", "height": "45px"},
     className="shadow-sm",
-    position="apart",
-    spacing="xs",
-    noWrap=True,
+    justify="space-between",
+    gap="xs",
+    wrap="nowrap",
 )

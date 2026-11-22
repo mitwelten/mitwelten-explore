@@ -25,14 +25,14 @@ def dataset_title(dataset: dict):
 
     return dmc.Group(
         [
-            dmc.Text(ds.get_title(), size="md", weight=500),
+            dmc.Text(ds.get_title(), size="md", fw=500),
             dmc.Badge(ds.get_unit(), size="md", color="indigo"),
             dmc.Group(
                 [
                     get_icon(icon=icons.location_marker),
                     dmc.Text(ds.get_location(), size="sm"),
                 ],
-                spacing=2,
+                gap=2,
             ),
         ],
         style={"rowGap": "2px"},
@@ -40,14 +40,14 @@ def dataset_title(dataset: dict):
 
 
 def taxon_list_card(taxon: Taxon, id_role):
-    title = dmc.Text(taxon.label_sci, weight=500)
+    title = dmc.Text(taxon.label_sci, fw=500)
     label_de = (
-        dmc.Group([badge_de, dmc.Text(taxon.label_de)], spacing=3)
+        dmc.Group([badge_de, dmc.Text(taxon.label_de)], gap=3)
         if taxon.label_de
         else None
     )
     label_en = (
-        dmc.Group([badge_en, dmc.Text(taxon.label_en)], spacing=3)
+        dmc.Group([badge_en, dmc.Text(taxon.label_en)], gap=3)
         if taxon.label_en
         else None
     )
@@ -61,16 +61,16 @@ def taxon_list_card(taxon: Taxon, id_role):
         dmc.Card(
             dmc.Grid(
                 [
-                    dmc.Col(dmc.Group([title, rank_badge]), className="col-lg-4"),
-                    dmc.Col(dmc.Group([label_de, label_en]), className="col-md-7"),
-                    dmc.Col(
+                    dmc.GridCol(dmc.Group([title, rank_badge]), span={"base": 12, "md": 4}),
+                    dmc.GridCol(dmc.Group([label_de, label_en]), span={"base": 12, "sm": 7}),
+                    dmc.GridCol(
                         dmc.Badge(
                             str(taxon.datum_id),
                             size="sm",
                             variant="outline",
                             color="gray",
                         ),
-                        className="col-md-1 d-flex justify-content-end align-items-center",
+                        span={"base": 12, "sm": 1}, className="d-flex justify-content-end align-items-center",
                     ),
                 ],
                 style={"rowGap": "4px"},
@@ -106,21 +106,21 @@ def pax_deployment_select_card(deployment: dict, id_role="pax_deployment_add"):
     return dmc.Card(
         dmc.Grid(
             [
-                dmc.Col(
+                dmc.GridCol(
                     dmc.Stack(
                         [
                             dmc.Group(
                                 [
-                                    dmc.Text(node_type, weight=500),
+                                    dmc.Text(node_type, fw=500),
                                     dmc.Group(
                                         [
                                             get_icon(icon=icons.location_marker),
                                             dmc.Text(
                                                 f"deployment #{deployment_id}",
-                                                weight=500,
+                                                fw=500,
                                             ),
                                         ],
-                                        spacing=3,
+                                        gap=3,
                                     ),
                                     dmc.Badge(
                                         f"{time_from} - {time_to}",
@@ -133,7 +133,7 @@ def pax_deployment_select_card(deployment: dict, id_role="pax_deployment_add"):
                             dmc.Group(
                                 [
                                     dmc.Text(
-                                        f"Node {node_label}", weight=400, size="sm"
+                                        f"Node {node_label}", fw=400, size="sm"
                                     ),
                                     dmc.Badge(
                                         node_platform, color="gray", variant="outline"
@@ -149,18 +149,18 @@ def pax_deployment_select_card(deployment: dict, id_role="pax_deployment_add"):
                                 ]
                             ),
                         ],
-                        spacing=4,
+                        gap=4,
                     ),
-                    className="col-lg-9",
+                    span={"base": 12, "md": 9},
                 ),
-                dmc.Col(
+                dmc.GridCol(
                     [
                         dmc.Group(
                             [
                                 dmc.Anchor(
                                     dmc.Button(
                                         "Viz",
-                                        leftIcon=get_icon(
+                                        leftSection=get_icon(
                                             icon=icons.line_chart, width=20
                                         ),
                                         color="indigo.6",
@@ -185,10 +185,10 @@ def pax_deployment_select_card(deployment: dict, id_role="pax_deployment_add"):
                                     },
                                 ),
                             ],
-                            spacing="xs",
+                            gap="xs",
                         )
                     ],
-                    className="col-xl-3 d-flex justify-content-end align-items-center",
+                    span={"base": 12, "lg": 3}, className="d-flex justify-content-end align-items-center",
                 ),
             ]
         ),
@@ -229,12 +229,12 @@ def env_deployment_select_cards(deployment: dict, id_role):
         dmc.Card(
             dmc.Grid(
                 [
-                    dmc.Col(
+                    dmc.GridCol(
                         dmc.Stack(
                             [
                                 dmc.Group(
                                     [
-                                        dmc.Text(ds.param_desc, weight=500),
+                                        dmc.Text(ds.param_desc, fw=500),
                                         dmc.Badge(
                                             ds.unit,
                                             color="indigo",
@@ -245,10 +245,10 @@ def env_deployment_select_cards(deployment: dict, id_role):
                                                 get_icon(icon=icons.location_marker),
                                                 dmc.Text(
                                                     f"deployment #{deployment_id}",
-                                                    weight=500,
+                                                    fw=500,
                                                 ),
                                             ],
-                                            spacing=3,
+                                            gap=3,
                                         ),
                                         dmc.Badge(
                                             f"{time_from} - {time_to}",
@@ -261,7 +261,7 @@ def env_deployment_select_cards(deployment: dict, id_role):
                                 dmc.Group(
                                     [
                                         dmc.Text(
-                                            f"Node {node_label}", weight=400, size="sm"
+                                            f"Node {node_label}", fw=400, size="sm"
                                         ),
                                         dmc.Badge(
                                             node_platform,
@@ -279,18 +279,18 @@ def env_deployment_select_cards(deployment: dict, id_role):
                                     ]
                                 ),
                             ],
-                            spacing=4,
+                            gap=4,
                         ),
-                        className="col-lg-9",
+                        span={"base": 12, "md": 9},
                     ),
-                    dmc.Col(
+                    dmc.GridCol(
                         [
                             dmc.Group(
                                 [
                                     dmc.Anchor(
                                         dmc.Button(
                                             "Viz",
-                                            leftIcon=get_icon(
+                                            leftSection=get_icon(
                                                 icon=icons.line_chart, width=20
                                             ),
                                             color="indigo.6",
@@ -315,10 +315,10 @@ def env_deployment_select_cards(deployment: dict, id_role):
                                         },
                                     ),
                                 ],
-                                spacing="xs",
+                                gap="xs",
                             )
                         ],
-                        className="col-xl-3 d-flex justify-content-end align-items-center",
+                        span={"base": 12, "lg": 3}, className="d-flex justify-content-end align-items-center",
                     ),
                 ]
             ),
@@ -338,13 +338,13 @@ def pollinator_dataset_card(id_role, deployment_ids=None, pollinator_class=None)
         if pollinator_class is None
         else pollinator_class.title()
     )
-    title_group = dmc.Group([get_icon(icon=icons.bee), dmc.Text(title, weight=500)])
+    title_group = dmc.Group([get_icon(icon=icons.bee), dmc.Text(title, fw=500)])
     btn_group = dmc.Group(
         [
             dmc.Anchor(
                 dmc.Button(
                     "Viz",
-                    leftIcon=get_icon(icon=icons.line_chart, width=20),
+                    leftSection=get_icon(icon=icons.line_chart, width=20),
                     color="indigo.6",
                     variant="outline",
                 ),
@@ -367,7 +367,7 @@ def pollinator_dataset_card(id_role, deployment_ids=None, pollinator_class=None)
                 },
             ),
         ],
-        position="right",
+        justify="flex-end",
     )
 
     if deployment_ids is None or len(deployment_ids) == 0:
@@ -398,13 +398,13 @@ def pollinator_dataset_card(id_role, deployment_ids=None, pollinator_class=None)
 def bird_dataset_card(id_role, deployment_ids=None):
     ds = BirdDataset(deployment_id=deployment_ids)
     title = "Distinct Species"
-    title_group = dmc.Group([get_icon(icon=icons.bird), dmc.Text(title, weight=500)])
+    title_group = dmc.Group([get_icon(icon=icons.bird), dmc.Text(title, fw=500)])
     btn_group = dmc.Group(
         [
             dmc.Anchor(
                 dmc.Button(
                     "Explore detected Species",
-                    leftIcon=get_icon(icon=icons.bird, width=20),
+                    leftSection=get_icon(icon=icons.bird, width=20),
                     color="indigo.6",
                     variant="outline",
                 ),
@@ -427,7 +427,7 @@ def bird_dataset_card(id_role, deployment_ids=None):
                 },
             ),
         ],
-        position="right",
+        justify="flex-end",
     )
 
     if deployment_ids is None or len(deployment_ids) == 0:
@@ -481,11 +481,11 @@ def deployment_info_spoiler(deployment_ids, location_information=None):
                         ),
                         dmc.Text(
                             d.description,
-                            color="dimmed",
+                            c="dimmed",
                             size="sm",
                             truncate=True,
                         ),
-                        dmc.Group([dmc.Badge(t, size="xs") for t in d.tags], spacing=4),
+                        dmc.Group([dmc.Badge(t, size="xs") for t in d.tags], gap=4),
                     ],
                     style={"rowGap": 3},
                 )
@@ -495,7 +495,7 @@ def deployment_info_spoiler(deployment_ids, location_information=None):
             showLabel="show all",
             hideLabel="hide",
             maxHeight=80,
-            children=dmc.Stack(deployment_list, spacing=6),
+            children=dmc.Stack(deployment_list, gap=6),
             styles={
                 "control": {
                     "fontWeight": 300,

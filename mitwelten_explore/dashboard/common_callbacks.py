@@ -27,15 +27,15 @@ def publish_annotation_callback(cookies, nc, search, pathname, data):
         )
         title_row = dmc.Group(
             [
-                dmc.Text(annot.title, weight=600, size="xl"),
+                dmc.Text(annot.title, fw=600, size="xl"),
                 dmc.Group(
                     [
-                        dmc.Text(annot.time_str, weight=300),
+                        dmc.Text(annot.time_str, fw=300),
                         dmc.Text(f"by {user.username}"),
                     ]
                 ),
             ],
-            position="apart",
+            justify="space-between",
         )
         if post_annotation(annotation=annot, auth_cookie=cookies.get("auth")):
 
@@ -53,12 +53,12 @@ def publish_annotation_callback(cookies, nc, search, pathname, data):
                     opened=True,
                     title=dmc.Group(
                         [
-                            dmc.Text("Annotation published!", weight=500),
+                            dmc.Text("Annotation published!", fw=500),
                             get_icon(
                                 icons.success_round, width="1.5rem", color="green"
                             ),
                         ],
-                        spacing="xs",
+                        gap="xs",
                     ),
                     size="60%",
                     zIndex=1000,

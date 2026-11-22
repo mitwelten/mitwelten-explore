@@ -1,4 +1,4 @@
-from h3 import h3
+import h3
 import numpy as np
 
 
@@ -44,7 +44,7 @@ def generate_clusters(resolution, lat, lon, values, fun, *args):
     assert len(lat) == len(values) == len(lon)
     values_dict = {}
     for i in range(len(lat)):
-        parent_cluster_id = h3.geo_to_h3(lat[i], lon[i], resolution)
+        parent_cluster_id = h3.latlng_to_cell(lat[i], lon[i], resolution)
         if not parent_cluster_id in values_dict:
             values_dict[parent_cluster_id] = []
         values_dict[parent_cluster_id].append(values[i])
@@ -56,10 +56,10 @@ def generate_clusters(resolution, lat, lon, values, fun, *args):
 
 def get_points_in_cluster(cluster_id, lat, lon, point_ids):
     assert len(lat) == len(point_ids) == len(lon)
-    resolution = h3.h3_get_resolution(cluster_id)
+    resolution = h3.get_resolution(cluster_id)
     points_in_cell = []
     for i in range(len(lat)):
-        if h3.geo_to_h3(lat[i], lon[i], resolution) == cluster_id:
+        if h3.latlng_to_cell(lat[i], lon[i], resolution) == cluster_id:
             points_in_cell.append(point_ids[i])
     return points_in_cell
 
@@ -67,7 +67,9 @@ def get_points_in_cluster(cluster_id, lat, lon, point_ids):
 def generate_geojson(unique_ids):
     geojson_features = []
     for h3id in unique_ids:
-        poly = [[list(tup) for tup in h3.h3_to_geo_boundary(h3id, geo_json=True)]]
+        # GeoJSON ring: [lng, lat] pairs, closed (as h3 v3's geo_json=True returned)
+        ring = [[lng, lat] for lat, lng in h3.cell_to_boundary(h3id)]
+        poly = [ring + [ring[0]]]
         geojson_features.append(
             {
                 "type": "Feature",

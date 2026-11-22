@@ -115,8 +115,8 @@ class H3HexBinMapAIO(html.Div):
                     data.get("id"),
                 )
 
-            zoomlvl = event_data.get("mapbox.zoom")
-            center_coords = event_data.get("mapbox.center")
+            zoomlvl = event_data.get("map.zoom")
+            center_coords = event_data.get("map.center")
             if None in [zoomlvl, center_coords]:
                 raise PreventUpdate
             center = (center_coords.get("lat"), center_coords.get("lon"))
@@ -270,8 +270,8 @@ class H3HexBinMapMultiAIO(html.Div):
                     )
             if bubblemap:
                 raise PreventUpdate
-            zoomlvl = event_data.get("mapbox.zoom")
-            center_coords = event_data.get("mapbox.center")
+            zoomlvl = event_data.get("map.zoom")
+            center_coords = event_data.get("map.center")
             if None in [zoomlvl, center_coords]:
                 raise PreventUpdate
             center = (center_coords.get("lat"), center_coords.get("lon"))

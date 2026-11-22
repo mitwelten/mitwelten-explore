@@ -44,7 +44,7 @@ def layout(**kwargs):
                     dmc.Tabs(
                         [
                             dmc.TabsList(
-                                [dmc.Tab(p.title(), value=p) for p in doc_pages],
+                                [dmc.TabsTab(p.title(), value=p) for p in doc_pages],
                             ),
                         ],
                         orientation="vertical",
@@ -105,4 +105,4 @@ def render_docs_content(active):
             f"#{active}",
         )
     else:
-        return no_update  
+        return no_update

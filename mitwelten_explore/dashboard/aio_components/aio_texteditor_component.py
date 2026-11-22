@@ -1,4 +1,3 @@
-import dash_quill
 from dash import (
     Dash,
     Output,
@@ -23,13 +22,33 @@ from dashboard.utils.text_utils import to_base64, from_base64, to_markdown
 
 
 DEFAULT_TOOLBAR_MODS = [
-    [{"header": "1"}, {"header": "2"}, "bold", "italic"],
-    [
-        {"list": "ordered"},
-        {"list": "bullet"},
-    ],
-    ["link"],
+    ["H1", "H2", "Bold", "Italic"],
+    ["OrderedList", "BulletList"],
+    ["Link", "Unlink"],
 ]
+
+EDITOR_EXTENSIONS = [
+    {
+        "StarterKit": {
+            "heading": {"levels": [1, 2]},
+            "codeBlock": False,
+            "strike": False,
+            "horizontalRule": False,
+        }
+    },
+    {"Placeholder": {"placeholder": "Describe what you have found..."}},
+]
+
+
+def rich_text_editor(id, html="", toolbar_mods=DEFAULT_TOOLBAR_MODS):
+    """Annotation text editor; its `html` prop holds the content (was dash_quill `value`)."""
+    return dmc.RichTextEditor(
+        id=id,
+        html=html,
+        extensions=EDITOR_EXTENSIONS,
+        toolbar={"sticky": True, "controlsGroups": toolbar_mods},
+        debounce=300,
+    )
 
 
 class TextEditorAIO(html.Div):
@@ -119,8 +138,8 @@ class TextEditorAIO(html.Div):
                     [
                         dmc.TabsList(
                             [
-                                dmc.Tab("Text Editor", value="edit_annot"),
-                                dmc.Tab("Preview", value="preview_annot"),
+                                dmc.TabsTab("Text Editor", value="edit_annot"),
+                                dmc.TabsTab("Preview", value="preview_annot"),
                             ],
                             grow=False,
                         ),
@@ -137,29 +156,23 @@ class TextEditorAIO(html.Div):
                             # debounce=100
                         ),
                         dmc.Space(h=4),
-                        dash_quill.Quill(
+                        rich_text_editor(
                             id=self.ids.editor_input(self.aio_id),
-                            value=default_html,
-                            maxLength=10000,
-                            modules={
-                                "toolbar": toolbar_mods,
-                                "clipboard": {
-                                    "matchVisual": True,
-                                },
-                            },
+                            html=default_html,
+                            toolbar_mods=toolbar_mods,
                         ),
                         dmc.Space(h=12),
                         dmc.Group(
                             dmc.Button(
                                 "Publish",
-                                leftIcon=DashIconify(
+                                leftSection=DashIconify(
                                     icon="material-symbols:send-outline"
                                 ),
                                 color="green",
                                 disabled=True,
                                 id=self.ids.publish_btn(self.aio_id),
                             ),
-                            position="right",
+                            justify="flex-end",
                         ),
                     ],
                     value="edit_annot",
@@ -173,7 +186,7 @@ class TextEditorAIO(html.Div):
                                     dmc.Stack(
                                         [
                                             dmc.Group(
-                                                position="apart",
+                                                justify="space-between",
                                                 id=self.ids.preview_header(self.aio_id),
                                             ),
                                             dmc.Divider(),
@@ -185,7 +198,7 @@ class TextEditorAIO(html.Div):
                                                 },
                                             ),
                                         ],
-                                        spacing="xs",
+                                        gap="xs",
                                     ),
                                     withBorder=True,
                                     pt=12,
@@ -241,11 +254,11 @@ class TextEditorAIO(html.Div):
                                     DashIconify(icon="mdi:drag", width=21, inline=True),
                                     dmc.Text("Edit Annotation"),
                                 ],
-                                spacing="sm",
+                                gap="sm",
                             ),
                             dmc.Tooltip(
                                 position="left",
-                                label=dmc.Text("Hide Editor", weight=300),
+                                label=dmc.Text("Hide Editor", fw=300),
                                 withArrow=True,
                                 openDelay=100,
                                 color="indigo.9",
@@ -260,7 +273,7 @@ class TextEditorAIO(html.Div):
                                 ],
                             ),
                         ],
-                        position="apart",
+                        justify="space-between",
                         style={
                             "position": "absolute",
                             "top": 0,
@@ -270,7 +283,7 @@ class TextEditorAIO(html.Div):
                         },
                     ),
                     header_style={"cursor": "move", "height": "32px"},
-                    children=[dmc.Group([], spacing="sm", position="right"), tabs],
+                    children=[dmc.Group([], gap="sm", justify="flex-end"), tabs],
                     body_class_name="py-0",
                     class_name="annotation_editor",
                     is_open=False,
@@ -291,7 +304,7 @@ class TextEditorAIO(html.Div):
     # update store
     @callback(
         Output(ids.store(MATCH), "data"),
-        Input(ids.editor_input(MATCH), "value"),
+        Input(ids.editor_input(MATCH), "html"),
         Input(ids.title_input(MATCH), "value"),
     )
     def update_store(value, title):
@@ -346,7 +359,7 @@ class TextEditorAIO(html.Div):
                     )
                 title = data.get("title")
                 header = [
-                    dmc.Text(title, size="lg", weight=700),
+                    dmc.Text(title, size="lg", fw=700),
                     dmc.Text(time_str, size="sm"),
                 ]
 
@@ -356,7 +369,7 @@ class TextEditorAIO(html.Div):
     # clear store on publish
     @callback(
         Output(ids.title_input(MATCH), "value"),
-        Output(ids.editor_input(MATCH), "value"),
+        Output(ids.editor_input(MATCH), "html"),
         Output(ids.annot_published_store(MATCH), "data", allow_duplicate=True),
         Input(ids.annot_published_store(MATCH), "modified_timestamp"),
         State(ids.annot_published_store(MATCH), "data"),

@@ -1,7 +1,6 @@
 import plotly.graph_objects as go
 from dashboard.styles import MULTI_VIZ_COLORSCALE
 from dashboard.utils.text_utils import chart_dataset_label
-import pandas as pd
 from plotly.subplots import make_subplots
 import datetime
 import re

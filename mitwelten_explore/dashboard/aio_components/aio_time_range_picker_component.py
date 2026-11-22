@@ -70,7 +70,7 @@ class TimeRangeAIO(html.Div):
                 ),
                 dmc.Group(
                     [
-                        dmc.MediaQuery(
+                        dmc.Box(
                             dmc.ActionIcon(
                                 DashIconify(
                                     icon="material-symbols:arrow-left", height=30
@@ -85,20 +85,20 @@ class TimeRangeAIO(html.Div):
                                     "border-right": "none",
                                 },
                             ),
-                            smallerThan="md",
-                            styles={"display": "none"},
+                            visibleFrom="md",
                         ),
-                        dmc.DateRangePicker(
+                        dmc.DatePickerInput(
+                            type="range",
                             id=self.ids.date_range_picker(self.aio_id),
                             value=dates,
                             style={"minWidth": 260},
-                            icon=DashIconify(
+                            leftSection=DashIconify(
                                 icon="material-symbols:date-range-outline"
                             ),
                             clearable=False,
                             radius=0,
                         ),
-                        dmc.MediaQuery(
+                        dmc.Box(
                             dmc.ActionIcon(
                                 DashIconify(
                                     icon="material-symbols:arrow-right", height=30
@@ -114,15 +114,13 @@ class TimeRangeAIO(html.Div):
                                     "border-left": "none",
                                 },
                             ),
-                            smallerThan="md",
-                            styles={"display": "none"},
+                            visibleFrom="md",
                         ),
-                        dmc.MediaQuery(
+                        dmc.Box(
                             dmc.Space(w=8),
-                            smallerThan="lg",
-                            styles={"display": "none"},
+                            visibleFrom="lg",
                         ),
-                        dmc.MediaQuery(
+                        dmc.Box(
                             dmc.ActionIcon(
                                 DashIconify(icon="bi:zoom-out"),
                                 size=36,
@@ -134,10 +132,9 @@ class TimeRangeAIO(html.Div):
                                     "border-bottom-left-radius": "4px",
                                 },
                             ),
-                            smallerThan="lg",
-                            styles={"display": "none"},
+                            visibleFrom="lg",
                         ),
-                        dmc.MediaQuery(
+                        dmc.Box(
                             dmc.ActionIcon(
                                 DashIconify(icon="bi:zoom-in"),
                                 size=36,
@@ -150,12 +147,11 @@ class TimeRangeAIO(html.Div):
                                     "border-left": "none",
                                 },
                             ),
-                            smallerThan="lg",
-                            styles={"display": "none"},
+                            visibleFrom="lg",
                         ),
                     ],
-                    spacing=0,
-                    noWrap=True,
+                    gap=0,
+                    wrap="nowrap",
                 ),
             ]
         )
@@ -165,7 +161,7 @@ class TimeRangeAIO(html.Div):
         Input(ids.date_range_picker(MATCH), "value"),
     )
     def update_store_on_change(dr):
-        if dr is not None:
+        if dr is not None and None not in dr:
             try:
                 dr_s = datetime.datetime.fromisoformat(dr[0])
                 dr_e = datetime.datetime.fromisoformat(dr[1])
@@ -190,6 +186,8 @@ class TimeRangeAIO(html.Div):
             if trg == "store_set":
                 if store_data is not None:
                     return store_data
+            if dr is None or None in dr:
+                return no_update
             try:
                 dr_s = datetime.datetime.strptime(dr[0], "%Y-%m-%d")
                 dr_e = datetime.datetime.strptime(dr[1], "%Y-%m-%d")

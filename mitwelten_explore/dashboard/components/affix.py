@@ -5,7 +5,7 @@ import uuid
 
 def datasource_affix(id):
     return dmc.Affix(
-        dmc.Loader(color="gray", size="xs", variant="dots"),
+        dmc.Loader(color="gray", size="xs", type="dots"),
         id=id,
         position={"bottom": 1, "left": 20},
     )
@@ -32,7 +32,7 @@ def affix_menu(menu_children, id=str(uuid.uuid4())):
             [
                 dmc.MenuTarget(affix_button(id, icons.more_3_dots)),
                 dmc.MenuDropdown(
-                    dmc.Stack(children=menu_children, spacing="md", pb=8),
+                    dmc.Stack(children=menu_children, gap="md", pb=8),
                     m=0,
                     p=0,
                     className="bg-transparent border-0",

@@ -159,11 +159,11 @@ def layout(**qargs):
             # Header: name and filters
             dmc.Grid(
                 [
-                    dmc.Col(
+                    dmc.GridCol(
                         id=ids.title,
-                        className="col-xl-4",
+                        span={"base": 12, "lg": 4},
                     ),
-                    dmc.Col(
+                    dmc.GridCol(
                         dmc.Group(
                             [
                                 dmc.Group(
@@ -175,10 +175,9 @@ def layout(**qargs):
                                 ),
                                 traio,
                             ],
-                            position="right",
-                            noWrap=False,
+                            justify="flex-end",
                         ),
-                        className="col-xl-8",
+                        span={"base": 12, "lg": 8},
                     ),
                 ]
             ),
@@ -188,7 +187,7 @@ def layout(**qargs):
                 [
                     dmc.Group(
                         [
-                            dmc.Text("Time Series", weight=500),
+                            dmc.Text("Time Series", fw=500),
                             dmc.Group(
                                 [
                                     reload_control(ids.main_chart_sync),
@@ -199,7 +198,7 @@ def layout(**qargs):
                                 ],
                             ),
                         ],
-                        position="apart",
+                        justify="space-between",
                     ),
                     chart_loading_overlay(
                         [
@@ -222,7 +221,7 @@ def layout(**qargs):
             dmc.Grid(
                 [
                     # time of day card
-                    dmc.Col(
+                    dmc.GridCol(
                         [
                             dmc.Tabs(
                                 color="teal",
@@ -231,8 +230,8 @@ def layout(**qargs):
                                 children=[
                                     dmc.TabsList(
                                         [
-                                            dmc.Tab(
-                                                dmc.Text("Time of Day", weight=500),
+                                            dmc.TabsTab(
+                                                dmc.Text("Time of Day", fw=500),
                                                 value="tod",
                                             ),
                                         ]
@@ -249,7 +248,7 @@ def layout(**qargs):
                                                                 chart_type_id=ids.tod_chart_type,
                                                                 position="left-end",
                                                             ),
-                                                            position="right",
+                                                            justify="flex-end",
                                                             style={
                                                                 "position": "absolute",
                                                                 "right": 4,
@@ -289,12 +288,12 @@ def layout(**qargs):
                                 ],
                             ),
                         ],
-                        className="col-xl-6",
+                        span={"base": 12, "lg": 6},
                         style={"height": "42vh"},
                     ),
-                    dmc.Col(
+                    dmc.GridCol(
                         style={"height": "42vh"},
-                        className="col-xl-6",
+                        span={"base": 12, "lg": 6},
                         children=[
                             dmc.Tabs(
                                 id=ids.tabs_selector,
@@ -306,16 +305,16 @@ def layout(**qargs):
                                 children=[
                                     dmc.TabsList(
                                         [
-                                            dmc.Tab(
-                                                dmc.Text("Map", weight=500),
+                                            dmc.TabsTab(
+                                                dmc.Text("Map", fw=500),
                                                 value="map",
                                             ),
-                                            dmc.Tab(
-                                                dmc.Text("Stats", weight=500),
+                                            dmc.TabsTab(
+                                                dmc.Text("Stats", fw=500),
                                                 value="stats",
                                             ),
-                                            dmc.Tab(
-                                                dmc.Text("FFT", weight=500),
+                                            dmc.TabsTab(
+                                                dmc.Text("FFT", fw=500),
                                                 value="fft",
                                             ),
                                         ],
@@ -399,7 +398,7 @@ def update_select_modal(is_open, data):
                             ),
                             dmc.Anchor("Select Datasets", href=PATH_PREFIX + "select"),
                         ],
-                        position="apart",
+                        justify="space-between",
                     )
                 )
             ]
@@ -411,7 +410,7 @@ def update_select_modal(is_open, data):
                         dmc.Button("Cancel", color="gray", variant="outline"),
                         href=PATH_PREFIX + "select",
                     ),
-                    position="right",
+                    justify="flex-end",
                 ),
             ]
         )

@@ -3,6 +3,7 @@ from dash import dcc, callback, Input, Output, State, ctx, html, no_update, ALL
 from dash.exceptions import PreventUpdate
 import flask
 import dash_mantine_components as dmc
+from dashboard.components.overlays import chart_loading_overlay
 from dashboard.aio_components.aio_hexbinmap_component import (
     H3HexBinMapMultiAIO,
     LocationData,
@@ -228,49 +229,21 @@ def layout(**qargs):
             annot_editor,
             dmc.Group(
                 [
-                    dmc.Text("Spatial exploration", size="lg", weight=600),
+                    dmc.Text("Spatial exploration", size="lg", fw=600),
                     traio,
                 ],
-                position="apart",
+                justify="space-between",
             ),
             dmc.Space(h=8),
             dmc.Grid(
                 [
-                    dmc.Col(
-                        dmc.LoadingOverlay(
-                            multihexmap,
-                            overlayOpacity=0,
-                            transitionDuration=400,
-                            loader=dmc.Card(
-                                dmc.Group(
-                                    [
-                                        dmc.Loader(
-                                            size="sm",
-                                            color="teal.5",
-                                        ),
-                                        dmc.Text(
-                                            "Loading",
-                                            color="gray.9",
-                                            weight=500,
-                                            size="md",
-                                        ),
-                                    ],
-                                ),
-                                style={
-                                    "position": "absolute",
-                                    "bottom": 10,
-                                    "left": 10,
-                                    "backgroundColor": "rgba(245, 245, 245,0.8)",
-                                },
-                                py=3,
-                                px=5,
-                            ),
-                        ),
-                        className="col-md-10",
+                    dmc.GridCol(
+                        chart_loading_overlay(multihexmap),
+                        span={"base": 12, "sm": 10},
                     ),
-                    dmc.Col(
+                    dmc.GridCol(
                         [
-                            dmc.Text("Datasets", weight=500),
+                            dmc.Text("Datasets", fw=500),
                             dmc.Space(h=4),
                             dmc.Stack(id=ids.dataset_card_stack),
                             dmc.Space(h=4),
@@ -279,7 +252,7 @@ def layout(**qargs):
                                     id=ids.switch_datasets,
                                     children=dmc.Button(
                                         "Switch Positions",
-                                        leftIcon=get_icon(icons.switch_arrows),
+                                        leftSection=get_icon(icons.switch_arrows),
                                         variant="subtle",
                                     ),
                                     href=None,
@@ -293,7 +266,7 @@ def layout(**qargs):
                                     dmc.Divider(),
                                     dmc.Group(
                                         [
-                                            dmc.Text("Map Layers", weight=500),
+                                            dmc.Text("Map Layers", fw=500),
                                             dmc.ActionIcon(
                                                 children=get_icon(
                                                     icons.info_filled, width=20
@@ -304,34 +277,34 @@ def layout(**qargs):
                                                 color="indigo",
                                             ),
                                         ],
-                                        position="apart",
+                                        justify="space-between",
                                     ),
                                     map_layer_base_select,
                                     map_layer_overlay_select,
                                 ],
-                                spacing="xs",
+                                gap="xs",
                             ),
                             dmc.Space(h=8),
                             dmc.Stack(
                                 [
-                                    dmc.Text("Map Type", weight=500),
+                                    dmc.Text("Map Type", fw=500),
                                     map_type_ctl,
                                 ],
-                                spacing="xs",
+                                gap="xs",
                             ),
                             dmc.Space(h=8),
                             dmc.Stack(
                                 id=ids.map_config_stack,
                                 style={"display": "none"} if bubble_map else None,
                                 children=[
-                                    dmc.Text("Map configuration", weight=500),
+                                    dmc.Text("Map configuration", fw=500),
                                     dmc.Checkbox(
                                         label="Show Scatter Markers",
                                         id=ids.show_scatter,
                                         checked=False,
                                     ),
                                     dmc.Space(h=8),
-                                    dmc.Text("Colorscale Finetuning", size="14px"),
+                                    dmc.Text("Colorscale Finetuning", fz="14px"),
                                     dmc.Center(
                                         get_icon(
                                             icons.hexagon_filled,
@@ -385,10 +358,10 @@ def layout(**qargs):
                                         else None,
                                     ),
                                 ],
-                                spacing="xs",
+                                gap="xs",
                             ),
                         ],
-                        className="col-md-2",
+                        span={"base": 12, "sm": 2},
                     ),
                 ]
             ),
@@ -434,7 +407,7 @@ def update_select_modal(is_open, data):
                             disabled=True,
                         ),
                     ],
-                    position="right",
+                    justify="flex-end",
                 ),
             ]
         )

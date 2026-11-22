@@ -148,7 +148,7 @@ def layout(**qargs):
             annot_editor,
             dmc.Group(
                 [
-                    dmc.Text("Compare Datasets", weight=600),
+                    dmc.Text("Compare Datasets", fw=600),
                     dmc.Group(
                         [
                             time_bucket_select(
@@ -161,7 +161,7 @@ def layout(**qargs):
                         ]
                     ),
                 ],
-                position="apart",
+                justify="space-between",
             ),
             dmc.Space(h=8),
             dmc.Card(
@@ -172,7 +172,7 @@ def layout(**qargs):
                                 [
                                     dmc.Text(
                                         "Time Series Chart",
-                                        weight=500,
+                                        fw=500,
                                     ),
                                     dmc.Group(
                                         [
@@ -187,7 +187,7 @@ def layout(**qargs):
                                     ),
                                 ],
                                 pl=4,
-                                position="apart",
+                                justify="space-between",
                             )
                         ]
                     ),
@@ -225,7 +225,7 @@ def layout(**qargs):
             dmc.Space(h=12),
             dmc.Grid(
                 [
-                    dmc.Col(
+                    dmc.GridCol(
                         children=[
                             dmc.Tabs(
                                 color="teal",
@@ -243,20 +243,20 @@ def layout(**qargs):
                                 children=[
                                     dmc.TabsList(
                                         [
-                                            dmc.Tab(
-                                                dmc.Text("Time Of Day", weight=500),
+                                            dmc.TabsTab(
+                                                dmc.Text("Time Of Day", fw=500),
                                                 value="tod",
                                             ),
-                                            dmc.Tab(
-                                                dmc.Text("Stats", weight=500),
+                                            dmc.TabsTab(
+                                                dmc.Text("Stats", fw=500),
                                                 value="stats",
                                             ),
-                                            dmc.Tab(
-                                                dmc.Text("Analysis", weight=500),
+                                            dmc.TabsTab(
+                                                dmc.Text("Analysis", fw=500),
                                                 value="analysis",
                                             ),
-                                            dmc.Tab(
-                                                dmc.Text("Map", weight=500),
+                                            dmc.TabsTab(
+                                                dmc.Text("Map", fw=500),
                                                 value="map",
                                             ),
                                         ],
@@ -284,7 +284,7 @@ def layout(**qargs):
                                                         pr=4,
                                                         # className="position-absolute",
                                                         # style={"zIndex": 1000,"right": 0,},
-                                                        position="apart",
+                                                        justify="space-between",
                                                     ),
                                                     chart_loading_overlay(
                                                         [
@@ -362,17 +362,17 @@ def layout(**qargs):
                                 ],
                             ),
                         ],
-                        className="col-lg-10",
+                        span={"base": 12, "md": 10},
                     ),
-                    dmc.Col(
+                    dmc.GridCol(
                         [
                             # dmc.Text("Datasets", weight=500, px=4),
-                            dmc.Stack(id=ids.dataset_card_stack, spacing="xs"),
+                            dmc.Stack(id=ids.dataset_card_stack, gap="xs"),
                         ],
-                        className="col-lg-2",
+                        span={"base": 12, "md": 2},
                     ),
                 ],
-                gutter="xs",
+                gap="xs",
             ),
         ],
         fluid=True,
@@ -416,7 +416,7 @@ def update_select_modal(is_open, data):
                             disabled=True,
                         ),
                     ],
-                    position="right",
+                    justify="flex-end",
                 ),
             ]
         )

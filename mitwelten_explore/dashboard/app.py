@@ -12,15 +12,12 @@ from dash import (
     page_container,
 )
 from dash.exceptions import PreventUpdate
+import dash
 import dash_mantine_components as dmc
 import flask
 from configuration import *
-from dashboard.components.navbar import nav_bar, ThemeSwitchAIO
-from dashboard.components.modals import confirm_dialog
-from dashboard.components.notifications import generate_notification
-from dashboard.utils.communication import get_user_from_cookies
-from dashboard.api_clients.userdata_client import update_collection, get_collection
-from dashboard.models import to_typed_dataset
+
+dash._dash_renderer._set_react_version("19.2.4")
 
 app = Dash(
     __name__,
@@ -31,13 +28,26 @@ app = Dash(
     update_title=None,
 )
 
-notification_provider = dmc.NotificationsProvider(
-    html.Div(id="noti_container"),
-)
+from dashboard.components.navbar import nav_bar, ThemeSwitchAIO
+from dashboard.components.modals import confirm_dialog
+from dashboard.components.notifications import generate_notification
+from dashboard.utils.communication import get_user_from_cookies
+from dashboard.api_clients.userdata_client import update_collection, get_collection
+from dashboard.models import to_typed_dataset
 
 app.layout = dmc.MantineProvider(
+    forceColorScheme="light",
+    useV8CssVariablesResolver=True,
     theme={
-        "colorScheme": "light",
+        "defaultRadius": "sm",
+        "fontWeights": {"medium": 500},
+        "components": {
+            "Switch": {"defaultProps": {"withThumbIndicator": False}},
+            # Mantine 6 default variants (Mantine >= 7 defaults to "filled")
+            "Badge": {"defaultProps": {"variant": "light"}},
+            "ActionIcon": {"defaultProps": {"variant": "subtle"}},
+            "Chip": {"defaultProps": {"variant": "outline"}},
+        },
         "colors": {
             "customcolors": [
                 "#0FB5AE",
@@ -48,6 +58,7 @@ app.layout = dmc.MantineProvider(
                 "#72E06A",
                 "#147AF3",
                 "#7326D3",
+                "#E8C600",
                 "#E8C600",
             ]
         },
@@ -62,7 +73,7 @@ app.layout = dmc.MantineProvider(
                 html.Div(id="keepalive_div"),
                 dcc.Location("url", refresh=False),
                 nav_bar,
-                notification_provider,
+                dmc.NotificationContainer(id="noti_container", position="bottom-right"),
                 dmc.Container([page_container], fluid=True, className="pt-2"),
             ],
             fluid=True,
@@ -75,7 +86,7 @@ app.layout = dmc.MantineProvider(
 @app.callback(
     Output("traces_store", "data", allow_duplicate=True),
     Output("trace_add_store", "data", allow_duplicate=True),
-    Output("noti_container", "children", allow_duplicate=True),
+    Output("noti_container", "sendNotifications", allow_duplicate=True),
     Input("traces_store", "modified_timestamp"),
     State("traces_store", "data"),
     Input("trace_add_store", "modified_timestamp"),
@@ -148,19 +159,13 @@ def update_hello_message(href):
 
 
 @app.callback(
-    Output("mt-provider", "theme"),
+    Output("mt-provider", "forceColorScheme"),
     Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
-    State("mt-provider", "theme"),
 )
-def update_mt_theme(value, theme):
+def update_mt_theme(value):
     if value is None:
         return no_update
-    theme = theme if theme is not None else {}
-    if value:
-        theme["colorScheme"] = "light"
-    else:
-        theme["colorScheme"] = "dark"
-    return theme
+    return "light" if value else "dark"
 
 
 app.clientside_callback(

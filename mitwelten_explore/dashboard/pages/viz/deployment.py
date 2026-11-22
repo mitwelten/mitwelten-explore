@@ -3,6 +3,7 @@ from dash import dcc, callback, Input, Output, State, ctx, html, no_update, ALL
 from dash.exceptions import PreventUpdate
 import flask
 import dash_mantine_components as dmc
+from dashboard.components.overlays import loading_overlay
 from dashboard.models import UrlSearchArgs, to_typed_dataset, Annotation, DatasetType
 from dashboard.styles import icons, get_icon
 from dashboard.components.navbar import ThemeSwitchAIO
@@ -106,22 +107,22 @@ affix = affix_menu(
 
 plaio_legend = dmc.Grid(
     [
-        dmc.Col(
+        dmc.GridCol(
             dmc.Text("Detections", size="sm"),
             span=2,
         ),
-        dmc.Col(
+        dmc.GridCol(
             dmc.Text("Name", size="sm"),
             span=8,
         ),
-        dmc.Col(
+        dmc.GridCol(
             dmc.Group(
                 dmc.Text(
                     "Dashboard",
-                    weight=400,
+                    fw=400,
                     size="sm",
                 ),
-                position="right",
+                justify="flex-end",
             ),
             span=2,
         ),
@@ -134,16 +135,16 @@ def value_indicator_group(value, text):
         [
             dmc.Text(
                 value,
-                size="1.5rem",
-                color="teal.5",
-                weight=600,
+                fz="1.5rem",
+                c="teal.5",
+                fw=600,
             ),
             dmc.Text(
                 text,
                 size="md",
             ),
         ],
-        spacing="xs",
+        gap="xs",
         p=0,
     )
 
@@ -167,12 +168,12 @@ def generate_list_items(species):
         normalized_count = np.sqrt(s.count)
         count_percent = (normalized_count / max_count_norm) * 100
         label_de = (
-            dmc.Group([badge_de, dmc.Text(s.label_de, size="sm")], spacing=3)
+            dmc.Group([badge_de, dmc.Text(s.label_de, size="sm")], gap=3)
             if s.label_de
             else None
         )
         label_en = (
-            dmc.Group([badge_en, dmc.Text(s.label_en, size="sm")], spacing=3)
+            dmc.Group([badge_en, dmc.Text(s.label_en, size="sm")], gap=3)
             if s.label_en
             else None
         )
@@ -180,11 +181,11 @@ def generate_list_items(species):
             dmc.Card(
                 dmc.Grid(
                     [
-                        dmc.Col(
+                        dmc.GridCol(
                             [
                                 dmc.Text(
                                     s.count,
-                                    weight=600,
+                                    fw=600,
                                 ),
                                 dmc.Progress(
                                     value=count_percent,
@@ -196,10 +197,10 @@ def generate_list_items(species):
                             ],
                             span=2,
                         ),
-                        dmc.Col(
+                        dmc.GridCol(
                             dmc.Group(
                                 [
-                                    dmc.Text(s.label_sci, weight=500),
+                                    dmc.Text(s.label_sci, fw=500),
                                     label_de,
                                     label_en,
                                 ],
@@ -207,7 +208,7 @@ def generate_list_items(species):
                             ),
                             span=9,
                         ),
-                        dmc.Col(
+                        dmc.GridCol(
                             dmc.Group(
                                 dmc.Anchor(
                                     dmc.Button(
@@ -219,7 +220,7 @@ def generate_list_items(species):
                                     href=f"{PATH_PREFIX}viz/taxon/{s.datum_id}?mw_data=true",
                                     target="_blank",
                                 ),
-                                position="right",
+                                justify="flex-end",
                             ),
                             span=1,
                         ),
@@ -273,20 +274,20 @@ def layout(**qargs):
                     title,
                     dmc.Group([conf_select, traio]),
                 ],
-                position="apart",
+                justify="space-between",
                 pb=12,
             ),
             dmc.Grid(
                 [
-                    dmc.Col(
+                    dmc.GridCol(
                         [
-                            dmc.AccordionMultiple(
+                            dmc.Accordion(
                                 [
                                     dmc.AccordionItem(
                                         [
                                             dmc.AccordionControl(
                                                 dmc.Text(
-                                                    "Detections", weight=500, size="sm"
+                                                    "Detections", fw=500, size="sm"
                                                 ),
                                                 py=8,
                                             ),
@@ -294,10 +295,10 @@ def layout(**qargs):
                                                 [
                                                     dmc.Group(
                                                         id=ids.detection_stats_group,
-                                                        position="center",
+                                                        justify="center",
                                                         p=0,
                                                     ),
-                                                    dmc.LoadingOverlay(
+                                                    loading_overlay(
                                                         dcc.Graph(
                                                             id=ids.pie_chart,
                                                             figure=no_data_figure(
@@ -306,8 +307,7 @@ def layout(**qargs):
                                                             config=dict(
                                                                 displayModeBar=False,
                                                             ),
-                                                        ),
-                                                        transitionDuration=400,
+                                                        )
                                                     ),
                                                 ]
                                             ),
@@ -318,7 +318,7 @@ def layout(**qargs):
                                     dmc.AccordionItem(
                                         [
                                             dmc.AccordionControl(
-                                                dmc.Text("Map", weight=500, size="sm"),
+                                                dmc.Text("Map", fw=500, size="sm"),
                                                 py=8,
                                             ),
                                             dmc.AccordionPanel(
@@ -339,7 +339,7 @@ def layout(**qargs):
                                             dmc.AccordionControl(
                                                 dmc.Text(
                                                     "Collected data",
-                                                    weight=500,
+                                                    fw=500,
                                                     size="sm",
                                                 ),
                                                 py=8,
@@ -348,9 +348,9 @@ def layout(**qargs):
                                                 [
                                                     dmc.Group(
                                                         id=ids.data_stats_indicator,
-                                                        position="center",
+                                                        justify="center",
                                                     ),
-                                                    dmc.LoadingOverlay(
+                                                    loading_overlay(
                                                         dcc.Graph(
                                                             id=ids.data_bar_chart,
                                                             figure=no_data_figure(
@@ -359,8 +359,7 @@ def layout(**qargs):
                                                             config=dict(
                                                                 displayModeBar=False,
                                                             ),
-                                                        ),
-                                                        transitionDuration=400,
+                                                        )
                                                     ),
                                                 ]
                                             ),
@@ -373,7 +372,7 @@ def layout(**qargs):
                                             dmc.AccordionControl(
                                                 dmc.Text(
                                                     "Environment",
-                                                    weight=500,
+                                                    fw=500,
                                                     size="sm",
                                                 ),
                                                 py=8,
@@ -392,16 +391,17 @@ def layout(**qargs):
                                     ),
                                 ],
                                 variant="contained",
+                                multiple=True,
                                 value=["detections"],
                                 # value="detections",
                                 styles={"content": {"padding": 0}},
                             ),
                         ],
-                        className="col-lg-5",
+                        span={"base": 12, "md": 5},
                     ),
-                    dmc.Col(
-                        dmc.LoadingOverlay(plaio, transitionDuration=400),
-                        className="col-lg-7",
+                    dmc.GridCol(
+                        loading_overlay(plaio),
+                        span={"base": 12, "md": 7},
                     ),
                 ],
             ),
@@ -472,7 +472,7 @@ def update_select_modal(is_open, data):
                                 "Select Datasets", href=PATH_PREFIX + "select/bird"
                             ),
                         ],
-                        position="apart",
+                        justify="space-between",
                     )
                 )
             ]
@@ -484,7 +484,7 @@ def update_select_modal(is_open, data):
                         dmc.Button("Cancel", color="gray", variant="outline"),
                         href=PATH_PREFIX + "select",
                     ),
-                    position="right",
+                    justify="flex-end",
                 ),
             ]
         )

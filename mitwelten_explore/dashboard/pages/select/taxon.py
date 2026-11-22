@@ -40,15 +40,17 @@ dash.register_page(__name__, path="/select/taxon")
 
 
 level_select_radiogroup = dmc.RadioGroup(
-    [
-        dmc.Radio(dmc.Text(str(l).title(), weight=500), value=l, color="teal")
-        for l in reversed([e.value for e in RankEnum])
-    ],
+    dmc.Group(
+        [
+            dmc.Radio(dmc.Text(str(l).title(), fw=500), value=l, color="teal", size="sm")
+            for l in reversed([e.value for e in RankEnum])
+        ],
+        mt=4,
+    ),
     id=ids.level_select_rg,
     value=RankEnum.species,
     # label="Select a level",
     size="sm",
-    offset=4
 )
 
 title_group = dmc.Group(
@@ -57,11 +59,11 @@ title_group = dmc.Group(
             [
                 dmc.Group(
                     [
-                        dmc.Text("Taxon Detections", weight=700, size="lg"),
+                        dmc.Text("Taxon Detections", fw=700, size="lg"),
                         dmc.Anchor(
                             get_icon(icons.help, width=18),
                             href=f"{PATH_PREFIX}docs#datasets",
-                            variant="text",
+                            c="inherit",
                             target="_blank",
                         ),
                     ],
@@ -69,17 +71,17 @@ title_group = dmc.Group(
                 ),
                 dmc.Text("Detections of Birds and Insects"),
             ],
-            spacing=0,
+            gap=0,
         ),
         dmc.Stack(
             [
-                dmc.Text("Select a level", size="sm", weight=500),
+                dmc.Text("Select a level", size="sm", fw=500),
                 level_select_radiogroup,
             ],
-            spacing=0,
+            gap=0,
         ),
     ],
-    spacing="5rem",
+    gap="5rem",
 )
 
 

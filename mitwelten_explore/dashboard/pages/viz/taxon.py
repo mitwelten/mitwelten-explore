@@ -134,7 +134,7 @@ def data_src_select(id, mitwelten=True, gbif=False):
                 multiple=True,
             ),
         ],
-        spacing="xs",
+        gap="xs",
     )
 
 
@@ -162,15 +162,15 @@ def layout(taxon_id=None, **qargs):
             dcc.Location(ids.url, refresh=False),
             dmc.Grid(
                 [
-                    dmc.Col(
+                    dmc.GridCol(
                         dmc.Group(
                             [
                                 html.Div(id=ids.title),
                             ]
                         ),
-                        className="col-xl-3",
+                        span={"base": 12, "lg": 3},
                     ),
-                    dmc.Col(
+                    dmc.GridCol(
                         dmc.Group(
                             [
                                 dmc.Group(
@@ -182,17 +182,16 @@ def layout(taxon_id=None, **qargs):
                                 ),
                                 traio,
                             ],
-                            position="right",
-                            noWrap=False,
+                            justify="flex-end",
                         ),
-                        className="col-xl-9",
+                        span={"base": 12, "lg": 9},
                     ),
                 ]
             ),
             dmc.Space(h=12),
             dmc.Grid(
                 [
-                    dmc.Col(
+                    dmc.GridCol(
                         [
                             dmc.Card(
                                 children=[
@@ -200,7 +199,7 @@ def layout(taxon_id=None, **qargs):
                                         [
                                             dmc.Group(
                                                 [
-                                                    dmc.Text("Time Series", weight=600),
+                                                    dmc.Text("Time Series", fw=600),
                                                     dmc.Code(
                                                         id=ids.time_bucket_indicator,
                                                         children="1w",
@@ -220,7 +219,7 @@ def layout(taxon_id=None, **qargs):
                                                 ]
                                             ),
                                         ],
-                                        position="apart",
+                                        justify="space-between",
                                     ),
                                     dmc.CardSection(
                                         chart_loading_overlay(
@@ -240,7 +239,7 @@ def layout(taxon_id=None, **qargs):
                             dmc.Space(h=8),
                             dmc.Grid(
                                 [
-                                    dmc.Col(
+                                    dmc.GridCol(
                                         dmc.Card(
                                             children=dmc.CardSection(
                                                 chart_loading_overlay(
@@ -250,9 +249,9 @@ def layout(taxon_id=None, **qargs):
                                             withBorder=True,
                                             shadow="sm",
                                         ),
-                                        className="col-md-6",
+                                        span={"base": 12, "sm": 6},
                                     ),
-                                    dmc.Col(
+                                    dmc.GridCol(
                                         dmc.Card(
                                             children=[
                                                 dmc.Group(
@@ -261,7 +260,7 @@ def layout(taxon_id=None, **qargs):
                                                             [
                                                                 dmc.Text(
                                                                     "Time Of Day",
-                                                                    weight=600,
+                                                                    fw=600,
                                                                 ),
                                                                 dmc.Code(
                                                                     id=ids.tod_bucket_indicator,
@@ -278,7 +277,7 @@ def layout(taxon_id=None, **qargs):
                                                             ]
                                                         ),
                                                     ],
-                                                    position="apart",
+                                                    justify="space-between",
                                                 ),
                                                 dmc.CardSection(
                                                     chart_loading_overlay(
@@ -300,15 +299,15 @@ def layout(taxon_id=None, **qargs):
                                             shadow="sm",
                                             style={"height": "100%"},
                                         ),
-                                        className="col-md-6",
+                                        span={"base": 12, "sm": 6},
                                     ),
                                 ],
-                                gutter="xs",
+                                gap="xs",
                             ),
                         ],
-                        className="col-lg-9",
+                        span={"base": 12, "md": 9},
                     ),
-                    dmc.Col(
+                    dmc.GridCol(
                         [
                             stat_card,
                             dmc.ScrollArea(
@@ -325,11 +324,11 @@ def layout(taxon_id=None, **qargs):
                                 style={"height": "90%"},
                             ),
                         ],
-                        className="col-lg-3",
+                        span={"base": 12, "md": 3},
                         style={"maxHeight": "90vh"},
                     ),
                 ],
-                gutter="xs",
+                gap="xs",
             ),
         ],
         fluid=True,
@@ -422,7 +421,7 @@ def update_title(pn):
         return (
             dmc.Group(
                 [
-                    dmc.Text(selected_taxon.label_sci, weight=700, size="xl"),
+                    dmc.Text(selected_taxon.label_sci, fw=700, size="xl"),
                     dmc.Badge(
                         selected_taxon.rank,
                         color="gray",

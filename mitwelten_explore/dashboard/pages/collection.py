@@ -20,11 +20,11 @@ list_legend = dmc.Card(
     [
         dmc.Grid(
             [
-                dmc.Col(dmc.Text("Type", size="sm", weight=500), span=1),
-                dmc.Col(
-                    dmc.Text("Name  Unit  Location", size="sm", weight=500), span=5
+                dmc.GridCol(dmc.Text("Type", size="sm", fw=500), span=1),
+                dmc.GridCol(
+                    dmc.Text("Name  Unit  Location", size="sm", fw=500), span=5
                 ),
-                dmc.Col(
+                dmc.GridCol(
                     dmc.Group(
                         [
                             dmc.Group(
@@ -32,67 +32,67 @@ list_legend = dmc.Card(
                                     get_icon(
                                         icon=icons.location_poi,
                                         width=20,
-                                        color=dmc.theme.DEFAULT_COLORS["grape"][6],
+                                        color=dmc.DEFAULT_THEME["colors"]["grape"][6],
                                     ),
                                     dmc.Text(
                                         "Deployment Dashboard",
-                                        color="grape.6",
+                                        c="grape.6",
                                         size="sm",
-                                        weight=500,
+                                        fw=500,
                                     ),
                                 ],
-                                spacing=3,
+                                gap=3,
                             ),
                             dmc.Group(
                                 [
                                     get_icon(
                                         icon=icons.map_chart,
                                         width=20,
-                                        color=dmc.theme.DEFAULT_COLORS["cyan"][6],
+                                        color=dmc.DEFAULT_THEME["colors"]["cyan"][6],
                                     ),
                                     dmc.Text(
                                         "Map Dashboard",
-                                        color="cyan.6",
+                                        c="cyan.6",
                                         size="sm",
-                                        weight=500,
+                                        fw=500,
                                     ),
                                 ],
-                                spacing=3,
+                                gap=3,
                             ),
                             dmc.Group(
                                 [
                                     get_icon(
                                         icon=icons.dashboard,
                                         width=20,
-                                        color=dmc.theme.DEFAULT_COLORS["teal"][6],
+                                        color=dmc.DEFAULT_THEME["colors"]["teal"][6],
                                     ),
                                     dmc.Text(
                                         "Taxon Dashboard",
-                                        color="teal.6",
+                                        c="teal.6",
                                         size="sm",
-                                        weight=500,
+                                        fw=500,
                                     ),
                                 ],
-                                spacing=3,
+                                gap=3,
                             ),
                             dmc.Group(
                                 [
                                     get_icon(
                                         icon=icons.line_chart,
                                         width=20,
-                                        color=dmc.theme.DEFAULT_COLORS["indigo"][6],
+                                        color=dmc.DEFAULT_THEME["colors"]["indigo"][6],
                                     ),
                                     dmc.Text(
                                         "Time Series Dashboard",
-                                        color="indigo.6",
+                                        c="indigo.6",
                                         size="sm",
-                                        weight=500,
+                                        fw=500,
                                     ),
                                 ],
-                                spacing=3,
+                                gap=3,
                             ),
                         ],
-                        position="right",
+                        justify="flex-end",
                     ),
                     span=6,
                 ),
@@ -116,11 +116,11 @@ def layout(**qargs):
         [
             dmc.Group(
                 [
-                    dmc.Text("Collected Datasets", weight=600, size="lg"),
+                    dmc.Text("Collected Datasets", fw=600, size="lg"),
                     dmc.Anchor(
                         get_icon(icons.help, width=18),
                         href=f"{PATH_PREFIX}docs#collection",
-                        variant="text",
+                        c="inherit",
                         target="_blank",
                     ),
                 ],
@@ -142,7 +142,7 @@ def update_sel_tr(data):
 
 @callback(
     Output("traces_store", "data", allow_duplicate=True),
-    Output("noti_container", "children", allow_duplicate=True),
+    Output("noti_container", "sendNotifications", allow_duplicate=True),
     Input({"role": "remove_from_collection_btn", "index": ALL}, "n_clicks"),
     State("traces_store", "data"),
     prevent_initial_call=True,

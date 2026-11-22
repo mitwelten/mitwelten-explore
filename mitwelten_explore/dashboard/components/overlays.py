@@ -1,3 +1,4 @@
+from dash import dcc, html
 import dash_mantine_components as dmc
 from dashboard.styles import icons, get_icon
 from dashboard.models import to_typed_dataset, DatasetType, UrlSearchArgs
@@ -5,13 +6,34 @@ from configuration import PATH_PREFIX
 from dashboard.utils.communication import urlencode_dict
 
 
+def loading_overlay(children, id=None, style=None, overlay_opacity=0.75, custom_spinner=None):
+    """Show a loader on top of `children` while a callback updates them.
+
+    Replaces the wrapper-style `dmc.LoadingOverlay` of DMC 0.12, which no longer
+    takes children (DMC >= 0.14 only has a controlled `visible` overlay).
+    `overlay_opacity` is the opacity of the white cover (0 = children stay fully visible).
+    If `id` is given, it is set on an inner div so that callbacks can keep writing
+    to `Output(id, "children")`.
+    """
+    if id is not None:
+        children = html.Div(children, id=id)
+    return dcc.Loading(
+        children,
+        parent_style={"position": "relative", **(style or {})},
+        overlay_style={"visibility": "visible", "opacity": 1 - overlay_opacity}
+        if overlay_opacity < 1
+        else None,
+        custom_spinner=custom_spinner if custom_spinner is not None else dmc.Loader(),
+        delay_show=100,
+    )
+
+
 def chart_loading_overlay(children, position="left", style=None):
-    return dmc.LoadingOverlay(
+    return loading_overlay(
         children,
         style=style,
-        overlayOpacity=0,
-        transitionDuration=400,
-        loader=dmc.Card(
+        overlay_opacity=0,
+        custom_spinner=dmc.Card(
             dmc.Group(
                 [
                     dmc.Loader(
@@ -20,8 +42,8 @@ def chart_loading_overlay(children, position="left", style=None):
                     ),
                     dmc.Text(
                         "Loading",
-                        color="gray.9",
-                        weight=500,
+                        c="gray.9",
+                        fw=500,
                         size="md",
                     ),
                 ],
@@ -57,12 +79,11 @@ def tooltip(
     else:
         return dmc.Tooltip(
             children=children,
-            label=dmc.Text(text, weight=300),
+            label=dmc.Text(text, fw=300),
             position=position,
             withArrow=arrow,
             openDelay=opendelay,
             color=color,
-            events="hover",
         )
 
 
@@ -93,7 +114,7 @@ def datasource_indicator(datasources: dict, url_args: UrlSearchArgs = None):
                     original_records = dmc.Anchor(
                         dmc.Text(
                             ["List of observations ", get_icon(icons.open_in_new_tab)],
-                            weight=500,
+                            fw=500,
                         ),
                         href=f"{PATH_PREFIX}reference/gbif?{urlencode_dict(dict(dataset=ds.to_dataset(), time_from=url_args.view_config.time_from,time_to=url_args.view_config.time_to))}",
                         target="_blank",
@@ -105,7 +126,7 @@ def datasource_indicator(datasources: dict, url_args: UrlSearchArgs = None):
                 original_records = dmc.Anchor(
                     dmc.Text(
                         ["List of observations ", get_icon(icons.open_in_new_tab)],
-                        weight=500,
+                        fw=500,
                     ),
                     href=f"{PATH_PREFIX}reference/gbif?{urlencode_dict(dict(dataset=ds.to_dataset()))}",
                     target="_blank",
@@ -128,23 +149,23 @@ def datasource_indicator(datasources: dict, url_args: UrlSearchArgs = None):
                                 # get_icon(icons.copyright),
                                 get_icon(icons.database),
                             ],
-                            spacing=1,
+                            gap=1,
                         ),
                     ]
-                    + [dmc.Text(" | ".join(titles), size="xs", color="dimmed")],
-                    spacing=4,
+                    + [dmc.Text(" | ".join(titles), size="xs", c="dimmed")],
+                    gap=4,
                     style={"cursor": "pointer"},
                 )
             ),
             dmc.HoverCardDropdown(
                 [
                     dmc.Group(
-                        [dmc.Text("Data Sources", weight=500), original_records],
-                        position="apart",
+                        [dmc.Text("Data Sources", fw=500), original_records],
+                        justify="space-between",
                     ),
                     dmc.Stack(
                         children,
-                        spacing=3,
+                        gap=3,
                         style={
                             "maxHeight": "60vh",
                             "maxWidth": "50vw",

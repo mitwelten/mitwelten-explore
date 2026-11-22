@@ -2,6 +2,7 @@ import dash
 from dash import html, dcc, callback, Input, Output, State
 from dash.exceptions import PreventUpdate
 import dash_mantine_components as dmc
+from dashboard.components.overlays import loading_overlay
 from dashboard.models import UrlSearchArgs, to_typed_dataset
 from dashboard.styles import icons, get_icon
 from dashboard.utils.communication import parse_nested_qargs, qargs_to_dict
@@ -32,7 +33,7 @@ def generate_table(occurences, limit=50, offset=0):
     for o in occurences:
         name = o.get("label_sci")
         if name is None:
-            name = dmc.Text("see occurence", color="dimmed", size="sm")
+            name = dmc.Text("see occurence", c="dimmed", size="sm")
         else:
             name = dmc.Text(name, truncate=True)
         media = o.get("media")
@@ -45,14 +46,14 @@ def generate_table(occurences, limit=50, offset=0):
             dmc.Card(
                 dmc.Grid(
                     [
-                        dmc.Col(
+                        dmc.GridCol(
                             dmc.Group(
-                                [dmc.Group([index_text, name]), media], position="apart"
+                                [dmc.Group([index_text, name]), media], justify="space-between"
                             ),
                             span=5,
                         ),
-                        dmc.Col([dmc.Text(format_datetime(o.get("time")))], span=2),
-                        dmc.Col(
+                        dmc.GridCol([dmc.Text(format_datetime(o.get("time")))], span=2),
+                        dmc.GridCol(
                             [
                                 dmc.Text(
                                     o.get("datasetName"), truncate=True, size="sm"
@@ -60,7 +61,7 @@ def generate_table(occurences, limit=50, offset=0):
                             ],
                             span=4,
                         ),
-                        dmc.Col(
+                        dmc.GridCol(
                             dmc.Group(
                                 [
                                     dmc.Anchor(
@@ -69,7 +70,7 @@ def generate_table(occurences, limit=50, offset=0):
                                         target="_blank",
                                     )
                                 ],
-                                position="right",
+                                justify="flex-end",
                             ),
                             span=1,
                         ),
@@ -87,34 +88,34 @@ def generate_table(occurences, limit=50, offset=0):
 list_legend = dmc.Card(
     dmc.Grid(
         [
-            dmc.Col(
+            dmc.GridCol(
                 dmc.Group(
                     [
                         dmc.Group(
                             [
-                                dmc.Text("#", size="sm", weight=500),
-                                dmc.Text("Name", size="sm", weight=500),
+                                dmc.Text("#", size="sm", fw=500),
+                                dmc.Text("Name", size="sm", fw=500),
                             ]
                         ),
-                        dmc.Text("Has Media", size="sm", weight=500),
+                        dmc.Text("Has Media", size="sm", fw=500),
                     ],
-                    position="apart",
+                    justify="space-between",
                 ),
                 span=5,
             ),
-            dmc.Col([dmc.Text("Eventdate", size="sm", weight=500)], span=2),
-            dmc.Col(
+            dmc.GridCol([dmc.Text("Eventdate", size="sm", fw=500)], span=2),
+            dmc.GridCol(
                 [
-                    dmc.Text("Dataset", size="sm", weight=500),
+                    dmc.Text("Dataset", size="sm", fw=500),
                 ],
                 span=4,
             ),
-            dmc.Col(
+            dmc.GridCol(
                 dmc.Group(
                     [
-                        dmc.Text("Link", size="sm", weight=500),
+                        dmc.Text("Link", size="sm", fw=500),
                     ],
-                    position="right",
+                    justify="flex-end",
                 ),
                 span=1,
             ),
@@ -145,7 +146,7 @@ def layout(**qargs):
                 dcc.Location(id=ids.url, refresh=False),
                 dmc.Group(
                     [
-                        dmc.Text("Occurence List", weight=500, size="lg"),
+                        dmc.Text("Occurence List", fw=500, size="lg"),
                         dmc.Text(f"{total_items} total occurences"),
                         dmc.Group(
                             [
@@ -165,7 +166,7 @@ def layout(**qargs):
                                             error=None,
                                         ),
                                     ],
-                                    spacing="xs",
+                                    gap="xs",
                                 ),
                                 dmc.Group(
                                     [
@@ -181,7 +182,7 @@ def layout(**qargs):
                                             w=90,
                                         ),
                                     ],
-                                    spacing="xs",
+                                    gap="xs",
                                 ),
                                 dmc.Button(
                                     "Go",
@@ -190,17 +191,17 @@ def layout(**qargs):
                                     id=ids.update_list_button,
                                 ),
                             ],
-                            spacing="lg",
+                            gap="lg",
                         ),
                     ],
-                    position="apart",
+                    justify="space-between",
                 ),
                 dmc.Space(h=12),
                 dmc.Stack(
                     [
                         list_legend,
-                        dmc.LoadingOverlay(
-                            dmc.Stack(spacing=2, id=ids.result_list_stack),
+                        loading_overlay(
+                            dmc.Stack(gap=2, id=ids.result_list_stack),
                         ),
                     ]
                 ),

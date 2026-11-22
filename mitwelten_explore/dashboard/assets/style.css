@@ -13,14 +13,14 @@
 
 }
 
-.ql-editor {
-
+/* annotation editor (dmc.RichTextEditor) */
+.mantine-RichTextEditor-content {
     max-height: 35vh;
-    min-height: 20vh;
-
-
-    /*max-height: max-content;*/
     overflow-y: auto;
+}
+
+.mantine-RichTextEditor-content .ProseMirror {
+    min-height: 20vh;
 }
 
 .tooltip .tooltip-inner {
@@ -29,4 +29,9 @@
 
 .tooltip .tooltip-arrow::before {
     --bs-tooltip-bg: #364FC7;
+}
+
+/* override bootstrap pink code color */
+.mantine-Code-root {
+    color: var(--mantine-color-text);
 }

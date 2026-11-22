@@ -1,0 +1,7 @@
+.git
+.venv
+venv
+.env
+**/__pycache__
+.notes.md
+debug_page.py
