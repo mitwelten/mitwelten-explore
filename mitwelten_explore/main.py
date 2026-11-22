@@ -3,6 +3,7 @@ from fastapi.responses import RedirectResponse
 from keycloak import KeycloakOpenID
 from fastapi.security import OAuth2AuthorizationCodeBearer
 from a2wsgi import WSGIMiddleware
+from jwcrypto import jwk
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 import time
@@ -29,10 +30,13 @@ oauth2_scheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl=f"{KC_SERVER_URL}realms/{KC_REALM_NAME}/protocol/openid-connect/auth",
     tokenUrl=f"{KC_SERVER_URL}realms/{KC_REALM_NAME}/protocol/openid-connect/token",
 )
-KEYCLOAK_PUBLIC_KEY = (
-    "-----BEGIN PUBLIC KEY-----\n"
-    + keycloak_openid.public_key()
-    + "\n-----END PUBLIC KEY-----"
+
+KEYCLOAK_PUBLIC_KEY = jwk.JWK.from_pem(
+    (
+        "-----BEGIN PUBLIC KEY-----\n"
+        + keycloak_openid.public_key()
+        + "\n-----END PUBLIC KEY-----"
+    ).encode()
 )
 
 
@@ -44,10 +48,10 @@ async def get_current_user(request: Request):
         auth_header = auth_header.split(" ")[1]
         print(auth_header)
         try:
+            # signature and exp are always checked, aud is not
             return keycloak_openid.decode_token(
                 auth_header,
                 key=KEYCLOAK_PUBLIC_KEY,
-                options={"verify_signature": True, "verify_aud": False, "exp": True},
             )
         except:
             pass
@@ -57,7 +61,6 @@ async def get_current_user(request: Request):
             return keycloak_openid.decode_token(
                 cookie_authorization,
                 key=KEYCLOAK_PUBLIC_KEY,
-                options={"verify_signature": True, "verify_aud": False, "exp": True},
             )
         except:
             pass
