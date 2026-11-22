@@ -142,7 +142,7 @@ def update_sel_tr(data):
 
 @callback(
     Output("traces_store", "data", allow_duplicate=True),
-    Output("noti_container", "children", allow_duplicate=True),
+    Output("noti_container", "sendNotifications", allow_duplicate=True),
     Input({"role": "remove_from_collection_btn", "index": ALL}, "n_clicks"),
     State("traces_store", "data"),
     prevent_initial_call=True,

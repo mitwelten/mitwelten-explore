@@ -73,7 +73,7 @@ app.layout = dmc.MantineProvider(
                 html.Div(id="keepalive_div"),
                 dcc.Location("url", refresh=False),
                 nav_bar,
-                notification_provider,
+                dmc.NotificationContainer(id="noti_container", position="bottom-right"),
                 dmc.Container([page_container], fluid=True, className="pt-2"),
             ],
             fluid=True,
@@ -86,7 +86,7 @@ app.layout = dmc.MantineProvider(
 @app.callback(
     Output("traces_store", "data", allow_duplicate=True),
     Output("trace_add_store", "data", allow_duplicate=True),
-    Output("noti_container", "children", allow_duplicate=True),
+    Output("noti_container", "sendNotifications", allow_duplicate=True),
     Input("traces_store", "modified_timestamp"),
     State("traces_store", "data"),
     Input("trace_add_store", "modified_timestamp"),
