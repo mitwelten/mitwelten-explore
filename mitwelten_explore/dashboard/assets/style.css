@@ -30,3 +30,8 @@
 .tooltip .tooltip-arrow::before {
     --bs-tooltip-bg: #364FC7;
 }
+
+/* override bootstrap pink code color */
+.mantine-Code-root {
+    color: var(--mantine-color-text);
+}

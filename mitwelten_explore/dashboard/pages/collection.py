@@ -32,7 +32,7 @@ list_legend = dmc.Card(
                                     get_icon(
                                         icon=icons.location_poi,
                                         width=20,
-                                        color=dmc.theme.DEFAULT_COLORS["grape"][6],
+                                        color=dmc.DEFAULT_THEME["colors"]["grape"][6],
                                     ),
                                     dmc.Text(
                                         "Deployment Dashboard",
@@ -48,7 +48,7 @@ list_legend = dmc.Card(
                                     get_icon(
                                         icon=icons.map_chart,
                                         width=20,
-                                        color=dmc.theme.DEFAULT_COLORS["cyan"][6],
+                                        color=dmc.DEFAULT_THEME["colors"]["cyan"][6],
                                     ),
                                     dmc.Text(
                                         "Map Dashboard",
@@ -64,7 +64,7 @@ list_legend = dmc.Card(
                                     get_icon(
                                         icon=icons.dashboard,
                                         width=20,
-                                        color=dmc.theme.DEFAULT_COLORS["teal"][6],
+                                        color=dmc.DEFAULT_THEME["colors"]["teal"][6],
                                     ),
                                     dmc.Text(
                                         "Taxon Dashboard",
@@ -80,7 +80,7 @@ list_legend = dmc.Card(
                                     get_icon(
                                         icon=icons.line_chart,
                                         width=20,
-                                        color=dmc.theme.DEFAULT_COLORS["indigo"][6],
+                                        color=dmc.DEFAULT_THEME["colors"]["indigo"][6],
                                     ),
                                     dmc.Text(
                                         "Time Series Dashboard",
