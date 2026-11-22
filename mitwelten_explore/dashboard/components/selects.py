@@ -8,13 +8,12 @@ import dash_bootstrap_components as dbc
 
 def confidence_threshold_select(id, value=None, visible=True, **kwargs):
     return dmc.Group(
-        spacing=4,
+        gap=4,
         style={"display": "none"} if not visible else {},
         children=[
-            dmc.MediaQuery(
-                dmc.Text("Confidence", size="xs", color="dimmed"),
-                smallerThan="xl",
-                styles={"display": "none"},
+            dmc.Box(
+                dmc.Text("Confidence", size="xs", c="dimmed"),
+                visibleFrom="xl",
             ),
             dmc.Select(
                 placeholder="Confidence",
@@ -26,7 +25,7 @@ def confidence_threshold_select(id, value=None, visible=True, **kwargs):
                     for i in [0.96, 0.97, 0.98, 0.99]
                 ],
                 style={"minWidth": 120} if visible else {"display": "none"},
-                icon=get_icon(icon="carbon:chart-minimum"),
+                leftSection=get_icon(icon="carbon:chart-minimum"),
                 **kwargs,
             ),
             dbc.Tooltip("Minimum Confidence", target=id, placement="bottom"),
@@ -36,13 +35,12 @@ def confidence_threshold_select(id, value=None, visible=True, **kwargs):
 
 def agg_fcn_select(id, value=None, visible=True, **kwargs):
     return dmc.Group(
-        spacing=4,
+        gap=4,
         style={"display": "none"} if not visible else {},
         children=[
-            dmc.MediaQuery(
-                dmc.Text("Aggregation", size="xs", color="dimmed"),
-                smallerThan="xl",
-                styles={"display": "none"},
+            dmc.Box(
+                dmc.Text("Aggregation", size="xs", c="dimmed"),
+                visibleFrom="xl",
             ),
             dmc.Select(
                 placeholder="Aggregation",
@@ -56,7 +54,7 @@ def agg_fcn_select(id, value=None, visible=True, **kwargs):
                     {"value": "min", "label": "min()"},
                 ],
                 style={"minWidth": 120} if visible else {"display": "none"},
-                icon=get_icon(icon="fluent:math-formula-20-filled"),
+                leftSection=get_icon(icon="fluent:math-formula-20-filled"),
                 **kwargs,
             ),
             dbc.Tooltip("Aggregation Function", target=id, placement="bottom"),
@@ -66,12 +64,11 @@ def agg_fcn_select(id, value=None, visible=True, **kwargs):
 
 def time_bucket_select(id, value=None, **kwargs):
     return dmc.Group(
-        spacing=4,
+        gap=4,
         children=[
-            dmc.MediaQuery(
-                dmc.Text("Time Bucket", size="xs", color="dimmed"),
-                smallerThan="xl",
-                styles={"display": "none"},
+            dmc.Box(
+                dmc.Text("Time Bucket", size="xs", c="dimmed"),
+                visibleFrom="xl",
             ),
             dmc.Select(
                 placeholder="Time Bucket",
@@ -91,7 +88,7 @@ def time_bucket_select(id, value=None, **kwargs):
                     {"value": "4w", "label": "4 Weeks"},
                 ],
                 style={"minWidth": 120},
-                icon=get_icon(icon="ic:round-access-time"),
+                leftSection=get_icon(icon="ic:round-access-time"),
                 **kwargs,
             ),
             dbc.Tooltip("Time Bucket Width", target=id, placement="bottom"),

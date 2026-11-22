@@ -106,14 +106,14 @@ class PagedListSearchableAIO(html.Div):
         scrollarea = dmc.ScrollArea(
             className="flex-grow-1",
             id=self.ids.scroll_area(self.aio_id),
-            children=dmc.Stack(items[:items_per_page], spacing=STACK_SPACING),
+            children=dmc.Stack(items[:items_per_page], gap=STACK_SPACING),
         )
         if use_loadingoverlay:
             scrollarea = dmc.ScrollArea(
                 className="flex-grow-1",
                 children=dmc.LoadingOverlay(
                     id=self.ids.scroll_area(self.aio_id),
-                    children=dmc.Stack(items[:items_per_page], spacing=STACK_SPACING),
+                    children=dmc.Stack(items[:items_per_page], gap=STACK_SPACING),
                 ),
             )
 
@@ -138,7 +138,7 @@ class PagedListSearchableAIO(html.Div):
                             dmc.TextInput(
                                 # label="Search in Results",
                                 id=self.ids.search_input(self.aio_id),
-                                icon=DashIconify(icon="ic:sharp-search"),
+                                leftSection=DashIconify(icon="ic:sharp-search"),
                                 rightSection=dmc.ActionIcon(
                                     DashIconify(icon="ic:outline-clear"),
                                     variant="transparent",
@@ -193,7 +193,7 @@ class PagedListSearchableAIO(html.Div):
 
                 n_pages = math.ceil(len(data) / items_per_page)
                 data = data[:items_per_page]
-                return 1, n_pages, dmc.Stack(data, spacing=STACK_SPACING), search_input
+                return 1, n_pages, dmc.Stack(data, gap=STACK_SPACING), search_input
             elif trg == "pager":
                 if query is not None:
                     if len(query) >= MIN_CHARS:
@@ -203,7 +203,7 @@ class PagedListSearchableAIO(html.Div):
                     no_update,
                     dmc.Stack(
                         data[(page - 1) * items_per_page : page * items_per_page],
-                        spacing=STACK_SPACING,
+                        gap=STACK_SPACING,
                     ),
                     no_update,
                 )
@@ -217,7 +217,7 @@ class PagedListSearchableAIO(html.Div):
                 return (
                     1,
                     n_pages,
-                    dmc.Stack(data[:items_per_page], spacing=STACK_SPACING),
+                    dmc.Stack(data[:items_per_page], gap=STACK_SPACING),
                     no_update,
                 )
             elif trg == "clear_input_btn":
@@ -225,7 +225,7 @@ class PagedListSearchableAIO(html.Div):
                 return (
                     1,
                     n_pages,
-                    dmc.Stack(data[:items_per_page], spacing=STACK_SPACING),
+                    dmc.Stack(data[:items_per_page], gap=STACK_SPACING),
                     "",
                 )
             elif trg == "search_input_store":
@@ -236,7 +236,7 @@ class PagedListSearchableAIO(html.Div):
                 return (
                     1,
                     n_pages,
-                    dmc.Stack(data[:items_per_page], spacing=STACK_SPACING),
+                    dmc.Stack(data[:items_per_page], gap=STACK_SPACING),
                     no_update,
                 )
 
@@ -306,7 +306,7 @@ class PagedListAIO(html.Div):
                                 children=dmc.LoadingOverlay(
                                     id=self.ids.scroll_area(self.aio_id),
                                     children=dmc.Stack(
-                                        items[:items_per_page], spacing=STACK_SPACING
+                                        items[:items_per_page], gap=STACK_SPACING
                                     ),
                                 ),
                             ),
@@ -345,7 +345,7 @@ class PagedListAIO(html.Div):
 
                 n_pages = math.ceil(len(data) / items_per_page)
                 data = data[:items_per_page]
-                return 1, n_pages, dmc.Stack(data, spacing=STACK_SPACING)
+                return 1, n_pages, dmc.Stack(data, gap=STACK_SPACING)
             elif trg == "pager":
 
                 return (
@@ -353,7 +353,7 @@ class PagedListAIO(html.Div):
                     no_update,
                     dmc.Stack(
                         data[(page - 1) * items_per_page : page * items_per_page],
-                        spacing=STACK_SPACING,
+                        gap=STACK_SPACING,
                     ),
                 )
 
@@ -408,7 +408,7 @@ class SearchableListAIO(html.Div):
                 className="flex-grow-1",
                 children=dmc.LoadingOverlay(
                     id=self.ids.scroll_area(self.aio_id),
-                    children=dmc.Stack(items, spacing=STACK_SPACING),
+                    children=dmc.Stack(items, gap=STACK_SPACING),
                 ),
                 type="scroll",
             )
@@ -416,7 +416,7 @@ class SearchableListAIO(html.Div):
             scrollarea = dmc.ScrollArea(
                 className="flex-grow-1",
                 id=self.ids.scroll_area(self.aio_id),
-                children=dmc.Stack(items, spacing=STACK_SPACING),
+                children=dmc.Stack(items, gap=STACK_SPACING),
                 type="scroll",
             )
 
@@ -437,7 +437,7 @@ class SearchableListAIO(html.Div):
                             dmc.TextInput(
                                 # label="Search in Results",
                                 id=self.ids.search_input(self.aio_id),
-                                icon=DashIconify(icon="ic:sharp-search"),
+                                leftSection=DashIconify(icon="ic:sharp-search"),
                                 rightSection=dmc.ActionIcon(
                                     DashIconify(icon="ic:outline-clear"),
                                     variant="transparent",
@@ -477,21 +477,21 @@ class SearchableListAIO(html.Div):
                     search_input = search_input_store
                     data = filter_data(data, search_input_store)
 
-                return dmc.Stack(data, spacing=STACK_SPACING), search_input
+                return dmc.Stack(data, gap=STACK_SPACING), search_input
             elif trg == "search_input":
                 if query is not None:
                     if len(query) >= MIN_CHARS:
 
                         data = filter_data(data, query)
-                return dmc.Stack(data, spacing=STACK_SPACING), no_update
+                return dmc.Stack(data, gap=STACK_SPACING), no_update
 
             elif trg == "clear_input_btn":
-                return dmc.Stack(data, spacing=STACK_SPACING), ""
+                return dmc.Stack(data, gap=STACK_SPACING), ""
 
             elif trg == "search_input_store":
                 if search_input_store is not None:
 
                     data = filter_data(data, search_input_store)
-                return dmc.Stack(data, spacing=STACK_SPACING), no_update
+                return dmc.Stack(data, gap=STACK_SPACING), no_update
 
         raise PreventUpdate

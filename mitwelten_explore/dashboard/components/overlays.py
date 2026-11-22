@@ -20,8 +20,8 @@ def chart_loading_overlay(children, position="left", style=None):
                     ),
                     dmc.Text(
                         "Loading",
-                        color="gray.9",
-                        weight=500,
+                        c="gray.9",
+                        fw=500,
                         size="md",
                     ),
                 ],
@@ -57,7 +57,7 @@ def tooltip(
     else:
         return dmc.Tooltip(
             children=children,
-            label=dmc.Text(text, weight=300),
+            label=dmc.Text(text, fw=300),
             position=position,
             withArrow=arrow,
             openDelay=opendelay,
@@ -93,7 +93,7 @@ def datasource_indicator(datasources: dict, url_args: UrlSearchArgs = None):
                     original_records = dmc.Anchor(
                         dmc.Text(
                             ["List of observations ", get_icon(icons.open_in_new_tab)],
-                            weight=500,
+                            fw=500,
                         ),
                         href=f"{PATH_PREFIX}reference/gbif?{urlencode_dict(dict(dataset=ds.to_dataset(), time_from=url_args.view_config.time_from,time_to=url_args.view_config.time_to))}",
                         target="_blank",
@@ -105,7 +105,7 @@ def datasource_indicator(datasources: dict, url_args: UrlSearchArgs = None):
                 original_records = dmc.Anchor(
                     dmc.Text(
                         ["List of observations ", get_icon(icons.open_in_new_tab)],
-                        weight=500,
+                        fw=500,
                     ),
                     href=f"{PATH_PREFIX}reference/gbif?{urlencode_dict(dict(dataset=ds.to_dataset()))}",
                     target="_blank",
@@ -128,23 +128,23 @@ def datasource_indicator(datasources: dict, url_args: UrlSearchArgs = None):
                                 # get_icon(icons.copyright),
                                 get_icon(icons.database),
                             ],
-                            spacing=1,
+                            gap=1,
                         ),
                     ]
-                    + [dmc.Text(" | ".join(titles), size="xs", color="dimmed")],
-                    spacing=4,
+                    + [dmc.Text(" | ".join(titles), size="xs", c="dimmed")],
+                    gap=4,
                     style={"cursor": "pointer"},
                 )
             ),
             dmc.HoverCardDropdown(
                 [
                     dmc.Group(
-                        [dmc.Text("Data Sources", weight=500), original_records],
-                        position="apart",
+                        [dmc.Text("Data Sources", fw=500), original_records],
+                        justify="space-between",
                     ),
                     dmc.Stack(
                         children,
-                        spacing=3,
+                        gap=3,
                         style={
                             "maxHeight": "60vh",
                             "maxWidth": "50vw",

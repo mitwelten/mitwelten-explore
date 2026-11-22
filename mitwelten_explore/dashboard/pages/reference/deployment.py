@@ -22,7 +22,7 @@ def layout(**qargs):
     return dmc.Container(
         dmc.Grid(
             [
-                dmc.Col(
+                dmc.GridCol(
                     deployment_info_card(
                         get_deployment_info(ids[i]), show_map=show_map
                     ),

@@ -23,31 +23,31 @@ def taxon_stat_card(total_det_id, n_deployments_id):
                         dmc.LoadingOverlay(
                             dmc.Text(
                                 id=total_det_id,
-                                size=32,
-                                weight=700,
-                                color="teal.6",
+                                fz=32,
+                                fw=700,
+                                c="teal.6",
                             )
                         ),
                         dmc.Text("Total Detections", size="md"),
                     ],
-                    spacing=1,
+                    gap=1,
                     justify="space-between",
                 ),
                 dmc.Stack(
                     [
                         dmc.Text(
                             id=n_deployments_id,
-                            size=32,
-                            weight=700,
-                            color="teal.6",
+                            fz=32,
+                            fw=700,
+                            c="teal.6",
                         ),
                         dmc.Text("Deployments", size="md"),
                     ],
-                    spacing=1,
+                    gap=1,
                     justify="space-between",
                 ),
             ],
-            position="apart",
+            justify="space-between",
             align="start",
         ),
         withBorder=True,
@@ -93,17 +93,17 @@ def taxon_viz_info_card(taxon_id):
                         href=f"{PATH_PREFIX}viz/taxon/{parent_taxons[i].datum_id}",
                     ),
                 ],
-                spacing=0,
+                gap=0,
             )
         )
 
     label_de = (
-        dmc.Group([badge_de, dmc.Text(selected_taxon.label_de)], spacing=3)
+        dmc.Group([badge_de, dmc.Text(selected_taxon.label_de)], gap=3)
         if selected_taxon.label_de
         else None
     )
     label_en = (
-        dmc.Group([badge_en, dmc.Text(selected_taxon.label_en)], spacing=3)
+        dmc.Group([badge_en, dmc.Text(selected_taxon.label_en)], gap=3)
         if selected_taxon.label_en
         else None
     )
@@ -122,7 +122,7 @@ def taxon_viz_info_card(taxon_id):
 
     return dmc.Card(
         [
-            dmc.Text(selected_taxon.label_sci, weight=700, size="lg"),
+            dmc.Text(selected_taxon.label_sci, fw=700, size="lg"),
             dmc.Group(
                 [
                     label_de,
@@ -134,9 +134,9 @@ def taxon_viz_info_card(taxon_id):
                 [
                     dmc.TabsList(
                         [
-                            dmc.Tab("Image", value="image"),
-                            dmc.Tab("Taxonomy", value="taxonomy"),
-                            dmc.Tab("Description", value="description"),
+                            dmc.TabsTab("Image", value="image"),
+                            dmc.TabsTab("Taxonomy", value="taxonomy"),
+                            dmc.TabsTab("Description", value="description"),
                         ]
                     ),
                     dmc.Space(h=16),
@@ -158,12 +158,12 @@ def taxon_viz_info_card(taxon_id):
                                     },
                                 ),
                             ],
-                            spacing=0,
+                            gap=0,
                         ),
                         value="image",
                     ),
                     dmc.TabsPanel(
-                        dmc.Stack(rank_badges, spacing="sm", align="flex-start"),
+                        dmc.Stack(rank_badges, gap="sm", align="flex-start"),
                         value="taxonomy",
                     ),
                     dmc.TabsPanel(
@@ -237,13 +237,13 @@ def dataset_info_card(
                                             [
                                                 ds.get_title(),
                                             ],
-                                            weight=500,
+                                            fw=500,
                                             size="sm",
                                             className="text-nowrap",
                                         ),
                                     ],
-                                    noWrap=True,
-                                    spacing=2,
+                                    wrap="nowrap",
+                                    gap=2,
                                 ),
                                 dmc.Space(h=3),
                             ],
@@ -262,19 +262,19 @@ def dataset_info_card(
                                             size="sm",
                                         ),
                                     ],
-                                    spacing=2,
+                                    gap=2,
                                 ),
                                 config_button,
                             ],
-                            spacing=4,
-                            position="apart",
+                            gap=4,
+                            justify="space-between",
                         ),
                     ],
-                    spacing=2,
+                    gap=2,
                 ),
                 dmc.Group(cfg_indicator_codes),
             ],
-            spacing=2,
+            gap=2,
         ),
         withBorder=True,
         radius="md",
@@ -316,7 +316,7 @@ def dataset_info_cards(args: UrlSearchArgs, config_btn_role):
                                     [
                                         dmc.Text(
                                             ds.get_title(),
-                                            weight=500,
+                                            fw=500,
                                             size="sm",
                                             className="text-nowrap",
                                         ),
@@ -337,19 +337,19 @@ def dataset_info_cards(args: UrlSearchArgs, config_btn_role):
                                                     size="sm",
                                                 ),
                                             ],
-                                            spacing=2,
+                                            gap=2,
                                         ),
                                         config_button,
                                     ],
-                                    spacing=4,
-                                    position="apart",
+                                    gap=4,
+                                    justify="space-between",
                                 ),
                             ],
-                            spacing=2,
+                            gap=2,
                         ),
                         dmc.Group(cfg_indicator_codes),
                     ],
-                    spacing=2,
+                    gap=2,
                 ),
                 withBorder=True,
                 radius="md",
@@ -388,8 +388,8 @@ def deployment_info_card(deployment_info: dict, show_map=False):
     edit_link = dmc.Anchor(
         dmc.Button(
             "Edit",
-            leftIcon=get_icon(icons.edit_pen),
-            rightIcon=get_icon(icon=icons.open_in_new_tab),
+            leftSection=get_icon(icons.edit_pen),
+            rightSection=get_icon(icon=icons.open_in_new_tab),
             variant="subtle",
         ),
         href=f"https://deploy.mitwelten.org/deployments/edit/{id}",
@@ -416,34 +416,34 @@ def deployment_info_card(deployment_info: dict, show_map=False):
                 [
                     dmc.Group(
                         [
-                            dmc.Text(f"Deployment {id}", weight=500),
+                            dmc.Text(f"Deployment {id}", fw=500),
                             dmc.Code(node_label),
                             edit_link,
                         ],
-                        position="apart",
+                        justify="space-between",
                     ),
                     dmc.Divider(),
                     dmc.Stack(
                         [
                             dmc.Group(
-                                [dmc.Text("Type:", weight=300), dmc.Text(node_type)],
+                                [dmc.Text("Type:", fw=300), dmc.Text(node_type)],
                             ),
                             dmc.Group(
-                                [dmc.Text("Description:", weight=300), dmc.Text(desc)],
+                                [dmc.Text("Description:", fw=300), dmc.Text(desc)],
                                 style={"rowGap": 2},
                             ),
                             dmc.Group(
                                 [
-                                    dmc.Text("Period:", weight=300),
+                                    dmc.Text("Period:", fw=300),
                                     dmc.Text(f"{period_start} - {period_end}"),
                                 ],
                             ),
                             dmc.Group(
-                                [dmc.Text("Tags:", weight=300)]
+                                [dmc.Text("Tags:", fw=300)]
                                 + [dmc.Badge(t) for t in tags]
                             ),
                         ],
-                        spacing=4,
+                        gap=4,
                     ),
                     dmc.Space(h=12),
                 ]

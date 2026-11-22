@@ -86,20 +86,20 @@ def get_dataset_list(station_id=None, unit=None):
                 get_icon(icon=icons.location_marker),
                 dmc.Text(param.get("station_name"), size="md"),
             ],
-            spacing=0,
+            gap=0,
         )
         list_entries.append(
             dmc.Card(
                 dmc.Grid(
                     [
-                        dmc.Col(
+                        dmc.GridCol(
                             # get_icon(icon="arcticons:meteoswiss", width=32),
                             dmc.Group(
                                 [
                                     dmc.Text(
                                         param.get("description"),
                                         size="md",
-                                        weight=500,
+                                        fw=500,
                                     ),
                                     dmc.Badge(
                                         param.get("unit"),
@@ -108,19 +108,19 @@ def get_dataset_list(station_id=None, unit=None):
                                     ),
                                     stn_badge,
                                     dmc.Text(
-                                        param.get("param_id"), size="xs", color="dimmed"
+                                        param.get("param_id"), size="xs", c="dimmed"
                                     ),
                                     dmc.Text(
                                         f"Last Datapoint: {last_measurement_str}",
                                         size="xs",
-                                        color="dimmed",
+                                        c="dimmed",
                                     ),
                                 ],
                                 style={"rowGap": "4px"},
                             ),
-                            className="col-lg-9",
+                            span={"base": 12, "md": 9},
                         ),
-                        dmc.Col(
+                        dmc.GridCol(
                             [
                                 dmc.Group(
                                     [
@@ -128,7 +128,7 @@ def get_dataset_list(station_id=None, unit=None):
                                             dmc.Anchor(
                                                 dmc.Button(
                                                     "Viz",
-                                                    leftIcon=get_icon(
+                                                    leftSection=get_icon(
                                                         icon=icons.line_chart, width=20
                                                     ),
                                                     color="indigo.6",
@@ -156,10 +156,10 @@ def get_dataset_list(station_id=None, unit=None):
                                             "Add dataset to your collection",
                                         ),
                                     ],
-                                    spacing="xs",
+                                    gap="xs",
                                 )
                             ],
-                            className="col-xl-3 d-flex justify-content-end align-items-center",
+                            span={"base": 12, "lg": 3}, className="d-flex justify-content-end align-items-center",
                         ),
                     ],
                 ),
@@ -174,7 +174,7 @@ def get_dataset_list(station_id=None, unit=None):
 listitem_skeleton = dmc.Card(
     dmc.Grid(
         [
-            dmc.Col(
+            dmc.GridCol(
                 [
                     dmc.Skeleton(
                         width="100%",
@@ -185,7 +185,7 @@ listitem_skeleton = dmc.Card(
                 ],
                 span=11,
             ),
-            dmc.Col(dmc.Skeleton(width="100%", height=32), span=1),
+            dmc.GridCol(dmc.Skeleton(width="100%", height=32), span=1),
         ],
     ),
     withBorder=True,
@@ -207,15 +207,15 @@ def layout(**qargs):
         [
             dmc.Grid(
                 [
-                    dmc.Col(
+                    dmc.GridCol(
                         children=[
                             dmc.Group(
                                 [
-                                    dmc.Text("Meteo Datasets", weight=700, size="lg"),
+                                    dmc.Text("Meteo Datasets", fw=700, size="lg"),
                                     dmc.Anchor(
                                         get_icon(icons.help, width=18),
                                         href=f"{PATH_PREFIX}docs#datasets",
-                                        variant="text",
+                                        c="inherit",
                                         target="_blank",
                                     ),
                                 ],
@@ -224,19 +224,19 @@ def layout(**qargs):
                             dmc.Space(h=12),
                             dmc.Grid(
                                 [
-                                    dmc.Col(
+                                    dmc.GridCol(
                                         dmc.Select(
                                             id=ids.meteo_stn_select,
                                             label="Meteo Station",
                                             data=get_station_select_data(),
                                             searchable=True,
                                             clearable=True,
-                                            icon=get_icon(icon=icons.location_marker),
+                                            leftSection=get_icon(icon=icons.location_marker),
                                             placeholder="Station",
                                         ),
-                                        className="col-sm-6",
+                                        span={"base": 12, "xs": 6},
                                     ),
-                                    dmc.Col(
+                                    dmc.GridCol(
                                         dmc.Select(
                                             data=get_unit_select_data(),
                                             searchable=True,
@@ -245,7 +245,7 @@ def layout(**qargs):
                                             label="Unit",
                                             id=ids.meteo_unit_select,
                                         ),
-                                        className="col-sm-6",
+                                        span={"base": 12, "xs": 6},
                                     ),
                                 ]
                             ),
@@ -255,7 +255,7 @@ def layout(**qargs):
                                     dmc.AccordionItem(
                                         [
                                             dmc.AccordionControl(
-                                                dmc.Text("Map", weight=500, size="sm"),
+                                                dmc.Text("Map", fw=500, size="sm"),
                                                 pl=0,
                                                 pb=8,
                                                 pt=4,
@@ -286,16 +286,16 @@ def layout(**qargs):
                             ),
                         ],
                         # span=4,
-                        className="col-lg-5",
+                        span={"base": 12, "md": 5},
                     ),
-                    dmc.Col(
+                    dmc.GridCol(
                         [
                             dmc.Space(h=12),
                             dmc.LoadingOverlay(
                                 plaio_meteo, transitionDuration=200, overlayOpacity=0
                             ),
                         ],
-                        className="col-lg-7",
+                        span={"base": 12, "md": 7},
                     ),
                 ]
             ),

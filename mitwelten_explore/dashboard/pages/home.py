@@ -26,26 +26,25 @@ class DashboardCard:
                     [
                         dmc.Group(
                             [
-                                dmc.MediaQuery(
+                                dmc.Box(
                                     get_icon(icon=self.icon, width="1.5rem"),
-                                    smallerThan="xl",
-                                    styles={"display": "none"},
+                                    visibleFrom="xl",
                                 ),
                                 dmc.Stack(
                                     [
                                         dmc.Text(
                                             self.title,
-                                            size="1.2rem",
-                                            weight=500,
+                                            fz="1.2rem",
+                                            fw=500,
                                         ),
                                         dmc.Text(
                                             self.subtitle,
-                                            size="1rem",
-                                            italic=True,
-                                            weight=300,
+                                            fz="1rem",
+                                            fs="italic",
+                                            fw=300,
                                         ),
                                     ],
-                                    spacing=0,
+                                    gap=0,
                                 ),
                             ],
                             style={"rowGap": "1px"},
@@ -212,7 +211,7 @@ quickstart_card = dmc.Anchor(
             title=dmc.Group(
                 [
                     get_icon(icon=icons.quickstart_rocket, width="1.5rem"),
-                    dmc.Text("Quickstart", size="1.2rem"),
+                    dmc.Text("Quickstart", fz="1.2rem"),
                 ]
             ),
             children=[
@@ -232,7 +231,7 @@ doc_card = dmc.Anchor(
             title=dmc.Group(
                 [
                     get_icon(icon=icons.docs_book, width="1.5rem"),
-                    dmc.Text("Datasets", size="1.2rem"),
+                    dmc.Text("Datasets", fz="1.2rem"),
                 ]
             ),
             children=[dmc.Text("Learn about the datasets in this tool")],
@@ -252,7 +251,7 @@ annots_card = dmc.Anchor(
             title=dmc.Group(
                 [
                     get_icon(icon=icons.annotation_bank, width="1.5rem"),
-                    dmc.Text("Annotations", size="1.2rem"),
+                    dmc.Text("Annotations", fz="1.2rem"),
                 ]
             ),
             children=[dmc.Text("See what users have discovered")],
@@ -281,37 +280,37 @@ def layout(**kwargs):
                             dmc.Text(
                                 "Explore the Biodiversity in and around",
                                 size="xl",
-                                weight=300,
+                                fw=300,
                             ),
-                            dmc.Text("Basel", size="xl", color="teal.5", weight=400),
+                            dmc.Text("Basel", size="xl", c="teal.5", fw=400),
                         ],
-                        spacing=4,
+                        gap=4,
                     ),
                 ],
-                spacing=4,
+                gap=4,
             ),
             dmc.Space(h=18),
             dmc.Grid(
                 [
-                    dmc.Col(
+                    dmc.GridCol(
                         [
                             dmc.Stack(
                                 [
                                     dmc.Text(
-                                        "Selected Dashboards", size="1.2rem", weight=500
+                                        "Selected Dashboards", fz="1.2rem", fw=500
                                     ),
                                     dmc.Divider(),
                                     dmc.Group(
                                         [
                                             dmc.Text(
                                                 "Taxon Dashboards",
-                                                size="1rem",
-                                                weight=500,
+                                                fz="1rem",
+                                                fw=500,
                                             ),
                                             dmc.Text(
                                                 "Explore the detections of a taxon",
                                                 size="md",
-                                                weight=300,
+                                                fw=300,
                                             ),
                                         ]
                                     ),
@@ -341,13 +340,13 @@ def layout(**kwargs):
                                         [
                                             dmc.Text(
                                                 "Comparison Dashboards",
-                                                size="1rem",
-                                                weight=500,
+                                                fz="1rem",
+                                                fw=500,
                                             ),
                                             dmc.Text(
                                                 "Compare multiple datasets",
                                                 size="md",
-                                                weight=300,
+                                                fw=300,
                                             ),
                                         ]
                                     ),
@@ -370,13 +369,13 @@ def layout(**kwargs):
                                         [
                                             dmc.Text(
                                                 "Map Dashboards",
-                                                size="1rem",
-                                                weight=500,
+                                                fz="1rem",
+                                                fw=500,
                                             ),
                                             dmc.Text(
                                                 "Explore the spatial distribution",
                                                 size="md",
-                                                weight=300,
+                                                fw=300,
                                             ),
                                         ]
                                     ),
@@ -399,13 +398,13 @@ def layout(**kwargs):
                                         [
                                             dmc.Text(
                                                 "Timeseries Dashboards",
-                                                size="1rem",
-                                                weight=500,
+                                                fz="1rem",
+                                                fw=500,
                                             ),
                                             dmc.Text(
                                                 "Analyze a single dataset",
                                                 size="md",
-                                                weight=300,
+                                                fw=300,
                                             ),
                                         ]
                                     ),
@@ -436,13 +435,13 @@ def layout(**kwargs):
                                         [
                                             dmc.Text(
                                                 "Deployment Dashboards",
-                                                size="1rem",
-                                                weight=500,
+                                                fz="1rem",
+                                                fw=500,
                                             ),
                                             dmc.Text(
                                                 "Explore the Biodiversity in a specific area",
                                                 size="md",
-                                                weight=300,
+                                                fw=300,
                                             ),
                                         ]
                                     ),
@@ -463,24 +462,24 @@ def layout(**kwargs):
                                         maxHeight=SPOILER_MAH,
                                     ),
                                 ],
-                                spacing="sm",
+                                gap="sm",
                                 pr=12,
                             )
                         ],
-                        className="col-md-8",
+                        span={"base": 12, "sm": 8},
                     ),
-                    dmc.Col(
+                    dmc.GridCol(
                         [
                             dmc.Stack(
                                 [
                                     dmc.Text(
-                                        "Documentation", size="1.2rem", weight=500
+                                        "Documentation", fz="1.2rem", fw=500
                                     ),
                                     dmc.Divider(),
                                     quickstart_card,
                                     doc_card,
                                 ],
-                                spacing="sm",
+                                gap="sm",
                             ),
                             dmc.Space(h=30),
                             dmc.Stack(
@@ -489,29 +488,29 @@ def layout(**kwargs):
                                         [
                                             dmc.Text(
                                                 "Latest Annotations",
-                                                size="1.2rem",
-                                                weight=500,
+                                                fz="1.2rem",
+                                                fw=500,
                                             ),
                                             dmc.Anchor(
                                                 dmc.Text(
-                                                    "See all", size="1.2rem", weight=500
+                                                    "See all", fz="1.2rem", fw=500
                                                 ),
                                                 href=PATH_PREFIX + "annotations",
                                             ),
                                         ],
-                                        position="apart",
+                                        justify="space-between",
                                     ),
                                     dmc.Divider(),
-                                    dmc.Stack(id="annots_card_stack", spacing="sm"),
+                                    dmc.Stack(id="annots_card_stack", gap="sm"),
                                 ],
-                                spacing="sm",
+                                gap="sm",
                             ),
                             dmc.Space(h=30),
                         ],
-                        className="col-md-4",
+                        span={"base": 12, "sm": 4},
                     ),
                 ],
-                gutter="xl",
+                gap="xl",
             ),
         ],
         className="container-xl",
@@ -538,7 +537,7 @@ def update_latest_annots(href):
                                                 color="blue",
                                             ),
                                             dmc.Text(
-                                                annots[i].user.full_name, weight=500
+                                                annots[i].user.full_name, fw=500
                                             ),
                                         ]
                                     ),
@@ -552,7 +551,7 @@ def update_latest_annots(href):
                                         color="teal",
                                     ),
                                 ],
-                                position="apart",
+                                justify="space-between",
                             ),
                             dmc.Text(annots[i].title[:80]),
                         ],
@@ -562,7 +561,7 @@ def update_latest_annots(href):
                 ],
                 href=PATH_PREFIX + f"annotations?annot_id={annots[i].id}",
                 target="_blank",
-                variant="text",
+                c="inherit",
             )
         )
     return annot_cards

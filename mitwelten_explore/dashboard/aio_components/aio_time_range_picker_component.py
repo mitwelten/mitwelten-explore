@@ -70,7 +70,7 @@ class TimeRangeAIO(html.Div):
                 ),
                 dmc.Group(
                     [
-                        dmc.MediaQuery(
+                        dmc.Box(
                             dmc.ActionIcon(
                                 DashIconify(
                                     icon="material-symbols:arrow-left", height=30
@@ -85,8 +85,7 @@ class TimeRangeAIO(html.Div):
                                     "border-right": "none",
                                 },
                             ),
-                            smallerThan="md",
-                            styles={"display": "none"},
+                            visibleFrom="md",
                         ),
                         dmc.DateRangePicker(
                             id=self.ids.date_range_picker(self.aio_id),
@@ -98,7 +97,7 @@ class TimeRangeAIO(html.Div):
                             clearable=False,
                             radius=0,
                         ),
-                        dmc.MediaQuery(
+                        dmc.Box(
                             dmc.ActionIcon(
                                 DashIconify(
                                     icon="material-symbols:arrow-right", height=30
@@ -114,15 +113,13 @@ class TimeRangeAIO(html.Div):
                                     "border-left": "none",
                                 },
                             ),
-                            smallerThan="md",
-                            styles={"display": "none"},
+                            visibleFrom="md",
                         ),
-                        dmc.MediaQuery(
+                        dmc.Box(
                             dmc.Space(w=8),
-                            smallerThan="lg",
-                            styles={"display": "none"},
+                            visibleFrom="lg",
                         ),
-                        dmc.MediaQuery(
+                        dmc.Box(
                             dmc.ActionIcon(
                                 DashIconify(icon="bi:zoom-out"),
                                 size=36,
@@ -134,10 +131,9 @@ class TimeRangeAIO(html.Div):
                                     "border-bottom-left-radius": "4px",
                                 },
                             ),
-                            smallerThan="lg",
-                            styles={"display": "none"},
+                            visibleFrom="lg",
                         ),
-                        dmc.MediaQuery(
+                        dmc.Box(
                             dmc.ActionIcon(
                                 DashIconify(icon="bi:zoom-in"),
                                 size=36,
@@ -150,12 +146,11 @@ class TimeRangeAIO(html.Div):
                                     "border-left": "none",
                                 },
                             ),
-                            smallerThan="lg",
-                            styles={"display": "none"},
+                            visibleFrom="lg",
                         ),
                     ],
-                    spacing=0,
-                    noWrap=True,
+                    gap=0,
+                    wrap="nowrap",
                 ),
             ]
         )

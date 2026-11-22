@@ -152,7 +152,7 @@ def get_annotation_list(annotations):
                                             [
                                                 dmc.Text(
                                                     annot.title,
-                                                    weight=500,
+                                                    fw=500,
                                                     size="lg",
                                                 ),
                                                 dmc.Group(
@@ -170,12 +170,12 @@ def get_annotation_list(annotations):
                                                     ]
                                                 ),
                                             ],
-                                            spacing="xl",
-                                            position="apart",
+                                            gap="xl",
+                                            justify="space-between",
                                         ),
                                         dmc.Grid(
                                             [
-                                                dmc.Col(
+                                                dmc.GridCol(
                                                     [
                                                         dmc.Text(
                                                             content,
@@ -183,9 +183,9 @@ def get_annotation_list(annotations):
                                                             lineClamp=2,
                                                         ),
                                                     ],
-                                                    className="col-md-9",
+                                                    span={"base": 12, "sm": 9},
                                                 ),
-                                                dmc.Col(
+                                                dmc.GridCol(
                                                     dmc.Group(
                                                         [
                                                             dmc.Badge(
@@ -204,15 +204,15 @@ def get_annotation_list(annotations):
                                                             )
                                                         ],
                                                         style={"rowGap": 8},
-                                                        spacing=8,
-                                                        position="center",
+                                                        gap=8,
+                                                        justify="center",
                                                     ),
-                                                    className="col-md-3",
+                                                    span={"base": 12, "sm": 3},
                                                 ),
                                             ]
                                         ),
                                     ],
-                                    spacing=4,
+                                    gap=4,
                                     className="flex-grow-1",
                                 ),
                             ],
@@ -223,7 +223,7 @@ def get_annotation_list(annotations):
                         ),
                     ],
                     href=f"{PATH_PREFIX}annotations?annot_id={annot.id}",
-                    variant="text",
+                    c="inherit",
                 ),
                 radius=0,
                 px=0,
@@ -272,7 +272,7 @@ def annot_container(
         edit_btn = dmc.Anchor(
             dmc.Button(
                 children="Edit",
-                leftIcon=get_icon(icons.edit_pen),
+                leftSection=get_icon(icons.edit_pen),
                 color="indigo",
                 disabled=edit_mode,
             ),
@@ -299,7 +299,7 @@ def annot_container(
         dmc.Group(
             [
                 get_icon(icon=icons.arrow_back),
-                dmc.Text("Annotations", weight=500),
+                dmc.Text("Annotations", fw=500),
             ]
         ),
         href=f"{PATH_PREFIX}annotations",
@@ -312,7 +312,7 @@ def annot_container(
                         [
                             dmc.Text(
                                 "Author",
-                                color="dimmed",
+                                c="dimmed",
                                 size="sm",
                             ),
                             dmc.Anchor(
@@ -329,30 +329,30 @@ def annot_container(
                                                     dmc.Text(
                                                         annot.user.username,
                                                         size="sm",
-                                                        weight=500,
+                                                        fw=500,
                                                     ),
                                                     dmc.Text(
                                                         annot.user.full_name,
                                                         size="sm",
                                                     ),
                                                 ],
-                                                spacing=0,
+                                                gap=0,
                                             ),
                                         ],
-                                        spacing="xs",
+                                        gap="xs",
                                     ),
                                 ],
                                 href=f"{PATH_PREFIX}annotations?q={annot.user.username}",
-                                variant="text",
+                                c="inherit",
                             ),
                         ],
-                        spacing=4,
+                        gap=4,
                     ),
                     dmc.Stack(
                         [
                             dmc.Text(
                                 "Created at",
-                                color="dimmed",
+                                c="dimmed",
                                 size="sm",
                             ),
                             dmc.Text(
@@ -360,13 +360,13 @@ def annot_container(
                                 size="sm",
                             ),
                         ],
-                        spacing=4,
+                        gap=4,
                     ),
                     dmc.Stack(
                         [
                             dmc.Text(
                                 "Dashboard Reference",
-                                color="dimmed",
+                                c="dimmed",
                                 size="sm",
                             ),
                             dmc.Anchor(
@@ -374,20 +374,20 @@ def annot_container(
                                     "Open Dashboard",
                                     color="teal",
                                     variant="outline",
-                                    rightIcon=get_icon(icon=icons.open_in_new_tab),
+                                    rightSection=get_icon(icon=icons.open_in_new_tab),
                                 ),
                                 target="_blank",
                                 href=f"{PATH_PREFIX}{annot.url}",
-                                variant="text",
+                                c="inherit",
                             ),
                         ],
-                        spacing=4,
+                        gap=4,
                     ),
                     dmc.Stack(
                         [
                             dmc.Text(
                                 "Datasets",
-                                color="dimmed",
+                                c="dimmed",
                                 size="sm",
                             ),
                             dmc.Group(
@@ -398,22 +398,22 @@ def annot_container(
                                     )
                                     for t in ds_types
                                 ],
-                                spacing=8,
+                                gap=8,
                                 style={"rowGap": 8},
                             ),
                         ],
-                        spacing=4,
+                        gap=4,
                     ),
                     dmc.Stack(
                         [
                             dmc.Text(
                                 "Dashboard Time Range",
-                                color="dimmed",
+                                c="dimmed",
                                 size="sm",
                             ),
                             dashboard_time_range,
                         ],
-                        spacing=4,
+                        gap=4,
                     ),
                     dmc.Group([edit_btn, cancel_btn, save_btn, delete_btn]),
                 ]
@@ -424,7 +424,7 @@ def annot_container(
     )
     annot_content_card = dmc.Card(
         [
-            dmc.Text(annot.title, weight=700, size="2rem"),
+            dmc.Text(annot.title, fw=700, fz="2rem"),
             dmc.Space(h=2),
             dmc.Divider(),
             dmc.Space(h=6),
@@ -432,7 +432,7 @@ def annot_container(
                 [
                     dcc.Markdown(annot.md_content),
                 ],
-                noWrap=True,
+                wrap="nowrap",
             ),
         ],
         withBorder=True,
@@ -440,7 +440,7 @@ def annot_container(
     )
     text_editor = dmc.Card(
         [
-            dmc.Text(annot.title, weight=700, size="2rem"),
+            dmc.Text(annot.title, fw=700, fz="2rem"),
             dmc.Space(h=12),
             dmc.CardSection(
                 dash_quill.Quill(
@@ -466,15 +466,15 @@ def annot_container(
                 [
                     dmc.Grid(
                         [
-                            dmc.Col(
+                            dmc.GridCol(
                                 [annot_content_card, text_editor],
-                                className="col-md-9",
+                                span={"base": 12, "sm": 9},
                             ),
-                            dmc.Col(
+                            dmc.GridCol(
                                 [
                                     side_element,
                                 ],
-                                className="col-lg-3",
+                                span={"base": 12, "md": 3},
                             ),
                         ]
                     )
@@ -498,33 +498,33 @@ annotation_skeleton = dmc.Card(
                             dmc.Skeleton(height=18, width="30%"),
                             dmc.Skeleton(height=18, width="10%"),
                         ],
-                        spacing="xl",
-                        position="apart",
+                        gap="xl",
+                        justify="space-between",
                     ),
                     dmc.Grid(
                         [
-                            dmc.Col(
+                            dmc.GridCol(
                                 [
                                     dmc.Skeleton(height=32),
                                 ],
-                                className="col-md-9",
+                                span={"base": 12, "sm": 9},
                             ),
-                            dmc.Col(
+                            dmc.GridCol(
                                 dmc.Group(
                                     [
                                         dmc.Skeleton(height=18, width="20%"),
                                         dmc.Skeleton(height=18, width="20%"),
                                         dmc.Skeleton(height=18, width="20%"),
                                     ],
-                                    spacing="md",
-                                    position="center",
+                                    gap="md",
+                                    justify="center",
                                 ),
-                                className="col-md-3",
+                                span={"base": 12, "sm": 3},
                             ),
                         ]
                     ),
                 ],
-                spacing=12,
+                gap=12,
                 className="flex-grow-1",
             ),
         ],
@@ -559,11 +559,11 @@ def layout(**kwargs):
             dcc.Location(id=ids.url, refresh=True),
             dmc.Group(
                 [
-                    dmc.Text("Annotations", weight=600, size="lg"),
+                    dmc.Text("Annotations", fw=600, size="lg"),
                     dmc.Anchor(
                         get_icon(icons.help, width=18),
                         href=f"{PATH_PREFIX}docs#annotations",
-                        variant="text",
+                        c="inherit",
                         target="_blank",
                     ),
                 ],
@@ -696,7 +696,7 @@ def open_delete_confirm_modal(nc, nc_conf):
                                             "index": annot_id,
                                         },
                                     ),
-                                    position="right",
+                                    justify="flex-end",
                                 ),
                             ],
                             title="Confirm your action",

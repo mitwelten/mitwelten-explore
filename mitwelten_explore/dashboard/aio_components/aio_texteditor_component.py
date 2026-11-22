@@ -119,8 +119,8 @@ class TextEditorAIO(html.Div):
                     [
                         dmc.TabsList(
                             [
-                                dmc.Tab("Text Editor", value="edit_annot"),
-                                dmc.Tab("Preview", value="preview_annot"),
+                                dmc.TabsTab("Text Editor", value="edit_annot"),
+                                dmc.TabsTab("Preview", value="preview_annot"),
                             ],
                             grow=False,
                         ),
@@ -152,14 +152,14 @@ class TextEditorAIO(html.Div):
                         dmc.Group(
                             dmc.Button(
                                 "Publish",
-                                leftIcon=DashIconify(
+                                leftSection=DashIconify(
                                     icon="material-symbols:send-outline"
                                 ),
                                 color="green",
                                 disabled=True,
                                 id=self.ids.publish_btn(self.aio_id),
                             ),
-                            position="right",
+                            justify="flex-end",
                         ),
                     ],
                     value="edit_annot",
@@ -173,7 +173,7 @@ class TextEditorAIO(html.Div):
                                     dmc.Stack(
                                         [
                                             dmc.Group(
-                                                position="apart",
+                                                justify="space-between",
                                                 id=self.ids.preview_header(self.aio_id),
                                             ),
                                             dmc.Divider(),
@@ -185,7 +185,7 @@ class TextEditorAIO(html.Div):
                                                 },
                                             ),
                                         ],
-                                        spacing="xs",
+                                        gap="xs",
                                     ),
                                     withBorder=True,
                                     pt=12,
@@ -241,11 +241,11 @@ class TextEditorAIO(html.Div):
                                     DashIconify(icon="mdi:drag", width=21, inline=True),
                                     dmc.Text("Edit Annotation"),
                                 ],
-                                spacing="sm",
+                                gap="sm",
                             ),
                             dmc.Tooltip(
                                 position="left",
-                                label=dmc.Text("Hide Editor", weight=300),
+                                label=dmc.Text("Hide Editor", fw=300),
                                 withArrow=True,
                                 openDelay=100,
                                 color="indigo.9",
@@ -260,7 +260,7 @@ class TextEditorAIO(html.Div):
                                 ],
                             ),
                         ],
-                        position="apart",
+                        justify="space-between",
                         style={
                             "position": "absolute",
                             "top": 0,
@@ -270,7 +270,7 @@ class TextEditorAIO(html.Div):
                         },
                     ),
                     header_style={"cursor": "move", "height": "32px"},
-                    children=[dmc.Group([], spacing="sm", position="right"), tabs],
+                    children=[dmc.Group([], gap="sm", justify="flex-end"), tabs],
                     body_class_name="py-0",
                     class_name="annotation_editor",
                     is_open=False,
@@ -346,7 +346,7 @@ class TextEditorAIO(html.Div):
                     )
                 title = data.get("title")
                 header = [
-                    dmc.Text(title, size="lg", weight=700),
+                    dmc.Text(title, size="lg", fw=700),
                     dmc.Text(time_str, size="sm"),
                 ]
 

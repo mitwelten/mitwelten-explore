@@ -66,15 +66,15 @@ def layout(**qargs):
         [
             dmc.Grid(
                 [
-                    dmc.Col(
+                    dmc.GridCol(
                         children=[
                             dmc.Group(
                                 [
-                                    dmc.Text("Env Datasets", weight=700, size="lg"),
+                                    dmc.Text("Env Datasets", fw=700, size="lg"),
                                     dmc.Anchor(
                                         get_icon(icons.help, width=18),
                                         href=f"{PATH_PREFIX}docs#datasets",
-                                        variant="text",
+                                        c="inherit",
                                         target="_blank",
                                     ),
                                 ],
@@ -83,17 +83,17 @@ def layout(**qargs):
                             dmc.Space(h=12),
                             dmc.Grid(
                                 [
-                                    dmc.Col(
+                                    dmc.GridCol(
                                         dmc.Select(
                                             id=ids.deployment_select,
                                             label="Deployment",
                                             data=get_deployment_select_data(),
                                             searchable=True,
                                             clearable=True,
-                                            icon=get_icon(icon=icons.location_marker),
+                                            leftSection=get_icon(icon=icons.location_marker),
                                             placeholder="Deployment",
                                         ),
-                                        className="col-sm-6",
+                                        span={"base": 12, "xs": 6},
                                     ),
                                 ]
                             ),
@@ -103,7 +103,7 @@ def layout(**qargs):
                                     dmc.AccordionItem(
                                         [
                                             dmc.AccordionControl(
-                                                dmc.Text("Map", weight=500, size="sm"),
+                                                dmc.Text("Map", fw=500, size="sm"),
                                                 pl=0,
                                                 pb=8,
                                                 pt=4,
@@ -134,9 +134,9 @@ def layout(**qargs):
                             ),
                         ],
                         # span=4,
-                        className="col-lg-5",
+                        span={"base": 12, "md": 5},
                     ),
-                    dmc.Col([dmc.Space(h=12), plaio], className="col-lg-7"),
+                    dmc.GridCol([dmc.Space(h=12), plaio], span={"base": 12, "md": 7}),
                 ]
             ),
         ],

@@ -38,7 +38,7 @@ import uuid
 
 def viz_single_dataset_select_modal(opened, id="select_ts_modal"):
     return dmc.Modal(
-        title=dmc.Text("Select a dataset from your collection", weight=500),
+        title=dmc.Text("Select a dataset from your collection", fw=500),
         opened=opened,
         id=id,
         size="80%",
@@ -77,7 +77,7 @@ def generate_viz_timeseries_select_modal_children(store_data):
                 get_icon(icon=icons.location_marker),
                 dmc.Text(ds.get_location(), size="md"),
             ],
-            spacing=2,
+            gap=2,
         )
         if ds.type in [
             DatasetType.distinct_species,
@@ -100,11 +100,11 @@ def generate_viz_timeseries_select_modal_children(store_data):
             dmc.Card(
                 dmc.Grid(
                     [
-                        dmc.Col(
+                        dmc.GridCol(
                             dmc.Anchor(
                                 dmc.Grid(
                                     [
-                                        dmc.Col(
+                                        dmc.GridCol(
                                             dmc.Group(
                                                 [
                                                     get_icon(ds.get_icon(), width=32),
@@ -113,7 +113,7 @@ def generate_viz_timeseries_select_modal_children(store_data):
                                             ),
                                             span=3,
                                         ),
-                                        dmc.Col(
+                                        dmc.GridCol(
                                             dmc.Group(
                                                 [
                                                     dmc.Text(ds.get_title(), size="md"),
@@ -127,16 +127,16 @@ def generate_viz_timeseries_select_modal_children(store_data):
                                     ]
                                 ),
                                 href=single_viz_url,
-                                variant="text",
+                                c="inherit",
                             ),
                             span=6,
                         ),
-                        dmc.Col(
+                        dmc.GridCol(
                             dmc.Group(
                                 [
                                     location_name,
                                 ],
-                                spacing=4,
+                                gap=4,
                             ),
                             span=6,
                         ),
@@ -154,7 +154,7 @@ def viz_compare_select_modal(
     id, title="Select two or more datasets from your collection"
 ):
     return dmc.Modal(
-        title=dmc.Text(title, weight=500),
+        title=dmc.Text(title, fw=500),
         id=id,
         opened=True,
         size="80%",
@@ -184,7 +184,7 @@ def generate_viz_map_select_modal_children(store_data, id_role):
                 get_icon(icon=icons.location_marker),
                 dmc.Text(ds.get_location(), size="md"),
             ],
-            spacing=2,
+            gap=2,
         )
         if ds.type in [
             DatasetType.distinct_species,
@@ -200,7 +200,7 @@ def generate_viz_map_select_modal_children(store_data, id_role):
         list_entries.append(
             dmc.Grid(
                 [
-                    dmc.Col(
+                    dmc.GridCol(
                         dmc.Group(
                             [
                                 dmc.Checkbox(
@@ -217,7 +217,7 @@ def generate_viz_map_select_modal_children(store_data, id_role):
                         ),
                         span=2,
                     ),
-                    dmc.Col(
+                    dmc.GridCol(
                         dmc.Group(
                             [
                                 dmc.Text(ds.get_title()),
@@ -226,7 +226,7 @@ def generate_viz_map_select_modal_children(store_data, id_role):
                         ),
                         span=5,
                     ),
-                    dmc.Col(
+                    dmc.GridCol(
                         location_name,
                         span=5,
                     ),
@@ -248,12 +248,12 @@ def generate_viz_map_select_modal_children(store_data, id_role):
             )
         )
 
-    list_entries.append(dmc.Text("Default Datasets", weight=500, align="center"))
+    list_entries.append(dmc.Text("Default Datasets", fw=500, ta="center"))
     for ds in default_datasets:
         list_entries.append(
             dmc.Grid(
                 [
-                    dmc.Col(
+                    dmc.GridCol(
                         dmc.Group(
                             [
                                 dmc.Checkbox(
@@ -270,7 +270,7 @@ def generate_viz_map_select_modal_children(store_data, id_role):
                         ),
                         span=2,
                     ),
-                    dmc.Col(
+                    dmc.GridCol(
                         dmc.Group(
                             [
                                 dmc.Text(ds.get_title(), size="md"),
@@ -279,13 +279,13 @@ def generate_viz_map_select_modal_children(store_data, id_role):
                         ),
                         span=5,
                     ),
-                    dmc.Col(
+                    dmc.GridCol(
                         dmc.Group(
                             [
                                 get_icon(icon=icons.location_marker),
                                 dmc.Text(ds.get_location(), size="sm"),
                             ],
-                            spacing=4,
+                            gap=4,
                         ),
                         span=5,
                     ),
@@ -319,7 +319,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
                 get_icon(icon=icons.location_marker),
                 dmc.Text(ds.get_location(), size="md"),
             ],
-            spacing=2,
+            gap=2,
         )
         if ds.type in [
             DatasetType.distinct_species,
@@ -338,7 +338,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
             dmc.Card(
                 dmc.Grid(
                     [
-                        dmc.Col(
+                        dmc.GridCol(
                             dmc.Group(
                                 [
                                     dmc.Checkbox(
@@ -355,7 +355,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
                             ),
                             span=2,
                         ),
-                        dmc.Col(
+                        dmc.GridCol(
                             dmc.Group(
                                 [
                                     dmc.Text(ds.get_title(), size="md"),
@@ -364,7 +364,7 @@ def generate_viz_compare_select_modal_children(store_data, id_role):
                             ),
                             span=5,
                         ),
-                        dmc.Col(
+                        dmc.GridCol(
                             location_name,
                             span=5,
                         ),
@@ -391,7 +391,7 @@ def generate_viz_deployment_select_modal_children(store_data):
                     get_icon(icon=icons.location_marker),
                     dmc.Text(ds.get_location(), size="md"),
                 ],
-                spacing=2,
+                gap=2,
             )
             if ds.deployment_id is not None:
                 location_name = deployment_info_spoiler(ds.deployment_id, location_name)
@@ -403,11 +403,11 @@ def generate_viz_deployment_select_modal_children(store_data):
                 dmc.Card(
                     dmc.Grid(
                         [
-                            dmc.Col(
+                            dmc.GridCol(
                                 dmc.Anchor(
                                     dmc.Grid(
                                         [
-                                            dmc.Col(
+                                            dmc.GridCol(
                                                 dmc.Group(
                                                     [
                                                         get_icon(
@@ -418,7 +418,7 @@ def generate_viz_deployment_select_modal_children(store_data):
                                                 ),
                                                 span=3,
                                             ),
-                                            dmc.Col(
+                                            dmc.GridCol(
                                                 dmc.Group(
                                                     [
                                                         dmc.Text(
@@ -434,11 +434,11 @@ def generate_viz_deployment_select_modal_children(store_data):
                                         ]
                                     ),
                                     href=deployment_viz_url,
-                                    variant="text",
+                                    c="inherit",
                                 ),
                                 span=6,
                             ),
-                            dmc.Col(
+                            dmc.GridCol(
                                 location_name,
                                 span=6,
                             ),
@@ -503,7 +503,7 @@ def taxon_select_modal(taxon_id, id_role, gbif_add_id_role):
             rank_badges.append(
                 dmc.Text(
                     get_icon(icon=icons.arrow_right, height="1.5rem"),
-                    color="teal.9",
+                    c="teal.9",
                 )
             )
         rank_badges.append(
@@ -538,12 +538,12 @@ def taxon_select_modal(taxon_id, id_role, gbif_add_id_role):
     gbif_detections = get_gbif_detection_count(selected_taxon.datum_id)
 
     label_de = (
-        dmc.Group([badge_de, dmc.Text(selected_taxon.label_de)], spacing=3)
+        dmc.Group([badge_de, dmc.Text(selected_taxon.label_de)], gap=3)
         if selected_taxon.label_de
         else None
     )
     label_en = (
-        dmc.Group([badge_en, dmc.Text(selected_taxon.label_en)], spacing=3)
+        dmc.Group([badge_en, dmc.Text(selected_taxon.label_en)], gap=3)
         if selected_taxon.label_en
         else None
     )
@@ -561,7 +561,7 @@ def taxon_select_modal(taxon_id, id_role, gbif_add_id_role):
         )
     return dmc.Modal(
         title=dmc.Group(
-            [dmc.Text(selected_taxon.label_sci, weight=700, size="xl"), rank_badge],
+            [dmc.Text(selected_taxon.label_sci, fw=700, size="xl"), rank_badge],
             align="center",
         ),
         opened=True,
@@ -592,13 +592,13 @@ def taxon_select_modal(taxon_id, id_role, gbif_add_id_role):
                                 ]
                             ),
                         ],
-                        position="apart",
+                        justify="space-between",
                     ),
-                    dmc.Group(rank_badges, spacing=1),
+                    dmc.Group(rank_badges, gap=1),
                     dmc.Divider(variant="solid"),
                     dmc.Grid(
                         [
-                            dmc.Col(
+                            dmc.GridCol(
                                 [
                                     dmc.Image(
                                         src=selected_taxon.image_url,
@@ -619,7 +619,7 @@ def taxon_select_modal(taxon_id, id_role, gbif_add_id_role):
                                 if selected_taxon.image_url
                                 else "col-md-auto",
                             ),
-                            dmc.Col(
+                            dmc.GridCol(
                                 [
                                     dcc.Markdown(
                                         extract,
@@ -637,14 +637,14 @@ def taxon_select_modal(taxon_id, id_role, gbif_add_id_role):
                                 # pl=40,
                             ),
                         ],
-                        gutter="lg",
+                        gap="lg",
                     ),
                     dmc.Group(
                         [
                             dmc.Button(
                                 "Add Mitwelten Detections to Collection",
                                 color="teal.6",
-                                leftIcon=get_icon(icon=icons.bookmark, height=25),
+                                leftSection=get_icon(icon=icons.bookmark, height=25),
                                 id={
                                     "role": id_role,
                                     "index": selected_taxon.datum_id,
@@ -653,7 +653,7 @@ def taxon_select_modal(taxon_id, id_role, gbif_add_id_role):
                             dmc.Button(
                                 "Add GBIF Observations to Collection",
                                 color="lime",
-                                leftIcon=get_icon(icon=icons.bookmark, height=25),
+                                leftSection=get_icon(icon=icons.bookmark, height=25),
                                 id={
                                     "role": gbif_add_id_role,
                                     "index": selected_taxon.datum_id,
@@ -663,17 +663,17 @@ def taxon_select_modal(taxon_id, id_role, gbif_add_id_role):
                                 dmc.Button(
                                     "Go to Taxon Dashboard",
                                     color="teal.6",
-                                    leftIcon=get_icon(icon=icons.dashboard, height=25),
-                                    rightIcon=get_icon(icon=icons.open_in_new_tab),
+                                    leftSection=get_icon(icon=icons.dashboard, height=25),
+                                    rightSection=get_icon(icon=icons.open_in_new_tab),
                                 ),
                                 href=f"{PATH_PREFIX}viz/taxon/{selected_taxon.datum_id}",
                                 target="_blank",
                             ),
                         ],
-                        position="right",
+                        justify="flex-end",
                     ),
                 ],
-                spacing="xs",
+                gap="xs",
             )
         ],
         size="80%",
@@ -715,7 +715,7 @@ def dataset_config_modal(
             dmc.Button(
                 "Apply", color="teal", id={"role": apply_btn_role, "index": index}
             ),
-            position="right",
+            justify="flex-end",
         )
     )
     return dmc.Modal(
@@ -743,9 +743,9 @@ def confirm_dialog(id, submit_id, text=None, title="Are you sure you want to con
                         n_clicks=0,
                     )
                 ],
-                position="right",
+                justify="flex-end",
             ),
         ],
-        title=dmc.Text(title, weight=500),
+        title=dmc.Text(title, fw=500),
         opened=True,
     )

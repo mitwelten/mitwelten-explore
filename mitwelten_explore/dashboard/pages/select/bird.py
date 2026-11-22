@@ -55,15 +55,15 @@ def layout(**qargs):
         [
             dmc.Grid(
                 [
-                    dmc.Col(
+                    dmc.GridCol(
                         children=[
                             dmc.Group(
                                 [
-                                    dmc.Text("Bird Diversity", weight=700, size="lg"),
+                                    dmc.Text("Bird Diversity", fw=700, size="lg"),
                                     dmc.Anchor(
                                         get_icon(icons.help, width=18),
                                         href=f"{PATH_PREFIX}docs#datasets",
-                                        variant="text",
+                                        c="inherit",
                                         target="_blank",
                                     ),
                                 ],
@@ -78,7 +78,7 @@ def layout(**qargs):
                                 data=get_deployment_select_data(),
                                 searchable=True,
                                 clearable=True,
-                                icon=get_icon(icon=icons.location_marker),
+                                leftSection=get_icon(icon=icons.location_marker),
                                 placeholder="All Deployments",
                             ),
                             dmc.Space(h=20),
@@ -87,7 +87,7 @@ def layout(**qargs):
                                     dmc.AccordionItem(
                                         [
                                             dmc.AccordionControl(
-                                                dmc.Text("Map", weight=500, size="sm"),
+                                                dmc.Text("Map", fw=500, size="sm"),
                                                 pl=0,
                                                 pb=8,
                                                 pt=4,
@@ -118,9 +118,9 @@ def layout(**qargs):
                             ),
                         ],
                         # span=4,
-                        className="col-lg-5",
+                        span={"base": 12, "md": 5},
                     ),
-                    dmc.Col(
+                    dmc.GridCol(
                         [
                             dmc.Space(h=12),
                             dmc.LoadingOverlay(
@@ -131,7 +131,7 @@ def layout(**qargs):
                                 ),
                             ),
                         ],
-                        className="col-lg-7",
+                        span={"base": 12, "md": 7},
                     ),
                 ]
             ),

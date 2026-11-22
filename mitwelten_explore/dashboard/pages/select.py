@@ -23,7 +23,7 @@ class DSCard:
                     title=dmc.Group(
                         [
                             get_icon(icon=self.icon, width="1.5rem"),
-                            dmc.Text(self.name, size="1.2rem"),
+                            dmc.Text(self.name, fz="1.2rem"),
                         ]
                     ),
                     children=[dmc.Text(self.text)],
@@ -39,7 +39,7 @@ class DSCard:
             title=dmc.Group(
                 [
                     get_icon(icon=self.icon, width="1.5rem"),
-                    dmc.Text(self.name, size="1.2rem"),
+                    dmc.Text(self.name, fz="1.2rem"),
                     dmc.Badge("Not yet available", color="pink"),
                 ],
             ),
@@ -106,8 +106,8 @@ layout = dmc.Container(
     [
         dmc.Text(
             "Datasets",
-            size="1.2rem",
-            weight=500,
+            fz="1.2rem",
+            fw=500,
         ),
         dmc.Space(h=20),
         dmc.Divider(),

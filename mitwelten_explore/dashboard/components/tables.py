@@ -32,7 +32,7 @@ def statsagg_table(summary):
             )
         )
     return [
-        dmc.Text("Statistical Aggregates", weight=500),
+        dmc.Text("Statistical Aggregates", fw=500),
         dmc.Space(h=12),
         dmc.Table(
             [html.Tbody(rows)],
@@ -65,7 +65,7 @@ def taxon_species_detections_table(
                                 dmc.Text("Detections"),
                                 dmc.Code(f"conf ≥ {confidence}"),
                             ],
-                            spacing="md",
+                            gap="md",
                         )
                     ),
                 ]
@@ -88,13 +88,13 @@ def taxon_species_detections_table(
                     html.Td(
                         dmc.Grid(
                             [
-                                dmc.Col(
+                                dmc.GridCol(
                                     dmc.Text(
-                                        f"{counts[i]:,}".replace(",", "'"), weight=500
+                                        f"{counts[i]:,}".replace(",", "'"), fw=500
                                     ),
                                     span=3,
                                 ),
-                                dmc.Col(
+                                dmc.GridCol(
                                     dmc.Progress(
                                         value=count_percents[i],
                                         size="xl",

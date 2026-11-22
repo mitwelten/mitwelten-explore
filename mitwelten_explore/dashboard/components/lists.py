@@ -131,7 +131,7 @@ def generate_selected_data_list(store_data):
                 get_icon(icon=icons.location_marker),
                 dmc.Text(ds.get_location(), size="md"),
             ],
-            spacing=2,
+            gap=2,
         )
         if ds.type in [
             DatasetType.distinct_species,
@@ -151,17 +151,17 @@ def generate_selected_data_list(store_data):
             dmc.Card(
                 dmc.Grid(
                     [
-                        dmc.Col(
+                        dmc.GridCol(
                             dmc.Stack(
                                 [
                                     get_icon(icon=ds.get_icon(), width=32),
-                                    dmc.Text(ds.get_id(), color="dimmed", size="sm"),
+                                    dmc.Text(ds.get_id(), c="dimmed", size="sm"),
                                 ],
-                                spacing=4,
+                                gap=4,
                             ),
                             span=1,
                         ),
-                        dmc.Col(
+                        dmc.GridCol(
                             [
                                 dmc.Stack(
                                     [
@@ -169,7 +169,7 @@ def generate_selected_data_list(store_data):
                                             [
                                                 dmc.Text(
                                                     ds.get_title(),
-                                                    weight=500,
+                                                    fw=500,
                                                     size="lg",
                                                 ),
                                                 dmc.Badge(
@@ -181,12 +181,12 @@ def generate_selected_data_list(store_data):
                                         ),
                                         location_information,
                                     ],
-                                    spacing=4,
+                                    gap=4,
                                 ),
                             ],
                             span=6,
                         ),
-                        dmc.Col(
+                        dmc.GridCol(
                             [
                                 dmc.Group(
                                     dashboard_buttons

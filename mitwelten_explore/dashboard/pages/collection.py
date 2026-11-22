@@ -20,11 +20,11 @@ list_legend = dmc.Card(
     [
         dmc.Grid(
             [
-                dmc.Col(dmc.Text("Type", size="sm", weight=500), span=1),
-                dmc.Col(
-                    dmc.Text("Name  Unit  Location", size="sm", weight=500), span=5
+                dmc.GridCol(dmc.Text("Type", size="sm", fw=500), span=1),
+                dmc.GridCol(
+                    dmc.Text("Name  Unit  Location", size="sm", fw=500), span=5
                 ),
-                dmc.Col(
+                dmc.GridCol(
                     dmc.Group(
                         [
                             dmc.Group(
@@ -36,12 +36,12 @@ list_legend = dmc.Card(
                                     ),
                                     dmc.Text(
                                         "Deployment Dashboard",
-                                        color="grape.6",
+                                        c="grape.6",
                                         size="sm",
-                                        weight=500,
+                                        fw=500,
                                     ),
                                 ],
-                                spacing=3,
+                                gap=3,
                             ),
                             dmc.Group(
                                 [
@@ -52,12 +52,12 @@ list_legend = dmc.Card(
                                     ),
                                     dmc.Text(
                                         "Map Dashboard",
-                                        color="cyan.6",
+                                        c="cyan.6",
                                         size="sm",
-                                        weight=500,
+                                        fw=500,
                                     ),
                                 ],
-                                spacing=3,
+                                gap=3,
                             ),
                             dmc.Group(
                                 [
@@ -68,12 +68,12 @@ list_legend = dmc.Card(
                                     ),
                                     dmc.Text(
                                         "Taxon Dashboard",
-                                        color="teal.6",
+                                        c="teal.6",
                                         size="sm",
-                                        weight=500,
+                                        fw=500,
                                     ),
                                 ],
-                                spacing=3,
+                                gap=3,
                             ),
                             dmc.Group(
                                 [
@@ -84,15 +84,15 @@ list_legend = dmc.Card(
                                     ),
                                     dmc.Text(
                                         "Time Series Dashboard",
-                                        color="indigo.6",
+                                        c="indigo.6",
                                         size="sm",
-                                        weight=500,
+                                        fw=500,
                                     ),
                                 ],
-                                spacing=3,
+                                gap=3,
                             ),
                         ],
-                        position="right",
+                        justify="flex-end",
                     ),
                     span=6,
                 ),
@@ -116,11 +116,11 @@ def layout(**qargs):
         [
             dmc.Group(
                 [
-                    dmc.Text("Collected Datasets", weight=600, size="lg"),
+                    dmc.Text("Collected Datasets", fw=600, size="lg"),
                     dmc.Anchor(
                         get_icon(icons.help, width=18),
                         href=f"{PATH_PREFIX}docs#collection",
-                        variant="text",
+                        c="inherit",
                         target="_blank",
                     ),
                 ],
