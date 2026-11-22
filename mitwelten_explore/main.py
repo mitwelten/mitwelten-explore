@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, Request, HTTPException, status
 from fastapi.responses import RedirectResponse
 from keycloak import KeycloakOpenID
 from fastapi.security import OAuth2AuthorizationCodeBearer
-from fastapi.middleware.wsgi import WSGIMiddleware
+from a2wsgi import WSGIMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 import time
