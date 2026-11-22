@@ -134,10 +134,10 @@ def get_continuous_color(colorscale, intermed):
 
 # empty map
 def generate_empty_map(zoom=DEFAULT_ZOOM, clat=DEFAULT_LAT, clon=DEFAULT_LON):
-    fig = go.Figure(go.Choroplethmapbox())
+    fig = go.Figure(go.Choroplethmap())
     fig.update_layout(
         margin=dict(l=0, r=0, t=0, b=0),
-        mapbox={
+        map={
             "style": "white-bg",
             "zoom": zoom,
             "center": {"lat": clat, "lon": clon},
@@ -177,7 +177,7 @@ def generate_scatter_map_plot(lats, lons, names, ids, selected=None):
             for sel in selected:
                 selected_index = ids.index(sel)
                 fig.add_trace(
-                    go.Scattermapbox(
+                    go.Scattermap(
                         lon=[lons[selected_index]],
                         lat=[lats[selected_index]],
                         text=[names[selected_index]],
@@ -189,7 +189,7 @@ def generate_scatter_map_plot(lats, lons, names, ids, selected=None):
         else:
             selected_index = ids.index(selected)
             fig.add_trace(
-                go.Scattermapbox(
+                go.Scattermap(
                     lon=[lons[selected_index]],
                     lat=[lats[selected_index]],
                     text=[names[selected_index]],
@@ -199,7 +199,7 @@ def generate_scatter_map_plot(lats, lons, names, ids, selected=None):
                 )
             )
     fig.add_trace(
-        go.Scattermapbox(
+        go.Scattermap(
             lon=lons,
             lat=lats,
             text=names,
@@ -213,7 +213,7 @@ def generate_scatter_map_plot(lats, lons, names, ids, selected=None):
         clickmode="event+select",
         plot_bgcolor="rgba(0,0,0,0)",
         hoverlabel_bgcolor="rgba(245, 245, 245,0.8)",
-        mapbox={
+        map={
             "style": "open-street-map",
             "center": {"lon": mean_lon, "lat": mean_lat},
             "zoom": zoom,
@@ -260,7 +260,7 @@ def deployment_location_map(
             min(valid_lats), max(valid_lats), min(valid_lons), max(valid_lons)
         )
     fig.add_trace(
-        go.Scattermapbox(
+        go.Scattermap(
             lon=lons,
             lat=lats,
             text=deployment_ids,
@@ -271,7 +271,7 @@ def deployment_location_map(
         )
     )
     fig.add_trace(
-        go.Scattermapbox(
+        go.Scattermap(
             lon=lons,
             lat=lats,
             text=deployment_ids,
@@ -284,7 +284,7 @@ def deployment_location_map(
     fig.update_layout(
         plot_bgcolor="rgba(0,0,0,0)",
         hoverlabel_bgcolor="rgba(245, 245, 245,0.8)",
-        mapbox={
+        map={
             "style": "open-street-map",
             "center": {"lon": mean_lon, "lat": mean_lat},
             "zoom": zoom,
@@ -323,7 +323,7 @@ def generate_environment_entries_traces(lats, lons, names, clat=None, clon=None)
         color_values.append(colors[-1])
         color_values.append(colors[i])
     traces.append(
-        go.Scattermapbox(
+        go.Scattermap(
             lon=lon_values,
             lat=lat_values,
             text=text_vals,
@@ -334,7 +334,7 @@ def generate_environment_entries_traces(lats, lons, names, clat=None, clon=None)
     )
     if clat is not None and clon is not None:
         traces.append(
-            go.Scattermapbox(
+            go.Scattermap(
                 lon=[clon],
                 lat=[clat],
                 name="center point",
@@ -356,7 +356,7 @@ def generate_multi_scatter_map_plot(data: list):
     for i in range(len(data)):
 
         traces.append(
-            go.Scattermapbox(
+            go.Scattermap(
                 lon=data[i].get("longitude"),
                 lat=data[i].get("latitude"),
                 text=data[i].get("name"),
@@ -381,7 +381,7 @@ def generate_multi_scatter_map_plot(data: list):
     fig.update_layout(
         plot_bgcolor="rgba(0,0,0,0)",
         hoverlabel_bgcolor="rgba(245, 245, 245,0.8)",
-        mapbox={
+        map={
             "style": "white-bg",
             "zoom": zoom,
             "center": {"lat": center_lat, "lon": center_lon},
@@ -392,12 +392,12 @@ def generate_multi_scatter_map_plot(data: list):
     )
     fig.update_traces(
         cluster_enabled=True, cluster_size=10, cluster_opacity=0.8, cluster_maxzoom=20
-    )  # https://plotly.com/python/reference/scattermapbox/#scattermapbox-cluster
+    )  # https://plotly.com/python/reference/scattermap/#scattermap-cluster
     return fig
 
 
 def generate_choroplethmap(h3ids, values):
-    return go.Choroplethmapbox(
+    return go.Choroplethmap(
         geojson=generate_geojson(h3ids),
         z=values,
         text=values,
@@ -410,7 +410,7 @@ def generate_choroplethmap(h3ids, values):
         marker_line_color="rgba(0,0,0,1)",
         hovertemplate="Count: <b>%{z}</b><extra></extra>",
         showscale=True,
-        colorbar=go.choroplethmapbox.ColorBar(
+        colorbar=go.choroplethmap.ColorBar(
             thicknessmode="pixels",
             thickness=15,
             x=0.99,
@@ -427,7 +427,7 @@ def generate_choroplethmap(h3ids, values):
 
 
 def generate_scattermap(lat, lon, ids, color="blue", size=7, opacity=0.7):
-    return go.Scattermapbox(
+    return go.Scattermap(
         lon=lon,
         lat=lat,
         text=ids,
@@ -501,7 +501,7 @@ def generate_h3hexbin_map(
         margin=dict(l=0, r=0, t=0, b=0),
         plot_bgcolor="rgba(0,0,0,0)",
         hoverlabel_bgcolor="rgba(245, 245, 245,0.8)",
-        mapbox={
+        map={
             "style": "white-bg",
             "zoom": zoom,
             "center": {"lat": clat, "lon": clon},
@@ -515,7 +515,7 @@ def generate_h3hexbin_map(
 def generate_choroplethmap_label_overlay(h3ids, legends):
     geojson = generate_geojson(h3ids)
 
-    return go.Choroplethmapbox(
+    return go.Choroplethmap(
         geojson=geojson,
         z=[0 for i in range(len(h3ids))],
         text=legends,
@@ -557,7 +557,7 @@ def generate_choroplethmap_multi(
     marker_opacity = 1 if borderonly else 0.7
     marker_line_width = 4 if borderonly else 0
     m_colorscale = TRANSPARENT_COLORSCALE if borderonly else colorscale
-    return go.Choroplethmapbox(
+    return go.Choroplethmap(
         geojson=geojson,
         z=values,
         text=values,
@@ -790,7 +790,7 @@ def generate_multi_h3hexbin_map(
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
         hoverlabel_bgcolor="rgba(245, 245, 245,0.8)",
-        mapbox={
+        map={
             "style": "white-bg",
             "zoom": zoom,
             "center": {"lat": clat, "lon": clon},
@@ -828,7 +828,7 @@ def generate_bubblemap_trace(
         vals.append(max(v * 1.3, 21 * sizeref))
         vals.append(max(v, 14 * sizeref))
 
-    return go.Scattermapbox(
+    return go.Scattermap(
         lon=lon,
         lat=lat,
         text=ids,
@@ -848,7 +848,7 @@ def generate_bubblemap_trace(
 
 
 def generate_bubblemap_hovertrace(lat, lon, ids, values, name=None, color="gray"):
-    return go.Scattermapbox(
+    return go.Scattermap(
         lon=lon,
         lat=lat,
         text=values,
@@ -952,7 +952,7 @@ def generate_multi_bubble_map(
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
         hoverlabel_bgcolor="rgba(245, 245, 245,0.8)",
-        mapbox={
+        map={
             "style": "white-bg",
             "zoom": zoom,
             "center": {"lat": clat, "lon": clon},
