@@ -618,7 +618,18 @@ def update_annotation_container(search, href):
     cookies = flask.request.cookies
     current_user = get_user_from_cookies(cookies)
     edit_mode = "true" in qargs_dict.get("edit", "false").lower()
-    annot = get_annotation(int(annot_id), cookies.get("auth"))
+    annot = (
+        get_annotation(int(annot_id), cookies.get("auth"))
+        if annot_id.isdigit()
+        else None
+    )
+    if annot is None:  # unknown or deleted annotation
+        return dmc.Alert(
+            dmc.Anchor("Back to all annotations", href=PATH_PREFIX + "annotations"),
+            title="Annotation not found",
+            color="gray",
+            mt=20,
+        )
     return annot_container(
         annot, current_user=current_user, href=href, edit_mode=edit_mode
     )
