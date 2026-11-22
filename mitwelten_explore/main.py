@@ -46,7 +46,6 @@ async def get_current_user(request: Request):
     auth_header = request.headers.get("Authorization")
     if auth_header:
         auth_header = auth_header.split(" ")[1]
-        print(auth_header)
         try:
             # signature and exp are always checked, aud is not
             return keycloak_openid.decode_token(
